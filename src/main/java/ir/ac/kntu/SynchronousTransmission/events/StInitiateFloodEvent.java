@@ -7,9 +7,9 @@ import ir.ac.kntu.SynchronousTransmission.StMessage;
 
 import java.util.logging.Level;
 
-public class StInitiateFlood extends StEvent {
+public class StInitiateFloodEvent extends StEvent {
 
-    public StInitiateFlood(long time) {
+    public StInitiateFloodEvent(long time) {
         super(time);
     }
 
@@ -17,12 +17,14 @@ public class StInitiateFlood extends StEvent {
     public void handle(ReadOnlyContext context) {
         super.handle(context);
 
-        getLogger().log(Level.INFO, "[" + context.getTime() + "] Node-" +
-                context.getRoundInitiator().getId() +
-                " initiated a message.");
 
         final Node node = context.getRoundInitiator();
+
         final StMessage<?> message = context.initiateFlood(context);
+        getLogger().log(Level.INFO, "[" + context.getTime() + "] Node-" +
+                context.getRoundInitiator().getId() +
+                " initiated message [" + message.messageNo() + "]");
+
         context.getSimulator().flood(node, message);
 
     }

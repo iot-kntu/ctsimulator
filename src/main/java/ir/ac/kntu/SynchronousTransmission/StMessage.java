@@ -6,7 +6,12 @@ package ir.ac.kntu.SynchronousTransmission;
  * @param initiator
  * @param content
  */
-public record StMessage<T>(Node initiator, T content) {
+public record StMessage<T>(Node initiator, int messageNo, T content) {
 
+    public static StMessage<Object> NULL_MESSAGE = new StMessage<>(Node.NULL_NODE, 0, null);
+
+    public boolean isNull(){
+        return messageNo == 0 || initiator.equals(Node.NULL_NODE);
+    }
 }
 

@@ -1,51 +1,96 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import org.jgrapht.Graphs;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.DefaultUndirectedGraph;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Supplier;
-
-import static org.jgrapht.util.SupplierUtil.DEFAULT_EDGE_SUPPLIER;
 
 public class NetGraph {
 
-    private final DefaultUndirectedGraph<Node, DefaultEdge> graph;
+    private final List<Node> nodes = new ArrayList<>();
+    private final HashMap<Node, List<Node>> neighborsMap = new HashMap<>();
 
-    public NetGraph() {
-        graph = new DefaultUndirectedGraph<>(
-                new Supplier<>() {
-                    private int idCounter = 0;
+    private NetGraph() {
+    }
 
-                    @Override
-                    public Node get() {
-                        return new Node(idCounter++);
+    public static @NotNull NetGraph loadFrom(String path) throws Exception {
+        NetGraph netGraph = new NetGraph();
+
+        int lineCounter = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lineCounter++;
+
+                final String[] split1 = line.split("\t");
+                if (split1.length < 2)
+                    throw new IllegalStateException("Line " + lineCounter + ": a node must have at least one neighbor");
+
+                final int nodeId = Integer.parseInt(split1[0]);
+                final Node e = new Node(nodeId);
+                netGraph.nodes.add(e);
+                netGraph.neighborsMap.put(e, new ArrayList<>());
+
+                final String[] neighborsStr = split1[1].split(",");
+                for (String s : neighborsStr) {
+                    if (s.isBlank())
+                        continue;
+                    final int neighborId = Integer.parseInt(s);
+                    netGraph.neighborsMap.get(e).add(new Node(neighborId));
+                }
+            }
+        }
+        catch (Exception ex) {
+            throw new Exception("Error parsing graph file at line " + lineCounter, ex);
+        }
+
+        return netGraph;
+    }
+
+    public void saveGraph(String path) throws IOException {
+
+        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(path))) {
+            for (Node node : nodes) {
+
+                fileWriter.write(node.getId());
+                fileWriter.write("\t");
+                final List<Node> neighbors = neighborsMap.get(node);
+
+                neighbors.forEach(node1 -> {
+                    try {
+                        fileWriter.write(node1.getId() + ",");
+                        fileWriter.newLine();
                     }
-                },
-                DEFAULT_EDGE_SUPPLIER, false
-        );
+                    catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        }
     }
 
-    public NetGraph(DefaultUndirectedGraph<Node, DefaultEdge> graph) {
-        this.graph = graph;
+    public boolean isEmpty() {
+        return nodes.isEmpty();
     }
 
-    public int getNodeCount(){
-        return graph.vertexSet().size();
+    public int getNodeCount() {
+        return nodes.size();
     }
 
     public Node getNodeById(int nodeId) {
-        final List<Node> list = graph.vertexSet().stream()
-                                     .filter(node -> node.getId() == nodeId)
-                                     .distinct().toList();
-        if(list.isEmpty())
+
+        final List<Node> list = nodes.stream().filter(node -> node.getId() == nodeId).toList();
+        if (list.isEmpty())
             return Node.NULL_NODE;
 
         return list.get(0);
     }
 
-    public List<Node> getNodeNeighbors(Node node){
-        return Graphs.neighborListOf(graph, node);
+    public List<Node> getNodeNeighbors(Node node) {
+        return neighborsMap.get(node);
     }
+
 }

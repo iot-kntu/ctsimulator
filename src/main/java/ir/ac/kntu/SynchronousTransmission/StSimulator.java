@@ -1,14 +1,13 @@
 package ir.ac.kntu.SynchronousTransmission;
 
 import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
-import ir.ac.kntu.SynchronousTransmission.events.StInitiateFlood;
+import ir.ac.kntu.SynchronousTransmission.events.StInitiateFloodEvent;
 
 import java.util.*;
 import java.util.logging.Logger;
 
 public class StSimulator {
 
-    private static StSimulator instance;
     private final SimulationSettings settings;
     private final PriorityQueue<StEvent> eventQueue = new PriorityQueue<>();
     private final SimulationContext context;
@@ -16,7 +15,7 @@ public class StSimulator {
     /**
      * Which node id's turn
      */
-    private int turnNodeId = 0;
+    private int turnNodeId = 1;
 
     private StSimulator(SimulationSettings settings, NetGraph graph, StApplication application) {
         Objects.requireNonNull(settings);
@@ -30,26 +29,24 @@ public class StSimulator {
     }
 
     public static StSimulator createInstance(SimulationSettings settings, NetGraph graph, StApplication application) {
-        instance = new StSimulator(settings, graph, application);
+        StSimulator instance = new StSimulator(settings, graph, application);
         instance.context.simulator = instance;
         return instance;
     }
 
     public void start() {
 
-        context.addApplication(new RoundDetectorStApplication());
-
         context.round = 1;
         context.slot = 1;
 
         context.roundInitiator = context.netGraph.getNodeById(turnNodeId);
-        StInitiateFlood initiateFloodEvent = new StInitiateFlood(context.time);
+        StInitiateFloodEvent initiateFloodEvent = new StInitiateFloodEvent(context.time);
         addStEvent(initiateFloodEvent);
 
         while (!eventQueue.isEmpty()) {
 
             final StEvent event = eventQueue.poll();
-            context.slot = (int) (event.getTime() - context.time);
+            context.slot = (int) (event.getTime() - context.time) + 1;
             context.time = event.getTime();
 
             event.handle(context);
@@ -65,7 +62,7 @@ public class StSimulator {
             turnNodeId = (turnNodeId + 1) % context.netGraph.getNodeCount();
 
         context.roundInitiator = context.netGraph.getNodeById(turnNodeId);
-        StInitiateFlood initiateFloodEvent = new StInitiateFlood(context.time + 1);
+        StInitiateFloodEvent initiateFloodEvent = new StInitiateFloodEvent(context.time + 1);
         addStEvent(initiateFloodEvent);
     }
 
@@ -75,7 +72,7 @@ public class StSimulator {
         for (int i = 1; i <= settings.floodRepeats(); i++) {
             int finalI = i;
             neighbors.forEach(node -> addStEvent(
-                    new StFloodPacket<>(context.time + finalI, message, sender , node)));
+                    new StFloodPacket<>(context.time + finalI, message, sender, node)));
         }
     }
 
@@ -83,22 +80,4 @@ public class StSimulator {
         eventQueue.add(stEvent);
     }
 
-    private static class RoundDetectorStApplication implements StApplication {
-
-        private final Set<Integer> receivedNodes = new HashSet<>();
-
-        @Override
-        public StMessage<?> onInitiateFlood(ReadOnlyContext context) {
-            receivedNodes.clear();
-            return new StMessage<>(context.getRoundInitiator(), "");
-        }
-
-        @Override
-        public void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context) {
-            receivedNodes.add(packet.getReceiver().getId());
-
-            if(receivedNodes.size() == context.getNetGraph().getNodeCount())
-                context.getSimulator().roundFinished();
-        }
-    }
 }
