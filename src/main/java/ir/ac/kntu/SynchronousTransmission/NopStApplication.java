@@ -10,7 +10,7 @@ public class NopStApplication implements StApplication {
 
     // TODO: 1/23/24 add listener to enable simple logging
     @Override
-    public StMessage<String> initiateFlood(ReadOnlyContext context) {
+    public StMessage<String> onInitiateFlood(ReadOnlyContext context) {
         return new StMessage<>(context.getRoundInitiator(), "");
     }
 

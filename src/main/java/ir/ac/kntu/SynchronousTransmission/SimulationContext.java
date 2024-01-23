@@ -1,26 +1,29 @@
 package ir.ac.kntu.SynchronousTransmission;
 
+import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class SimulationContext implements ReadOnlyContext {
 
     StSimulator simulator;
     NetGraph netGraph;
-    StApplication application;
+    List<StApplication> applications;
     Node roundInitiator;
     long time;
     int round;
     int slot;
 
     public SimulationContext() {
+        applications = new ArrayList<>();
+        roundInitiator = Node.NULL_NODE;
     }
 
     @Override
     public StSimulator getSimulator() {
         return simulator;
-    }
-
-    @Override
-    public StApplication getApplication() {
-        return application;
     }
 
     @Override
@@ -48,5 +51,34 @@ public class SimulationContext implements ReadOnlyContext {
         return roundInitiator;
     }
 
+    @Override
+    public List<StApplication> getApplications() {
+        return Collections.unmodifiableList(applications);
+    }
 
+    void addApplication(StApplication application){
+        applications.add(application);
+    }
+
+    /**
+     * Only the main application which given by user and it is stored in the 0 position of the
+     * applications list gives the final message.
+     * @param context the read only context
+     * @return the generated message by the user-given application
+     */
+    @Override
+    public StMessage<?> initiateFlood(ReadOnlyContext context) {
+        final StMessage<?> stMessage = applications.get(0).onInitiateFlood(context);
+        for (int i = 1; i < applications.size(); i++) {
+            final StApplication app = applications.get(i);
+            app.onInitiateFlood(context);
+        }
+
+        return stMessage;
+    }
+
+    @Override
+    public void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context){
+        applications.forEach(application -> application.onPacketReceive(packet, context));
+    }
 }

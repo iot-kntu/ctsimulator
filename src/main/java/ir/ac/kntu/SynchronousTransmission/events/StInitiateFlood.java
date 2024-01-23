@@ -17,12 +17,12 @@ public class StInitiateFlood extends StEvent {
     public void handle(ReadOnlyContext context) {
         super.handle(context);
 
-        getLogger().log(Level.INFO, "["+context.getTime()+"] Node-" +
+        getLogger().log(Level.INFO, "[" + context.getTime() + "] Node-" +
                 context.getRoundInitiator().getId() +
                 " initiated a message.");
 
         final Node node = context.getRoundInitiator();
-        final StMessage<?> message = context.getApplication().initiateFlood(context);
+        final StMessage<?> message = context.initiateFlood(context);
         context.getSimulator().flood(node, message);
 
     }

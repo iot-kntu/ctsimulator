@@ -1,10 +1,14 @@
 package ir.ac.kntu.SynchronousTransmission;
 
+import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
+
+import java.util.List;
+
 public interface ReadOnlyContext {
 
     StSimulator getSimulator();
 
-    StApplication getApplication();
+    List<StApplication> getApplications();
 
     long getTime();
 
@@ -15,4 +19,8 @@ public interface ReadOnlyContext {
     NetGraph getNetGraph();
 
     Node getRoundInitiator();
+
+    StMessage<?> initiateFlood(ReadOnlyContext context);
+
+    void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context);
 }

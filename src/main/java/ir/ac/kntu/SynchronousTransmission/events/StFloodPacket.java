@@ -47,10 +47,10 @@ public class StFloodPacket<T> extends StEvent {
     public void handle(ReadOnlyContext context) {
         super.handle(context);
 
-        getLogger().log(Level.INFO, String.format("[%d] node-%d received Pkt[%d]",
+        getLogger().log(Level.INFO, String.format("[%d] node-%d received Pkt[%d]\n",
                                                   getTime(), receiver.getId(), getPacketNo()));
 
-        context.getApplication().onPacketReceive(this, context);
+        context.onPacketReceive(this, context);
 
         context.getSimulator().flood(receiver, stMessage);
     }

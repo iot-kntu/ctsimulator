@@ -21,23 +21,19 @@ public class StSimulator {
     private int turnNodeId = 0;
 
     private StSimulator(SimulationSettings settings, NetGraph graph, StApplication application) {
+        Objects.requireNonNull(settings);
+        Objects.requireNonNull(graph);
+        Objects.requireNonNull(application);
+
         this.settings = settings;
         this.context = new SimulationContext();
         this.context.netGraph = graph;
-        this.context.application = application;
+        this.context.addApplication(application);
     }
 
     public static StSimulator createInstance(SimulationSettings settings, NetGraph graph, StApplication application) {
-        Objects.requireNonNull(graph);
-        Objects.requireNonNull(settings);
-
         instance = new StSimulator(settings, graph, application);
         instance.context.simulator = instance;
-        return instance;
-    }
-
-    public static StSimulator getInstance() {
-        Objects.requireNonNull(instance, "StSimulator instance has not been created.");
         return instance;
     }
 
