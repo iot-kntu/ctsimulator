@@ -3,9 +3,7 @@ package ir.ac.kntu.SynchronousTransmission;
 import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
 import ir.ac.kntu.SynchronousTransmission.events.StInitiateFlood;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class StSimulator {
@@ -39,6 +37,8 @@ public class StSimulator {
 
     public void start() {
 
+        context.addApplication(new RoundDetectorStApplication());
+
         context.round = 1;
         context.slot = 1;
 
@@ -57,6 +57,7 @@ public class StSimulator {
     }
 
     public void roundFinished() {
+
         context.round++;
         context.slot = 1;
 
@@ -82,4 +83,22 @@ public class StSimulator {
         eventQueue.add(stEvent);
     }
 
+    private static class RoundDetectorStApplication implements StApplication {
+
+        private final Set<Integer> receivedNodes = new HashSet<>();
+
+        @Override
+        public StMessage<?> onInitiateFlood(ReadOnlyContext context) {
+            receivedNodes.clear();
+            return new StMessage<>(context.getRoundInitiator(), "");
+        }
+
+        @Override
+        public void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context) {
+            receivedNodes.add(packet.getReceiver().getId());
+
+            if(receivedNodes.size() == context.getNetGraph().getNodeCount())
+                context.getSimulator().roundFinished();
+        }
+    }
 }
