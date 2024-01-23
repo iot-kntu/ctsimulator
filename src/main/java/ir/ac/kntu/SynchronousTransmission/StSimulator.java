@@ -1,6 +1,7 @@
 package ir.ac.kntu.SynchronousTransmission;
 
 import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
+import ir.ac.kntu.SynchronousTransmission.events.StInitiateFlood;
 
 import java.util.List;
 import java.util.Objects;
@@ -46,6 +47,8 @@ public class StSimulator {
         context.slot = 1;
 
         context.roundInitiator = context.netGraph.getNodeById(turnNodeId);
+        StInitiateFlood initiateFloodEvent = new StInitiateFlood(context.time);
+        addStEvent(initiateFloodEvent);
 
         while (!eventQueue.isEmpty()) {
 
@@ -54,7 +57,6 @@ public class StSimulator {
             context.time = event.getTime();
 
             event.handle(context);
-
         }
     }
 
@@ -66,14 +68,17 @@ public class StSimulator {
             turnNodeId = (turnNodeId + 1) % context.netGraph.getNodeCount();
 
         context.roundInitiator = context.netGraph.getNodeById(turnNodeId);
+        StInitiateFlood initiateFloodEvent = new StInitiateFlood(context.time + 1);
+        addStEvent(initiateFloodEvent);
     }
 
     public <T> void flood(Node sender, StMessage<T> message) {
         final List<Node> neighbors = context.netGraph.getNodeNeighbors(sender);
+
         for (int i = 1; i <= settings.floodRepeats(); i++) {
             int finalI = i;
             neighbors.forEach(node -> addStEvent(
-                    new StFloodPacket<T>(context.time + finalI, message, sender , node)));
+                    new StFloodPacket<>(context.time + finalI, message, sender , node)));
         }
     }
 
