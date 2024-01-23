@@ -23,7 +23,7 @@ public class Main {
                     0.0   // loss probability
             );
 
-            StSimulator simulator = StSimulator.createInstance(settings, netGraph, new NopStApplication());
+            StSimulator simulator = StSimulator.createInstance(settings, netGraph, new LimitedRoundStApplication(5));
             simulator.start();
         }
         catch (Exception e) {
@@ -31,7 +31,7 @@ public class Main {
         }
     }
 
-    public static void startLogger() throws IOException {
+    static void startLogger() throws IOException {
         InputStream inputStream = ClassLoader.getSystemClassLoader()
                                              .getResourceAsStream("logging.properties");
 

@@ -14,7 +14,7 @@ import java.util.logging.Level;
  */
 public class StFloodPacket<T> extends StEvent {
 
-    private final HashMap<Integer, HashSet<Node>> messageToRcvdNodes = new HashMap<>();
+    private final static HashMap<Integer, HashSet<Node>> messageToRcvdNodes = new HashMap<>();
 
     private final StMessage<T> stMessage;
     private final Node sender;
