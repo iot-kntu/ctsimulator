@@ -77,7 +77,7 @@ public class StSimulator {
 
         for (int i = 1; i <= settings.floodRepeats(); i++) {
             for (Node node : neighbors) {
-                if(random.nextDouble() <= settings.lossProbability())
+                if(random.nextDouble() >= settings.lossProbability())
                     addStEvent(new StFloodPacket<>(context.time + i, message, sender, node));
             }
         }
