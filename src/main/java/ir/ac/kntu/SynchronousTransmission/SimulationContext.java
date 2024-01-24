@@ -66,9 +66,15 @@ public class SimulationContext implements ReadOnlyContext {
      * @param context the read only context
      * @return the generated message by the user-given application
      */
+
     @Override
-    public StMessage<?> initiateFlood(ReadOnlyContext context) {
-        final StMessage<?> stMessage = applications.get(0).onInitiateFlood(context);
+    public void onTimeProgress(ReadOnlyContext context) {
+        applications.forEach(application -> application.onTimeProgress(this));
+    }
+
+    @Override
+    public StMessage<?> onInitiateFlood(ReadOnlyContext context) {
+        final StMessage<?> stMessage = applications.get(0).onInitiateFlood(this);
         for (int i = 1; i < applications.size(); i++) {
             final StApplication app = applications.get(i);
             app.onInitiateFlood(context);
@@ -79,6 +85,6 @@ public class SimulationContext implements ReadOnlyContext {
 
     @Override
     public void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context){
-        applications.forEach(application -> application.onPacketReceive(packet, context));
+        applications.forEach(application -> application.onPacketReceive(packet, this));
     }
 }

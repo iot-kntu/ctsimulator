@@ -1,10 +1,8 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
-
 import java.util.List;
 
-public interface ReadOnlyContext {
+public interface ReadOnlyContext extends StApplication {
 
     StSimulator getSimulator();
 
@@ -20,7 +18,4 @@ public interface ReadOnlyContext {
 
     Node getRoundInitiator();
 
-    StMessage<?> initiateFlood(ReadOnlyContext context);
-
-    void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context);
 }

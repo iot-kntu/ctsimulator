@@ -1,5 +1,7 @@
 package ir.ac.kntu.SynchronousTransmission;
 
+import ir.ac.kntu.SynchronousTransmission.applications.LimitedRoundStApplication;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,9 +33,8 @@ public class Main {
         }
     }
 
-    static void startLogger() throws IOException {
-        InputStream inputStream = ClassLoader.getSystemClassLoader()
-                                             .getResourceAsStream("logging.properties");
+    private static void startLogger() throws IOException {
+        InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("logging.properties");
 
         if (inputStream == null) {
             System.err.println("Cannot find logging config file, is package corrupted??");

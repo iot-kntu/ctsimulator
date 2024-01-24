@@ -3,7 +3,9 @@ package ir.ac.kntu.SynchronousTransmission;
 import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
 import ir.ac.kntu.SynchronousTransmission.events.StInitiateFloodEvent;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.PriorityQueue;
 import java.util.logging.Logger;
 
 public class StSimulator {
@@ -46,7 +48,11 @@ public class StSimulator {
         while (!eventQueue.isEmpty()) {
 
             final StEvent event = eventQueue.poll();
-            context.slot = (int) (event.getTime() - context.time) + 1;
+            final int timeDiff = (int) (event.getTime() - context.time);
+            if (timeDiff > 0) {
+                context.slot = timeDiff + 1;
+                context.onTimeProgress(context);
+            }
             context.time = event.getTime();
 
             event.handle(context);
