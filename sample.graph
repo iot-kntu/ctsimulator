@@ -1,0 +1,6 @@
+# <node_id><TAB><Node Type><TAB><comma separated list of neighbors>
+# <Node_Type>: 0:normal, 1: random 2:silent, 3:initiate faulty, 4:faulty flood, 5:all faulty re-transmits
+1   0	2,3
+2	0   1,4
+3	0   1,4
+4	0   2,4
