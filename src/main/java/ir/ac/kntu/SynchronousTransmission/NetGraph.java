@@ -1,6 +1,7 @@
 package ir.ac.kntu.SynchronousTransmission;
 
 
+import ir.ac.kntu.SynchronousTransmission.applications.NodeFaultMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -26,20 +27,23 @@ public class NetGraph {
                 lineCounter++;
 
                 final String[] split1 = line.split("\t");
-                if (split1.length < 2)
-                    throw new IllegalStateException("Line " + lineCounter + ": a node must have at least one neighbor");
+                if (split1.length < 3)
+                    throw new IllegalStateException("Line " + lineCounter + ": each row must have format of <node_id><TAB><Node Type><TAB><comma separated list of neighbors>");
 
                 final int nodeId = Integer.parseInt(split1[0]);
-                final Node e = new Node(nodeId);
-                netGraph.nodes.add(e);
-                netGraph.neighborsMap.put(e, new ArrayList<>());
+                final Node newNode = new Node(nodeId);
+                netGraph.nodes.add(newNode);
+                netGraph.neighborsMap.put(newNode, new ArrayList<>());
 
-                final String[] neighborsStr = split1[1].split(",");
+                final int modeNo = Integer.parseInt(split1[1]);
+                newNode.setFaultMode(NodeFaultMode.values()[modeNo]);
+
+                final String[] neighborsStr = split1[2].split(",");
                 for (String s : neighborsStr) {
                     if (s.isBlank())
                         continue;
                     final int neighborId = Integer.parseInt(s);
-                    netGraph.neighborsMap.get(e).add(new Node(neighborId));
+                    netGraph.neighborsMap.get(newNode).add(new Node(neighborId));
                 }
             }
         }
@@ -57,8 +61,12 @@ public class NetGraph {
 
                 fileWriter.write(node.getId());
                 fileWriter.write("\t");
-                final List<Node> neighbors = neighborsMap.get(node);
 
+                fileWriter.write(node.getFaultMode().ordinal());
+                fileWriter.write("\t");
+
+
+                final List<Node> neighbors = neighborsMap.get(node);
                 neighbors.forEach(node1 -> {
                     try {
                         fileWriter.write(node1.getId() + ",");
