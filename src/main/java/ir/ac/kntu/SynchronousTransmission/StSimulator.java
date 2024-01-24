@@ -3,9 +3,7 @@ package ir.ac.kntu.SynchronousTransmission;
 import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
 import ir.ac.kntu.SynchronousTransmission.events.StInitiateFloodEvent;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class StSimulator {
@@ -75,10 +73,13 @@ public class StSimulator {
     public <T> void flood(Node sender, StMessage<T> message) {
         final List<Node> neighbors = context.netGraph.getNodeNeighbors(sender);
 
+        Random random = new Random(new Date().getTime());
+
         for (int i = 1; i <= settings.floodRepeats(); i++) {
-            int finalI = i;
-            neighbors.forEach(node -> addStEvent(
-                    new StFloodPacket<>(context.time + finalI, message, sender, node)));
+            for (Node node : neighbors) {
+                if(random.nextDouble() <= settings.lossProbability())
+                    addStEvent(new StFloodPacket<>(context.time + i, message, sender, node));
+            }
         }
     }
 

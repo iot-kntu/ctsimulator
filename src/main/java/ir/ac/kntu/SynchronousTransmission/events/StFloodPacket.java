@@ -8,7 +8,7 @@ import ir.ac.kntu.SynchronousTransmission.StMessage;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.logging.Level;
-
+// TODO: 1/24/24 we may cleanup the messageToRcvdNodes map as previous messages are not useful
 /**
  * An object that represents a data that should be sent between
  */
@@ -46,12 +46,13 @@ public class StFloodPacket<T> extends StEvent {
         getLogger().log(Level.INFO, String.format("[%d] node-%d received Pkt[%d]\n",
                                                   getTime(), receiver.getId(), getStMessage().messageNo()));
 
-        if (!messageToRcvdNodes.containsKey(stMessage.messageNo())) {
+        if (!messageToRcvdNodes.containsKey(stMessage.messageNo()))
             messageToRcvdNodes.put(stMessage.messageNo(), new HashSet<>());
-        }
 
         final HashSet<Node> messageReceivers = messageToRcvdNodes.get(stMessage.messageNo());
+
         // check to see if a node previously has received the packet
+        //  if no, flood it; otherwise stop flooding
         if (!messageReceivers.contains(receiver)) {
             messageReceivers.add(getReceiver());
 

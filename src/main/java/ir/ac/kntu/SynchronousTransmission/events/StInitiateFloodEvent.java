@@ -20,7 +20,7 @@ public class StInitiateFloodEvent extends StEvent {
 
         final Node node = context.getRoundInitiator();
 
-        final StMessage<?> message = context.initiateFlood(context);
+        final StMessage<?> message = context.onInitiateFlood(context);
         getLogger().log(Level.INFO, "[" + context.getTime() + "] Node-" +
                 context.getRoundInitiator().getId() +
                 " initiated message [" + message.messageNo() + "]");
