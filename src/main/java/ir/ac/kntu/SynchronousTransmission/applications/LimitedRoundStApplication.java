@@ -1,27 +1,29 @@
 package ir.ac.kntu.SynchronousTransmission.applications;
 
 import ir.ac.kntu.SynchronousTransmission.ReadOnlyContext;
-import ir.ac.kntu.SynchronousTransmission.StApplication;
-import ir.ac.kntu.SynchronousTransmission.StMessage;
 
 import java.util.Objects;
 
-public class LimitedRoundStApplication implements StApplication {
+public class LimitedRoundStApplication extends BaseApplication {
 
-    private int roundsLimit = 10;
+    private final int roundsLimit;
 
     public LimitedRoundStApplication(int roundsLimit) {
         this.roundsLimit = roundsLimit;
     }
 
+    public int getRoundsLimit() {
+        return roundsLimit;
+    }
+
     @Override
-    public StMessage<?> onInitiateFlood(ReadOnlyContext context) {
+    public void onInitiateFlood(ReadOnlyContext context) {
         Objects.requireNonNull(context);
 
-        if(context.getRound() < this.roundsLimit)
-            return new StMessage<>(context.getRoundInitiator(), new Object());
-        else
-            return StMessage.NULL_MESSAGE;
+        if (context.getRound() < this.roundsLimit)
+            next().onInitiateFlood(context);
+
+        // else do nothing, and return
     }
 
 }

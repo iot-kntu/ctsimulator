@@ -1,6 +1,5 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-
 import ir.ac.kntu.SynchronousTransmission.applications.NodeFaultMode;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,13 +21,19 @@ public class NetGraph {
 
         int lineCounter = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+
             String line;
             while ((line = reader.readLine()) != null) {
                 lineCounter++;
 
-                final String[] split1 = line.split("\t");
+                if (line.startsWith("#"))
+                    continue;
+
+                final String[] split1 = line.split(";");
                 if (split1.length < 3)
-                    throw new IllegalStateException("Line " + lineCounter + ": each row must have format of <node_id><TAB><Node Type><TAB><comma separated list of neighbors>");
+                    throw new IllegalStateException(
+                            "Line " + lineCounter + ": each row must have format of <node_id>;<Node " +
+                                    "Type>;<comma separated list of neighbors>");
 
                 final int nodeId = Integer.parseInt(split1[0]);
                 final Node newNode = new Node(nodeId);
@@ -60,11 +65,10 @@ public class NetGraph {
             for (Node node : nodes) {
 
                 fileWriter.write(node.getId());
-                fileWriter.write("\t");
+                fileWriter.write(";");
 
                 fileWriter.write(node.getFaultMode().ordinal());
-                fileWriter.write("\t");
-
+                fileWriter.write(";");
 
                 final List<Node> neighbors = neighborsMap.get(node);
                 neighbors.forEach(node1 -> {

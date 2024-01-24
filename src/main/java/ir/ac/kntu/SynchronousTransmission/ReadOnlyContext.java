@@ -1,12 +1,10 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import java.util.List;
-
-public interface ReadOnlyContext extends StApplication {
+public interface ReadOnlyContext {
 
     StSimulator getSimulator();
 
-    List<StApplication> getApplications();
+    StApplication getApplication();
 
     long getTime();
 

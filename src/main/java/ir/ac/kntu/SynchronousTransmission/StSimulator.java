@@ -1,9 +1,10 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
 import ir.ac.kntu.SynchronousTransmission.events.StInitiateFloodEvent;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class StSimulator {
@@ -25,7 +26,7 @@ public class StSimulator {
         this.settings = settings;
         this.context = new SimulationContext();
         this.context.netGraph = graph;
-        this.context.addApplication(application);
+        this.context.rootApplication = application;
     }
 
     public static StSimulator createInstance(SimulationSettings settings, NetGraph graph, StApplication application) {
@@ -41,19 +42,24 @@ public class StSimulator {
 
         context.roundInitiator = context.netGraph.getNodeById(turnNodeId);
         StInitiateFloodEvent initiateFloodEvent = new StInitiateFloodEvent(context.time);
-        addStEvent(initiateFloodEvent);
+        scheduleEvent(initiateFloodEvent);
 
         while (!eventQueue.isEmpty()) {
 
-            final StEvent event = eventQueue.poll();
-            final int timeDiff = (int) (event.getTime() - context.time);
-            if (timeDiff > 0) {
-                context.slot = timeDiff + 1;
-                context.onTimeProgress(context);
-            }
-            context.time = event.getTime();
+            try {
+                final StEvent event = eventQueue.poll();
+                final int timeDiff = (int) (event.getTime() - context.time);
+                if (timeDiff > 0) {
+                    context.slot = timeDiff + 1;
+                    context.getApplication().onTimeProgress(context);
+                }
+                context.time = event.getTime();
 
-            event.handle(context);
+                event.handle(context);
+            }
+            catch (Exception e) {
+                logger.log(Level.SEVERE, "Error in simulation start method", e);
+            }
         }
     }
 
@@ -67,23 +73,14 @@ public class StSimulator {
 
         context.roundInitiator = context.netGraph.getNodeById(turnNodeId);
         StInitiateFloodEvent initiateFloodEvent = new StInitiateFloodEvent(context.time + 1);
-        addStEvent(initiateFloodEvent);
+        scheduleEvent(initiateFloodEvent);
     }
 
-    public <T> void flood(Node sender, StMessage<T> message) {
-        final List<Node> neighbors = context.netGraph.getNodeNeighbors(sender);
-
-        Random random = new Random(new Date().getTime());
-
-        for (int i = 1; i <= settings.floodRepeats(); i++) {
-            for (Node node : neighbors) {
-                if(random.nextDouble() >= settings.lossProbability())
-                    addStEvent(new StFloodPacket<>(context.time + i, message, sender, node));
-            }
-        }
+    public SimulationSettings getSettings() {
+        return settings;
     }
 
-    private void addStEvent(StEvent stEvent) {
+    public void scheduleEvent(StEvent stEvent) {
         eventQueue.add(stEvent);
     }
 

@@ -25,7 +25,18 @@ public class Main {
                     0.0   // loss probability
             );
 
-            StSimulator simulator = StSimulator.createInstance(settings, netGraph, new LimitedRoundStApplication(5));
+            LimitedRoundStApplication application1 = new LimitedRoundStApplication(10);
+
+            StApplication primaryApplication = new BlueFloodBaseApplication(){
+                @Override
+                public StMessage<String> buildMessage(ReadOnlyContext context) {
+                    String msg = "MSG-" + context.getRoundInitiator().getId();
+                    return new StMessage<>(context.getRoundInitiator(), msg);
+                }
+            };
+            application1.addNextApplication(primaryApplication);
+
+            StSimulator simulator = StSimulator.createInstance(settings, netGraph, application1);
             simulator.start();
         }
         catch (Exception e) {

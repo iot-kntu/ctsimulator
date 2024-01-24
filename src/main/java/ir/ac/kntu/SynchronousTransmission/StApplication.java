@@ -10,17 +10,28 @@ import java.util.Objects;
  */
 public interface StApplication {
 
-    default void onTimeProgress(ReadOnlyContext context) {
+    default StApplication next() {
+        return new NullApplication();
     }
 
-    default StMessage<?> onInitiateFlood(ReadOnlyContext context) {
+    void addNextApplication(StApplication application);
 
+    default void onTimeProgress(ReadOnlyContext context) {
         Objects.requireNonNull(context);
-        return new StMessage<>(context.getRoundInitiator(), "");
+        next().onTimeProgress(context);
+    }
+
+    default void onInitiateFlood(ReadOnlyContext context) {
+        Objects.requireNonNull(context);
+
+        next().onInitiateFlood(context);
     }
 
     default void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context) {
+        Objects.requireNonNull(packet);
+        Objects.requireNonNull(context);
 
+        next().onPacketReceive(packet, context);
     }
 
 }
