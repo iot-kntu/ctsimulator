@@ -4,7 +4,7 @@ import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
 
 /**
  * This class is default null implementation of the {@link StApplication} interface
- * and does nothing. It can be used as a terminator of application chain.
+ * and does nothing. It can be used as a terminator of an application chain.
  */
 public class NullApplication implements StApplication {
 

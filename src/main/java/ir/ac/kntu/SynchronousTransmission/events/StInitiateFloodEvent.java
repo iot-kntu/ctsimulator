@@ -3,6 +3,8 @@ package ir.ac.kntu.SynchronousTransmission.events;
 import ir.ac.kntu.SynchronousTransmission.ReadOnlyContext;
 import ir.ac.kntu.SynchronousTransmission.StEvent;
 
+import java.util.StringJoiner;
+
 public class StInitiateFloodEvent extends StEvent {
 
     public StInitiateFloodEvent(long time) {
@@ -14,5 +16,12 @@ public class StInitiateFloodEvent extends StEvent {
         super.handle(context);
 
         context.getApplication().onInitiateFlood(context);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", StInitiateFloodEvent.class.getSimpleName() + "[", "]")
+                .add("t="+getTime())
+                .toString();
     }
 }

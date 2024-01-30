@@ -48,6 +48,7 @@ public class StSimulator {
 
             try {
                 final StEvent event = eventQueue.poll();
+                logger.log(Level.FINE, "Event popped:" + event);
                 final int timeDiff = (int) (event.getTime() - context.time);
                 if (timeDiff > 0) {
                     context.slot = timeDiff + 1;
@@ -82,6 +83,7 @@ public class StSimulator {
 
     public void scheduleEvent(StEvent stEvent) {
         eventQueue.add(stEvent);
+        logger.log(Level.FINE, "Event scheduled:" + stEvent);
     }
 
 }

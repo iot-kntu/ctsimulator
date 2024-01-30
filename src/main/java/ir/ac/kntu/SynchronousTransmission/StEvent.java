@@ -1,6 +1,7 @@
 package ir.ac.kntu.SynchronousTransmission;
 
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.logging.Logger;
 
 public class StEvent implements Comparable<StEvent> {
@@ -35,5 +36,11 @@ public class StEvent implements Comparable<StEvent> {
         return (int) (this.time - o.time);
     }
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", StEvent.class.getSimpleName() + "[", "]")
+                .add("t=" + time)
+                .toString();
+    }
 }
 

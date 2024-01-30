@@ -22,6 +22,7 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
 
     @Override
     public void onInitiateFlood(ReadOnlyContext context) {
+        Objects.requireNonNull(context);
 
         final Node node = context.getRoundInitiator();
 
@@ -30,10 +31,14 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
                 context.getRoundInitiator().getId() + " initiated message [" + message.messageNo() + "]");
 
         floodMessage(context, node, message);
+
+        next().onInitiateFlood(context);
     }
 
     @Override
     public void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context) {
+        Objects.requireNonNull(packet);
+        Objects.requireNonNull(context);
 
         if (!messageToRcvdNodes.containsKey(packet.getStMessage().messageNo()))
             messageToRcvdNodes.put(packet.getStMessage().messageNo(), new HashSet<>());
@@ -49,7 +54,7 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
                 context.getSimulator().roundFinished();
             }
             else {
-                floodPacket(context, packet);
+                floodMessage(context, packet.getReceiver(), packet.getStMessage());
             }
         }
 
@@ -61,11 +66,18 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         final List<Node> neighbors = context.getNetGraph().getNodeNeighbors(sender);
 
         for (Node node : neighbors) {
-            final StFloodPacket<T> stEvent = new StFloodPacket<>(context.getTime() + 1, message, sender, node);
+            final StFloodPacket<T> stEvent = new StFloodPacket<>(context.getTime() + 1,
+                                                                 message, sender, node);
             floodPacket(context, stEvent);
         }
     }
 
+    /**
+     * Floods the given packet for {@link SimulationSettings#floodRepeats()} times, and
+     * also considers {@link SimulationSettings#lossProbability()}
+     * @param context simulation context
+     * @param packet packet for flooding
+     */
     private void floodPacket(ReadOnlyContext context, StFloodPacket<?> packet) {
 
         final SimulationSettings settings = context.getSimulator().getSettings();

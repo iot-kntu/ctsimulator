@@ -5,6 +5,7 @@ import ir.ac.kntu.SynchronousTransmission.ReadOnlyContext;
 import ir.ac.kntu.SynchronousTransmission.StEvent;
 import ir.ac.kntu.SynchronousTransmission.StMessage;
 
+import java.util.StringJoiner;
 import java.util.logging.Level;
 
 // TODO: 1/24/24 we may cleanup the messageToRcvdNodes map as previous messages are not useful
@@ -57,4 +58,12 @@ public class StFloodPacket<T> extends StEvent {
         return new StFloodPacket<>(getTime() + delay, getStMessage(), getSender(), getReceiver());
     }
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", StFloodPacket.class.getSimpleName() + "[", "]")
+                .add(getTime() + ":")
+                .add(sender + " -> " + receiver)
+                .add("msg=" + stMessage)
+                .toString();
+    }
 }

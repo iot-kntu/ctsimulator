@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -102,7 +103,7 @@ public class NetGraph {
     }
 
     public List<Node> getNodeNeighbors(Node node) {
-        return neighborsMap.get(node);
+        return (node.getId() < 0) ? Collections.emptyList() : neighborsMap.get(node);
     }
 
 }

@@ -1,7 +1,9 @@
 package ir.ac.kntu.SynchronousTransmission.applications;
 
 import ir.ac.kntu.SynchronousTransmission.NullApplication;
+import ir.ac.kntu.SynchronousTransmission.ReadOnlyContext;
 import ir.ac.kntu.SynchronousTransmission.StApplication;
+import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
 
 import java.util.Objects;
 
@@ -11,10 +13,10 @@ import java.util.Objects;
  */
 public abstract class BaseApplication implements StApplication {
 
-    protected StApplication next = new NullApplication();
+    protected StApplication next = null;
 
     public StApplication next() {
-        return next;
+        return (next == null) ? new NullApplication() : next;
     }
 
     @Override
@@ -22,6 +24,24 @@ public abstract class BaseApplication implements StApplication {
         Objects.requireNonNull(application);
 
         next = application;
+    }
+
+    public void onTimeProgress(ReadOnlyContext context) {
+        Objects.requireNonNull(context);
+        next().onTimeProgress(context);
+    }
+
+    public void onInitiateFlood(ReadOnlyContext context) {
+        Objects.requireNonNull(context);
+
+        next().onInitiateFlood(context);
+    }
+
+    public void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context) {
+        Objects.requireNonNull(packet);
+        Objects.requireNonNull(context);
+
+        next().onPacketReceive(packet, context);
     }
 }
 
