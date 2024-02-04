@@ -25,19 +25,24 @@ public class Main {
                     0.0   // loss probability
             );
 
-            LimitedRoundStApplication application1 = new LimitedRoundStApplication(10);
 
-            StApplication primaryApplication = new BlueFloodBaseApplication(){
+
+            BlueFloodBaseApplication application2 = new BlueFloodBaseApplication(){
+                static int counter = 1;
                 @Override
                 public StMessage<String> buildMessage(ReadOnlyContext context) {
-                    String msg = "MSG-" + context.getRoundInitiator().getId();
+                    String msg = "MSG-" + context.getRoundInitiator().getId() + "-" + counter++;
                     return new StMessage<>(context.getRoundInitiator(), msg);
                 }
             };
-            application1.addNextApplication(primaryApplication);
 
-            StSimulator simulator = StSimulator.createInstance(settings, netGraph, application1);
+            LimitedRoundStApplication rootApplication = new LimitedRoundStApplication(10);
+            rootApplication.addNextApplication(application2);
+
+            StSimulator simulator = StSimulator.createInstance(settings, netGraph, rootApplication);
             simulator.start();
+
+            System.out.println(application2.printTimeline());
         }
         catch (Exception e) {
             System.err.println("High level error occurred: " + e);

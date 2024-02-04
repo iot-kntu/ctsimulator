@@ -12,11 +12,11 @@ public class StSimulator {
     private final SimulationSettings settings;
     private final PriorityQueue<StEvent> eventQueue = new PriorityQueue<>();
     private final SimulationContext context;
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     /**
      * Which node id's turn
      */
-    private int turnNodeId = 1;
+    private int turnNodeIndex = 0;
 
     private StSimulator(SimulationSettings settings, NetGraph graph, StApplication application) {
         Objects.requireNonNull(settings);
@@ -40,18 +40,20 @@ public class StSimulator {
         context.round = 1;
         context.slot = 1;
 
-        context.roundInitiator = context.netGraph.getNodeById(turnNodeId);
+        context.roundInitiator = context.netGraph.getNodes().get(turnNodeIndex);
         StInitiateFloodEvent initiateFloodEvent = new StInitiateFloodEvent(context.time);
         scheduleEvent(initiateFloodEvent);
+        context.getApplication().onTimeProgress(context);
 
         while (!eventQueue.isEmpty()) {
 
             try {
                 final StEvent event = eventQueue.poll();
                 logger.log(Level.FINE, "Event popped:" + event);
+
                 final int timeDiff = (int) (event.getTime() - context.time);
                 if (timeDiff > 0) {
-                    context.slot = timeDiff + 1;
+                    context.slot += timeDiff;
                     context.getApplication().onTimeProgress(context);
                 }
                 context.time = event.getTime();
@@ -66,15 +68,18 @@ public class StSimulator {
 
     public void roundFinished() {
 
+        logger.log(Level.INFO, "======== round " + context.round + " completed ===========");
         context.round++;
         context.slot = 1;
 
-        if (settings.stInitiatorStrategy() == StInitiatorStrategy.RoundRobin)
-            turnNodeId = (turnNodeId + 1) % context.netGraph.getNodeCount();
+        if (settings.stInitiatorStrategy() == StInitiatorStrategy.RoundRobin) {
+            turnNodeIndex = (turnNodeIndex + 1) % context.netGraph.getNodeCount();
+        }
 
-        context.roundInitiator = context.netGraph.getNodeById(turnNodeId);
+        context.roundInitiator = context.netGraph.getNodes().get(turnNodeIndex);
         StInitiateFloodEvent initiateFloodEvent = new StInitiateFloodEvent(context.time + 1);
         scheduleEvent(initiateFloodEvent);
+        context.getApplication().onTimeProgress(context);
     }
 
     public SimulationSettings getSettings() {

@@ -3,6 +3,7 @@ package ir.ac.kntu.SynchronousTransmission.applications;
 import ir.ac.kntu.SynchronousTransmission.ReadOnlyContext;
 
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class LimitedRoundStApplication extends BaseApplication {
 
@@ -22,6 +23,8 @@ public class LimitedRoundStApplication extends BaseApplication {
 
         if (context.getRound() < this.roundsLimit)
             next().onInitiateFlood(context);
+        else
+            logger.log(Level.INFO, "Rounds limit reached: " + context.getRound());
 
         // else do nothing, and return
     }

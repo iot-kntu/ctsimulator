@@ -5,19 +5,25 @@ import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
 
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public abstract class BlueFloodBaseApplication extends BaseApplication {
 
     private final static HashMap<Integer, HashSet<Node>> messageToRcvdNodes = new HashMap<>();
-    private final Logger logger = Logger.getLogger("BlueFloodBaseApplication");
     private final Random random = new Random(new Date().getTime());
+    private Tracer tracer;
 
     public abstract StMessage<?> buildMessage(ReadOnlyContext context);
 
     @Override
     public void onTimeProgress(ReadOnlyContext context) {
-        super.onTimeProgress(context);
+        Objects.requireNonNull(context);
+
+        if (tracer == null)
+            tracer = new Tracer(context.getNetGraph().getNodes());
+
+        tracer.timeForward(context.getRound(), context.getSlot());
+
+        next().onTimeProgress(context);
     }
 
     @Override
@@ -25,6 +31,8 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         Objects.requireNonNull(context);
 
         final Node node = context.getRoundInitiator();
+
+        tracer.setState(context.getRound(), context.getSlot(), node, NodeState.Flood);
 
         final StMessage<?> message = buildMessage(context);
         logger.log(Level.INFO, "[" + context.getTime() + "] Node-" +
@@ -40,6 +48,10 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         Objects.requireNonNull(packet);
         Objects.requireNonNull(context);
 
+        final Node receiver = packet.getReceiver();
+
+        tracer.setState(context.getRound(), context.getSlot(), receiver, NodeState.Listen);
+
         if (!messageToRcvdNodes.containsKey(packet.getStMessage().messageNo()))
             messageToRcvdNodes.put(packet.getStMessage().messageNo(), new HashSet<>());
 
@@ -47,18 +59,20 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
 
         // check to see if a node previously has received the packet
         //  if no, flood it; otherwise stop flooding
-        if (!messageReceivers.contains(packet.getReceiver())) {
-            messageReceivers.add(packet.getReceiver());
+        if (!messageReceivers.contains(receiver)) {
+            messageReceivers.add(receiver);
 
-            if (messageReceivers.size() == context.getNetGraph().getNodeCount()) {
+            if (messageReceivers.size() == context.getNetGraph().getNodeCount())
                 context.getSimulator().roundFinished();
-            }
-            else {
-                floodMessage(context, packet.getReceiver(), packet.getStMessage());
-            }
+            else
+                floodMessage(context, receiver, packet.getStMessage());
         }
 
         super.onPacketReceive(packet, context);
+    }
+
+    public String printTimeline() {
+        return tracer.printTimeline();
     }
 
     protected <T> void floodMessage(ReadOnlyContext context, Node sender, StMessage<T> message) {
@@ -75,8 +89,9 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
     /**
      * Floods the given packet for {@link SimulationSettings#floodRepeats()} times, and
      * also considers {@link SimulationSettings#lossProbability()}
+     *
      * @param context simulation context
-     * @param packet packet for flooding
+     * @param packet  packet for flooding
      */
     private void floodPacket(ReadOnlyContext context, StFloodPacket<?> packet) {
 
@@ -90,4 +105,32 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
             }
         }
     }
+
+    private NodeState getNodeState(Node node, int nodesCount) {
+        //fixme: implement
+        return NodeState.Sleep;
+    }
+
+    private void compute(long time, NetGraph netGraph, int floodRepeatCount) {
+
+        final int graphDiameter = netGraph.getDiameter();
+        final int graphNodeCount = netGraph.getNodeCount();
+
+        int totalSlotsOfRound = graphDiameter + floodRepeatCount;
+
+        int round = (int) (1.0 * time / totalSlotsOfRound);
+        int slot = (int) (time % totalSlotsOfRound);
+
+        int initiatorId = round % graphNodeCount;
+        boolean isInitiateSlot = slot == 0;
+
+        Map<Node, NodeState> nodesStateMap = new HashMap<>();
+        for (Node node : netGraph.getNodes()) {
+            if(node.getId() == initiatorId)
+                nodesStateMap.put(node, NodeState.Flood);
+        }
+
+        //Note that nodeId start from 1
+    }
+
 }

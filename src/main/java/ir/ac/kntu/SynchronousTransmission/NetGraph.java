@@ -106,4 +106,11 @@ public class NetGraph {
         return (node.getId() < 0) ? Collections.emptyList() : neighborsMap.get(node);
     }
 
+    public List<Node> getNodes() {
+        return Collections.unmodifiableList(nodes);
+    }
+    public int getDiameter(){
+        //fixme put algoruthm here
+        return 2;
+    }
 }

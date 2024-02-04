@@ -6,6 +6,7 @@ import ir.ac.kntu.SynchronousTransmission.StApplication;
 import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
 
 import java.util.Objects;
+import java.util.logging.Logger;
 
 /**
  * This class is the default implementation of {@link StApplication} interface
@@ -14,6 +15,7 @@ import java.util.Objects;
 public abstract class BaseApplication implements StApplication {
 
     protected StApplication next = null;
+    protected Logger logger = Logger.getLogger("applications");
 
     public StApplication next() {
         return (next == null) ? new NullApplication() : next;
