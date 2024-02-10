@@ -1,4 +1,4 @@
-package ir.ac.kntu.SynchronousTransmission.applications;
+package ir.ac.kntu.SynchronousTransmission.blueflood;
 
 public enum NodeFaultMode {
 

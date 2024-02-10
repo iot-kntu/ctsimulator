@@ -1,17 +1,16 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-public class SimulationContext implements ReadOnlyContext {
+public class SimulationContext implements ContextView {
 
     StSimulator simulator;
     NetGraph netGraph;
     StApplication rootApplication;
-    Node roundInitiator;
     long time;
-    int round;
-    int slot;
+    //int round;
+    //int slot;
 
     public SimulationContext() {
-        roundInitiator = Node.NULL_NODE;
+
     }
 
     @Override
@@ -29,24 +28,19 @@ public class SimulationContext implements ReadOnlyContext {
         return time;
     }
 
-    @Override
-    public int getRound() {
-        return round;
-    }
-
-    @Override
-    public int getSlot() {
-        return slot;
-    }
+    //@Override
+    //public int getRound() {
+    //    return round;
+    //}
+    //
+    //@Override
+    //public int getSlot() {
+    //    return slot;
+    //}
 
     @Override
     public NetGraph getNetGraph() {
         return netGraph;
-    }
-
-    @Override
-    public Node getRoundInitiator() {
-        return roundInitiator;
     }
 
 }

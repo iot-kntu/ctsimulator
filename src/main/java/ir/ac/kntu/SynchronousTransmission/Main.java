@@ -1,6 +1,8 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.applications.LimitedRoundStApplication;
+import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodBaseApplication;
+import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodDefaultTransmissionPolicy;
+import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,30 +21,27 @@ public class Main {
             if (netGraph.isEmpty())
                 throw new IllegalArgumentException("Invalid graph file format, it is not loaded");
 
-            SimulationSettings settings = new SimulationSettings(
-                    1,    //flood repeat
-                    StInitiatorStrategy.RoundRobin, //initiator strategy
-                    0.0   // loss probability
+            BlueFloodSettings settings = new BlueFloodSettings(
+                    0.0,    // loss probability
+                    10,      // rounds limit
+                    new RoundRobin(netGraph.getNodeCount()), //initiator strategy
+                    new BlueFloodDefaultTransmissionPolicy(1, netGraph.getDiameter(), netGraph.getNodeCount())
             );
 
 
-
-            BlueFloodBaseApplication application2 = new BlueFloodBaseApplication(){
+            BlueFloodBaseApplication blueFloodApplication = new BlueFloodBaseApplication(settings){
                 static int counter = 1;
                 @Override
-                public StMessage<String> buildMessage(ReadOnlyContext context) {
-                    String msg = "MSG-" + context.getRoundInitiator().getId() + "-" + counter++;
-                    return new StMessage<>(context.getRoundInitiator(), msg);
+                public StMessage<String> buildMessage(ContextView context) {
+                    String msg = "MSG-" + settings.initiatorStrategy().getCurrentInitiatorId() + "-" + counter++;
+                    return new StMessage<>(netGraph.getNodeById(settings.initiatorStrategy().getCurrentInitiatorId()), msg);
                 }
             };
 
-            LimitedRoundStApplication rootApplication = new LimitedRoundStApplication(10);
-            rootApplication.addNextApplication(application2);
-
-            StSimulator simulator = StSimulator.createInstance(settings, netGraph, rootApplication);
+            StSimulator simulator = StSimulator.createInstance(netGraph, blueFloodApplication);
             simulator.start();
 
-            System.out.println(application2.printTimeline());
+            System.out.println(blueFloodApplication.printTimeline());
         }
         catch (Exception e) {
             System.err.println("High level error occurred: " + e);

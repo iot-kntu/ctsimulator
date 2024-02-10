@@ -14,17 +14,27 @@ public class NullApplication implements StApplication {
     }
 
     @Override
-    public void onTimeProgress(ReadOnlyContext context) {
+    public void simulationStarting(ContextView context) {
 
     }
 
     @Override
-    public void onInitiateFlood(ReadOnlyContext context) {
+    public void simulationFinishing(ContextView context) {
 
     }
 
     @Override
-    public void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context) {
+    public void simulationTimeProgressed(ContextView context) {
+
+    }
+
+    @Override
+    public void initiateFlood(ContextView context) {
+
+    }
+
+    @Override
+    public void packetReceived(StFloodPacket<?> packet, ContextView context) {
 
     }
 }

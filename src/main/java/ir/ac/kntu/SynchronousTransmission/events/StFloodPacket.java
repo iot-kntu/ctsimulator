@@ -1,14 +1,11 @@
 package ir.ac.kntu.SynchronousTransmission.events;
 
+import ir.ac.kntu.SynchronousTransmission.ContextView;
 import ir.ac.kntu.SynchronousTransmission.Node;
-import ir.ac.kntu.SynchronousTransmission.ReadOnlyContext;
 import ir.ac.kntu.SynchronousTransmission.StEvent;
 import ir.ac.kntu.SynchronousTransmission.StMessage;
 
 import java.util.StringJoiner;
-import java.util.logging.Level;
-
-// TODO: 1/24/24 we may cleanup the messageToRcvdNodes map as previous messages are not useful
 
 /**
  * An object that represents a data that should be sent between
@@ -39,14 +36,10 @@ public class StFloodPacket<T> extends StEvent {
     }
 
     @Override
-    public void handle(ReadOnlyContext context) {
+    public void handle(ContextView context) {
         super.handle(context);
 
-        getLogger().log(Level.INFO, String.format("[t:%d-r:%d-s:%d] node-%d received Pkt[%d]",
-                                                  getTime(), context.getRound(), context.getSlot(),
-                                                  receiver.getId(), getStMessage().messageNo()));
-
-        context.getApplication().onPacketReceive(this, context);
+        context.getApplication().packetReceived(this, context);
     }
 
     public StEvent scheduleFor(int delay) {
@@ -67,3 +60,4 @@ public class StFloodPacket<T> extends StEvent {
                 .toString();
     }
 }
+

@@ -1,6 +1,6 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-public interface ReadOnlyContext {
+public interface ContextView {
 
     StSimulator getSimulator();
 
@@ -8,12 +8,11 @@ public interface ReadOnlyContext {
 
     long getTime();
 
-    int getRound();
-
-    int getSlot();
-
     NetGraph getNetGraph();
 
-    Node getRoundInitiator();
+    //int getRound();
+    //
+    //int getSlot();
+
 
 }

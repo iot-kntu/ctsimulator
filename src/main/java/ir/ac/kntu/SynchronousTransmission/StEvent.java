@@ -7,14 +7,25 @@ import java.util.logging.Logger;
 public class StEvent implements Comparable<StEvent> {
 
     private final long time;
+    private final StEventPriority priority;
     private final Logger logger = Logger.getLogger("StEvent");
 
     public StEvent(long time) {
         this.time = time;
+        this.priority = StEventPriority.Normal;
+    }
+
+    public StEvent(long time, StEventPriority priority) {
+        this.time = time;
+        this.priority = priority;
     }
 
     public long getTime() {
         return time;
+    }
+
+    public StEventPriority getPriority() {
+        return priority;
     }
 
     public Logger getLogger() {
@@ -27,13 +38,16 @@ public class StEvent implements Comparable<StEvent> {
      *
      * @param context gives the read only state of simulation instance
      */
-    public void handle(ReadOnlyContext context) {
+    public void handle(ContextView context) {
         Objects.requireNonNull(context);
     }
 
     @Override
     public int compareTo(StEvent o) {
-        return (int) (this.time - o.time);
+        if (this.time == o.time)
+            return this.priority.compareTo(o.priority);
+        else
+            return (int) (this.time - o.time);
     }
 
     @Override

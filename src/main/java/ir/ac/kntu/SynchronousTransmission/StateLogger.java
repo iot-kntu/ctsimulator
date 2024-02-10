@@ -2,16 +2,22 @@ package ir.ac.kntu.SynchronousTransmission;
 
 import java.util.*;
 
-public class Tracer {
+/**
+ * This class intended for logging the state of the simulation and printing
+ */
+public class StateLogger {
 
     private final SortedMap<SimPace, Map<Integer, NodeState>> nodeStates = new TreeMap<>();
     private final List<Node> nodes;
 
-    public Tracer(List<Node> nodes) {
+    public StateLogger(List<Node> nodes) {
         this.nodes = nodes;
     }
 
-    public void timeForward(int round, int slot) {
+    public void timeForward(StNetworkTime networkTime) {
+
+        final int round = networkTime.round();
+        final int slot = networkTime.slot();
 
         Map<Integer, NodeState> nodeStateMap = new HashMap<>();
 
@@ -22,7 +28,11 @@ public class Tracer {
         nodeStates.put(pace, nodeStateMap);
     }
 
-    public void setState(int round, int slot, Node node, NodeState nodeState) {
+    public void setState(StNetworkTime networkTime, Node node, NodeState nodeState) {
+
+        final int round = networkTime.round();
+        final int slot = networkTime.slot();
+
         SimPace simPace = new SimPace(round, slot);
         final Map<Integer, NodeState> stateMap = nodeStates.get(simPace);
 
@@ -73,5 +83,4 @@ public class Tracer {
                     : this.round() - o.round();
         }
     }
-
 }

@@ -1,21 +1,28 @@
 package ir.ac.kntu.SynchronousTransmission.events;
 
-import ir.ac.kntu.SynchronousTransmission.ReadOnlyContext;
+import ir.ac.kntu.SynchronousTransmission.ContextView;
 import ir.ac.kntu.SynchronousTransmission.StEvent;
 
 import java.util.StringJoiner;
 
 public class StInitiateFloodEvent extends StEvent {
 
-    public StInitiateFloodEvent(long time) {
+    private final int nextInitiator;
+
+    public int getNextInitiator() {
+        return nextInitiator;
+    }
+
+    public StInitiateFloodEvent(long time, int nextInitiator) {
         super(time);
+        this.nextInitiator = nextInitiator;
     }
 
     @Override
-    public void handle(ReadOnlyContext context) {
+    public void handle(ContextView context) {
         super.handle(context);
 
-        context.getApplication().onInitiateFlood(context);
+        context.getApplication().initiateFlood(context);
     }
 
     @Override

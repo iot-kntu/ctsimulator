@@ -1,6 +1,6 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.applications.NodeFaultMode;
+import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFaultMode;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;

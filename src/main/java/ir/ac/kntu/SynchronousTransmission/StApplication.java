@@ -14,10 +14,22 @@ public interface StApplication {
 
     void addNextApplication(StApplication application);
 
-    void onTimeProgress(ReadOnlyContext context);
+    /**
+     * Called by simulator to announce simulation start
+     * @param context
+     */
+    void simulationStarting(ContextView context);
 
-    void onInitiateFlood(ReadOnlyContext context);
+    void simulationFinishing(ContextView context);
 
-    void onPacketReceive(StFloodPacket<?> packet, ReadOnlyContext context);
+    /**
+     * Called when simulation time progresses by one unit
+     * @param context
+     */
+    void simulationTimeProgressed(ContextView context);
+
+    void initiateFlood(ContextView context);
+
+    void packetReceived(StFloodPacket<?> packet, ContextView context);
 }
 
