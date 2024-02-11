@@ -45,7 +45,9 @@ public class StEvent implements Comparable<StEvent> {
     @Override
     public int compareTo(StEvent o) {
         if (this.time == o.time)
-            return this.priority.compareTo(o.priority);
+            // as high priorities has higher value
+            //  the reverse of comparison result should be considered
+            return o.priority.compareTo(this.priority);
         else
             return (int) (this.time - o.time);
     }

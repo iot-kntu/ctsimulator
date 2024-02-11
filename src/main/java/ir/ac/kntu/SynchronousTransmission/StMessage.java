@@ -67,10 +67,7 @@ public final class StMessage<T> {
 
     @Override
     public String toString() {
-        return "StMessage[" +
-                "initiator=" + initiator + ", " +
-                "messageNo=" + messageNo + ", " +
-                "content=" + content + ']';
+        return "StMessage[I=%s, Msg[%d]=%s]".formatted(initiator, messageNo, content);
     }
 
 }

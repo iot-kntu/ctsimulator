@@ -1,8 +1,8 @@
 package ir.ac.kntu.SynchronousTransmission;
 
 import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodBaseApplication;
+import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodConfig;
 import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodDefaultTransmissionPolicy;
-import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,11 +21,11 @@ public class Main {
             if (netGraph.isEmpty())
                 throw new IllegalArgumentException("Invalid graph file format, it is not loaded");
 
-            BlueFloodSettings settings = new BlueFloodSettings(
+            BlueFloodConfig settings = new BlueFloodConfig(
                     0.0,    // loss probability
-                    10,      // rounds limit
+                    5,      // rounds limit
                     new RoundRobin(netGraph.getNodeCount()), //initiator strategy
-                    new BlueFloodDefaultTransmissionPolicy(1, netGraph.getDiameter(), netGraph.getNodeCount())
+                    new BlueFloodDefaultTransmissionPolicy(1, netGraph)
             );
 
 
@@ -33,8 +33,8 @@ public class Main {
                 static int counter = 1;
                 @Override
                 public StMessage<String> buildMessage(ContextView context) {
-                    String msg = "MSG-" + settings.initiatorStrategy().getCurrentInitiatorId() + "-" + counter++;
-                    return new StMessage<>(netGraph.getNodeById(settings.initiatorStrategy().getCurrentInitiatorId()), msg);
+                    String msg = "MSG-" + config.initiatorStrategy().getCurrentInitiatorId() + "-" + counter++;
+                    return new StMessage<>(netGraph.getNodeById(config.initiatorStrategy().getCurrentInitiatorId()), msg);
                 }
             };
 

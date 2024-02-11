@@ -49,6 +49,6 @@ public class Node {
 
     @Override
     public String toString() {
-        return "[Node " + getId() + "]";
+        return "N[" + getId() + "]";
     }
 }

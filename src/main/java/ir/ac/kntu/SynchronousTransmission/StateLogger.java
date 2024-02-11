@@ -7,7 +7,7 @@ import java.util.*;
  */
 public class StateLogger {
 
-    private final SortedMap<SimPace, Map<Integer, NodeState>> nodeStates = new TreeMap<>();
+    private final SortedMap<StNetworkTime, Map<Integer, NodeState>> nodeStates = new TreeMap<>();
     private final List<Node> nodes;
 
     public StateLogger(List<Node> nodes) {
@@ -16,25 +16,17 @@ public class StateLogger {
 
     public void timeForward(StNetworkTime networkTime) {
 
-        final int round = networkTime.round();
-        final int slot = networkTime.slot();
-
         Map<Integer, NodeState> nodeStateMap = new HashMap<>();
 
         for (Node node : nodes)
-            nodeStateMap.put(node.getId(), NodeState.Sleep);
+            nodeStateMap.put(node.getId(), NodeState.Listen);
 
-        final SimPace pace = new SimPace(round, slot);
-        nodeStates.put(pace, nodeStateMap);
+        nodeStates.put(networkTime, nodeStateMap);
     }
 
     public void setState(StNetworkTime networkTime, Node node, NodeState nodeState) {
 
-        final int round = networkTime.round();
-        final int slot = networkTime.slot();
-
-        SimPace simPace = new SimPace(round, slot);
-        final Map<Integer, NodeState> stateMap = nodeStates.get(simPace);
+        final Map<Integer, NodeState> stateMap = nodeStates.get(networkTime);
 
         if (stateMap == null)
             throw new IllegalStateException("No state saved for this round and slot");
@@ -48,13 +40,13 @@ public class StateLogger {
 
         builder.append(String.format("%1$5s", "*"));
 
-        for (SimPace simPace : nodeStates.keySet())
-            builder.append(String.format("%1$5s", simPace.round()));
+        for (StNetworkTime StNetworkTime : nodeStates.keySet())
+            builder.append(String.format("%1$5s", StNetworkTime.round()));
         builder.append('\n');
 
         builder.append(String.format("%1$5s", "*"));
-        for (SimPace simPace : nodeStates.keySet())
-            builder.append(String.format("%1$5s", simPace.slot()));
+        for (StNetworkTime StNetworkTime : nodeStates.keySet())
+            builder.append(String.format("%1$5s", StNetworkTime.slot()));
         builder.append('\n');
 
         final List<String> rows = new ArrayList<>();
@@ -72,15 +64,5 @@ public class StateLogger {
         rows.forEach(s -> builder.append(s).append("\n"));
 
         return builder.toString();
-    }
-
-    record SimPace(int round, int slot) implements Comparable<SimPace> {
-        @Override
-        public int compareTo(SimPace o) {
-
-            return this.round() == o.round()
-                    ? this.slot() - o.slot()
-                    : this.round() - o.round();
-        }
     }
 }

@@ -5,8 +5,6 @@ import ir.ac.kntu.SynchronousTransmission.Node;
 import ir.ac.kntu.SynchronousTransmission.StEvent;
 import ir.ac.kntu.SynchronousTransmission.StMessage;
 
-import java.util.StringJoiner;
-
 /**
  * An object that represents a data that should be sent between
  */
@@ -42,7 +40,7 @@ public class StFloodPacket<T> extends StEvent {
         context.getApplication().packetReceived(this, context);
     }
 
-    public StEvent scheduleFor(int delay) {
+    public StEvent scheduleWithDelay(int delay) {
         if (delay < 0)
             throw new IllegalArgumentException("delay must be 0 or a positive number");
         if(delay == 0)
@@ -53,11 +51,7 @@ public class StFloodPacket<T> extends StEvent {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", StFloodPacket.class.getSimpleName() + "[", "]")
-                .add(getTime() + ":")
-                .add(sender + " -> " + receiver)
-                .add("msg=" + stMessage)
-                .toString();
+        return String.format("StFloodPacket[%d:%s->%s]=[%s]", getTime(),sender, receiver, stMessage);
     }
 }
 

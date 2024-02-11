@@ -1,5 +1,7 @@
 package ir.ac.kntu.SynchronousTransmission;
 
+import ir.ac.kntu.SynchronousTransmission.events.SimulationStartEvent;
+
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.logging.Level;
@@ -28,12 +30,9 @@ public class StSimulator {
 
     public void start() {
 
-        context.time = 0;
+        scheduleEvent(new SimulationStartEvent(0));
 
-        context.getApplication().simulationStarting(context);
-
-        //context.getApplication().simulationTimeProgressed(context);
-
+        context.time = -1;
         while (!eventQueue.isEmpty()) {
 
             try {
@@ -42,10 +41,9 @@ public class StSimulator {
 
                 final int timeDiff = (int) (event.getTime() - context.time);
                 if (timeDiff > 0) {
-
+                    context.time = event.getTime();
                     context.getApplication().simulationTimeProgressed(context);
                 }
-                context.time = event.getTime();
 
                 event.handle(context);
             }
