@@ -57,8 +57,8 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
                                     }
         );
 
-        nodeStateMap.get(initiator).set(0, NodeState.Flood);
-        IntStream.range(1, getTotalSlotsOfRound())
+        IntStream.range(0, floodRepeatCount).forEach(i -> nodeStateMap.get(initiator).set(i, NodeState.Flood));
+        IntStream.range(floodRepeatCount, getTotalSlotsOfRound())
                  .forEach(i -> nodeStateMap.get(initiator).set(i, NodeState.Sleep));
 
     }
@@ -71,8 +71,8 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
     public void newPacketReceived(Node node, int slot) {
         // when a new packet is received by a node, it floods
         //  it for floodRepeatCount times and then goes to sleep
-        for (int i = 1; i <= floodRepeatCount; i++)
-            nodeStateMap.get(node).set(slot + i, NodeState.Flood);
+        for (int i = slot + 1; i <= slot + floodRepeatCount; i++)
+            nodeStateMap.get(node).set(i, NodeState.Flood);
 
         for (int i = slot + floodRepeatCount + 1; i < getTotalSlotsOfRound(); i++)
             nodeStateMap.get(node).set(i, NodeState.Sleep);
@@ -96,7 +96,7 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
         builder.append(String.format("%1$5s", "R"));
 
         for (StNetworkTime StNetworkTime : stateHistory.keySet()) {
-            for (int i = 0; i <getTotalSlotsOfRound(); i++) {
+            for (int i = 0; i < getTotalSlotsOfRound(); i++) {
                 builder.append(String.format("%1$5s", StNetworkTime.round()));
             }
 
