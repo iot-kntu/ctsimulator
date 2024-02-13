@@ -4,7 +4,7 @@ import ir.ac.kntu.SynchronousTransmission.Node;
 import ir.ac.kntu.SynchronousTransmission.NodeState;
 import ir.ac.kntu.SynchronousTransmission.StNetworkTime;
 
-public interface BlueFloodTransmissionPolicy {
+public interface TransmissionPolicy {
 
     int getFloodRepeatCount();
 

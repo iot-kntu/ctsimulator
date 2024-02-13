@@ -1,9 +1,6 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
-import ir.ac.kntu.SynchronousTransmission.NetGraph;
-import ir.ac.kntu.SynchronousTransmission.Node;
-import ir.ac.kntu.SynchronousTransmission.NodeState;
-import ir.ac.kntu.SynchronousTransmission.StNetworkTime;
+import ir.ac.kntu.SynchronousTransmission.*;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -12,15 +9,15 @@ import java.util.stream.IntStream;
  * Default transmission policy is listen all slots to receive a valid packet
  * then flood N consecutive slots, then go to deep sleep.
  */
-public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmissionPolicy {
+public class DefaultTransmissionPolicy implements TransmissionPolicy {
 
     private final int floodRepeatCount;
     private final NetGraph netGraph;
     private final SortedMap<StNetworkTime, SortedMap<Node, List<NodeState>>> stateHistory;
     private SortedMap<Node, List<NodeState>> nodeStateMap;
 
-    public BlueFloodDefaultTransmissionPolicy(int floodRepeatCount, NetGraph netGraph) {
-        this.floodRepeatCount = floodRepeatCount;
+    public DefaultTransmissionPolicy(BlueFloodSettings settings, NetGraph netGraph) {
+        this.floodRepeatCount = settings.floodRepeatCount();
         this.netGraph = netGraph;
         this.stateHistory = new TreeMap<>();
     }

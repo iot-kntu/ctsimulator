@@ -1,8 +1,9 @@
 package ir.ac.kntu.SynchronousTransmission;
 
 import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodBaseApplication;
-import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodConfig;
-import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodDefaultTransmissionPolicy;
+import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodStrategies;
+import ir.ac.kntu.SynchronousTransmission.blueflood.DefaultTransmissionPolicy;
+import ir.ac.kntu.SynchronousTransmission.blueflood.NonFaultyFloodStrategy;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.io.InputStream;
 import java.util.logging.LogManager;
 
 public class Main {
+
 
     public static void main(String[] args) {
 
@@ -21,20 +23,27 @@ public class Main {
             if (netGraph.isEmpty())
                 throw new IllegalArgumentException("Invalid graph file format, it is not loaded");
 
-            BlueFloodConfig config = new BlueFloodConfig(
+            BlueFloodSettings settings = new BlueFloodSettings(
                     0.0,    // loss probability
                     5,      // rounds limit
+                    2       // flood repeat times
+            );
+
+            BlueFloodStrategies strategies = new BlueFloodStrategies(
                     new RoundRobin(netGraph.getNodeCount()), //initiator strategy
-                    new BlueFloodDefaultTransmissionPolicy(2, netGraph)
+                    new DefaultTransmissionPolicy(settings, netGraph),
+                    new NonFaultyFloodStrategy(settings)
             );
 
 
-            BlueFloodBaseApplication blueFloodApplication = new BlueFloodBaseApplication(config){
+            BlueFloodBaseApplication blueFloodApplication = new BlueFloodBaseApplication(settings, strategies) {
                 static int counter = 1;
+
                 @Override
                 public StMessage<String> buildMessage(ContextView context) {
-                    String msg = "MSG-" + config.initiatorStrategy().getCurrentInitiatorId() + "-" + counter++;
-                    return new StMessage<>(netGraph.getNodeById(config.initiatorStrategy().getCurrentInitiatorId()), msg);
+                    String msg = "MSG-" + strategies.initiatorStrategy().getCurrentInitiatorId() + "-" + counter++;
+                    return new StMessage<>(netGraph.getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId()),
+                                           msg);
                 }
             };
 
