@@ -37,4 +37,9 @@ public class NullApplication implements StApplication {
     public void packetReceived(StFloodPacket<?> packet, ContextView context) {
 
     }
+
+    @Override
+    public void newRound(ContextView context) {
+
+    }
 }

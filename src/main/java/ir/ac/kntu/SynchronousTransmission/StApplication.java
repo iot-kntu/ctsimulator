@@ -31,5 +31,7 @@ public interface StApplication {
     void initiateFlood(ContextView context);
 
     void packetReceived(StFloodPacket<?> packet, ContextView context);
+
+    void newRound(ContextView context);
 }
 

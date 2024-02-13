@@ -6,6 +6,7 @@ import ir.ac.kntu.SynchronousTransmission.NodeState;
 import ir.ac.kntu.SynchronousTransmission.StNetworkTime;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * Default transmission policy is listen all slots to receive a valid packet
@@ -56,7 +57,12 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
                                     }
         );
 
+        if(nodeStateMap.get(initiator) == null)
+            System.out.println("Wow");
         nodeStateMap.get(initiator).set(0, NodeState.Flood);
+        IntStream.range(1, getTotalSlotsOfRound())
+                 .forEach(i -> nodeStateMap.get(initiator).set(i, NodeState.Sleep));
+
     }
 
     @Override
@@ -71,7 +77,7 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
             nodeStateMap.get(node).set(slot + i, NodeState.Flood);
 
         for (int i = slot + floodRepeatCount + 1; i < getTotalSlotsOfRound(); i++)
-                nodeStateMap.get(node).set(i, NodeState.Sleep);
+            nodeStateMap.get(node).set(i, NodeState.Sleep);
     }
 
     @Override
@@ -100,8 +106,6 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
             builder.append(String.format("%1$5s", StNetworkTime.slot()));
         builder.append('\n');
 
-        final List<String> rows = new ArrayList<>();
-
         for (Node node : netGraph.getNodes()) {
             StringBuilder row = new StringBuilder(String.format("%1$5s", "N[" + node.getId() + "]"));
             final Collection<Map<Node, List<NodeState>>> values = stateHistory.values();
@@ -113,6 +117,23 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
             builder.append(row).append('\n');
         }
         return builder.toString();
+    }
+
+    @Override
+    public void printCurrentNodeStates() {
+
+        StringBuilder builder = new StringBuilder();
+
+        for (Node node : netGraph.getNodes()) {
+            StringBuilder row = new StringBuilder(String.format("%1$5s", "N[" + node.getId() + "]"));
+            nodeStateMap.get(node).stream()
+                        .map(state -> String.format("%1$5c", state.getSymbol()))
+                        .forEach(row::append);
+            builder.append(row).append('\n');
+        }
+
+        System.out.println(builder);
+
     }
 
 }

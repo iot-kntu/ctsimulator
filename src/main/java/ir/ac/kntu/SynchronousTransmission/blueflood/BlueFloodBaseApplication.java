@@ -27,8 +27,8 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
 
     @Override
     public void simulationStarting(ContextView context) {
+        newRound(context);
 
-        roundFinished(context);
         super.simulationStarting(context);
     }
 
@@ -44,16 +44,6 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         final BlueFloodTransmissionPolicy transmissionPolicy = config.transmissionPolicy();
         this.networkTime = transmissionPolicy.getNetworkTime(context.getTime());
 
-        // if this slot is not considered to be in this round, start a new round
-        final int slot = getSlot();
-        if (slot == transmissionPolicy.getTotalSlotsOfRound()) {
-            roundFinished(context);
-        }
-
-        if (context.getTime() > 0) {
-            //fixme
-        }
-
         super.simulationTimeProgressed(context);
     }
 
@@ -64,11 +54,15 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         final Node inode = context.getNetGraph().getNodeById(config.initiatorStrategy().getCurrentInitiatorId());
         config.transmissionPolicy().newRound(networkTime, inode);
 
+        context.getSimulator().scheduleEvent(new StNewRoundEvent(context.getTime() + config.transmissionPolicy().getTotalSlotsOfRound()));
+
         final StMessage<?> message = buildMessage(context);
         logger.log(Level.INFO, "[" + context.getTime() + "] Node-" + inode.getId() +
                 " initiated message [" + message.messageNo() + "]");
 
         floodMessage(context, inode, message);
+
+        config.transmissionPolicy().printCurrentNodeStates();
 
         next().initiateFlood(context);
     }
@@ -98,17 +92,21 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
             case Flood -> getLogger().log(Level.WARNING, "Received packet while in the flooding state");
         }
 
+        config.transmissionPolicy().printCurrentNodeStates();
+
         super.packetReceived(packet, context);
     }
 
-    public void roundFinished(ContextView context) {
-
+    @Override
+    public void newRound(ContextView context) {
         if (this.networkTime != null && this.networkTime.round() > 0)
             logger.log(Level.INFO, "======== round " + getRound() + " completed ===========");
 
-        final int nextInitiator = config.initiatorStrategy().getNextInitiatorId();
-        StInitiateFloodEvent initiateFloodEvent = new StInitiateFloodEvent(context.getTime(), nextInitiator);
-        context.getSimulator().scheduleEvent(initiateFloodEvent);
+        if(getRound() < config.maxRounds()) {
+            final int nextInitiator = config.initiatorStrategy().getNextInitiatorId();
+            StInitiateFloodEvent initiateFloodEvent = new StInitiateFloodEvent(context.getTime(), nextInitiator);
+            context.getSimulator().scheduleEvent(initiateFloodEvent);
+        }
     }
 
     public String printTimeline() {

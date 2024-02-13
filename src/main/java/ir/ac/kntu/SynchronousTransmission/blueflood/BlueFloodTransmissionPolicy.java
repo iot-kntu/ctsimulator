@@ -21,4 +21,6 @@ public interface BlueFloodTransmissionPolicy {
     int getTotalSlotsOfRound();
 
     String printHistory();
+
+    void printCurrentNodeStates();
 }

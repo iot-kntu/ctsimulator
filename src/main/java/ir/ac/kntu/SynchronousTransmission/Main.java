@@ -21,7 +21,7 @@ public class Main {
             if (netGraph.isEmpty())
                 throw new IllegalArgumentException("Invalid graph file format, it is not loaded");
 
-            BlueFloodConfig settings = new BlueFloodConfig(
+            BlueFloodConfig config = new BlueFloodConfig(
                     0.0,    // loss probability
                     5,      // rounds limit
                     new RoundRobin(netGraph.getNodeCount()), //initiator strategy
@@ -29,7 +29,7 @@ public class Main {
             );
 
 
-            BlueFloodBaseApplication blueFloodApplication = new BlueFloodBaseApplication(settings){
+            BlueFloodBaseApplication blueFloodApplication = new BlueFloodBaseApplication(config){
                 static int counter = 1;
                 @Override
                 public StMessage<String> buildMessage(ContextView context) {
