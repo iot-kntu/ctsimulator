@@ -5,7 +5,7 @@ import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFaultMode;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-public class Node {
+public class Node implements Comparable<Node>{
     public static final Node NULL_NODE = new Node(-1);
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -50,5 +50,10 @@ public class Node {
     @Override
     public String toString() {
         return "N[" + getId() + "]";
+    }
+
+    @Override
+    public int compareTo(Node o) {
+        return this.getId() - o.getId();
     }
 }

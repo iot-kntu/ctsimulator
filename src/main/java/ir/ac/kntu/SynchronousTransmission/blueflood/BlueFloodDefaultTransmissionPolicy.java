@@ -16,13 +16,13 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
 
     private final int floodRepeatCount;
     private final NetGraph netGraph;
-    private final Map<StNetworkTime, Map<Node, List<NodeState>>> stateHistory;
-    private Map<Node, List<NodeState>> nodeStateMap;
+    private final SortedMap<StNetworkTime, SortedMap<Node, List<NodeState>>> stateHistory;
+    private SortedMap<Node, List<NodeState>> nodeStateMap;
 
     public BlueFloodDefaultTransmissionPolicy(int floodRepeatCount, NetGraph netGraph) {
         this.floodRepeatCount = floodRepeatCount;
         this.netGraph = netGraph;
-        this.stateHistory = new HashMap<>();
+        this.stateHistory = new TreeMap<>();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
         if (networkTime.round() > 0)
             stateHistory.put(networkTime, nodeStateMap);
 
-        this.nodeStateMap = new HashMap<>(netGraph.getNodeCount());
+        this.nodeStateMap = new TreeMap<>();
         netGraph.getNodes().forEach(node ->
                                     {
                                         List<NodeState> states = new ArrayList<>(getTotalSlotsOfRound());
@@ -57,8 +57,6 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
                                     }
         );
 
-        if(nodeStateMap.get(initiator) == null)
-            System.out.println("Wow");
         nodeStateMap.get(initiator).set(0, NodeState.Flood);
         IntStream.range(1, getTotalSlotsOfRound())
                  .forEach(i -> nodeStateMap.get(initiator).set(i, NodeState.Sleep));
@@ -95,24 +93,46 @@ public class BlueFloodDefaultTransmissionPolicy implements BlueFloodTransmission
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append(String.format("%1$5s", "*"));
+        builder.append(String.format("%1$5s", "R"));
 
-        for (StNetworkTime StNetworkTime : stateHistory.keySet())
-            builder.append(String.format("%1$5s", StNetworkTime.round()));
+        for (StNetworkTime StNetworkTime : stateHistory.keySet()) {
+            for (int i = 0; i <getTotalSlotsOfRound(); i++) {
+                builder.append(String.format("%1$5s", StNetworkTime.round()));
+            }
+
+            builder.append(String.format("%1$5s", "|"));
+        }
         builder.append('\n');
 
-        builder.append(String.format("%1$5s", "*"));
-        for (StNetworkTime StNetworkTime : stateHistory.keySet())
-            builder.append(String.format("%1$5s", StNetworkTime.slot()));
+        builder.append(String.format("%1$5s", "S"));
+        final int rounds = stateHistory.keySet().size();
+        for (int i = 0; i < rounds; i++) {
+            for (int j = 0; j < getTotalSlotsOfRound(); j++) {
+                builder.append(String.format("%1$5s", j));
+            }
+
+            builder.append(String.format("%1$5s", "|"));
+        }
+        builder.append('\n');
+
+        builder.append(String.format("%1$5s", "|"));
+        for (int i = 0; i < rounds; i++) {
+            for (int j = 0; j < getTotalSlotsOfRound(); j++) {
+                builder.append(String.format("%1$5s", "-----"));
+            }
+            builder.append(String.format("%1$5s", "|"));
+        }
         builder.append('\n');
 
         for (Node node : netGraph.getNodes()) {
             StringBuilder row = new StringBuilder(String.format("%1$5s", "N[" + node.getId() + "]"));
-            final Collection<Map<Node, List<NodeState>>> values = stateHistory.values();
+            final Collection<SortedMap<Node, List<NodeState>>> values = stateHistory.values();
             for (Map<Node, List<NodeState>> value : values) {
                 final List<NodeState> states = value.get(node);
                 for (NodeState state : states)
                     row.append(String.format("%1$5c", state.getSymbol()));
+
+                row.append(String.format("%1$5s", "|"));
             }
             builder.append(row).append('\n');
         }

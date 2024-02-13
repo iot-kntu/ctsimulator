@@ -25,7 +25,7 @@ public class Main {
                     0.0,    // loss probability
                     5,      // rounds limit
                     new RoundRobin(netGraph.getNodeCount()), //initiator strategy
-                    new BlueFloodDefaultTransmissionPolicy(1, netGraph)
+                    new BlueFloodDefaultTransmissionPolicy(2, netGraph)
             );
 
 
