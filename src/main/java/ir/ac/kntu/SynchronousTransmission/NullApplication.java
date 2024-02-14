@@ -34,8 +34,18 @@ public class NullApplication implements StApplication {
     }
 
     @Override
+    public Node getInitiatorNode(ContextView context) {
+        return Node.NULL_NODE;
+    }
+
+    @Override
     public void packetReceived(StFloodPacket<?> packet, ContextView context) {
 
+    }
+
+    @Override
+    public NodeState getNodeState(Node node) {
+        return NodeState.Sleep;
     }
 
     @Override

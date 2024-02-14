@@ -49,7 +49,7 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
     public void initiateFlood(ContextView context) throws RuntimeException {
         Objects.requireNonNull(context);
 
-        final Node inode = context.getNetGraph().getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId());
+        final Node inode = getInitiatorNode(context);
         strategies.transmissionPolicy().newRound(networkTime, inode);
 
         context.getSimulator().scheduleEvent(
@@ -68,13 +68,17 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
     }
 
     @Override
+    public Node getInitiatorNode(ContextView context) {
+        return context.getNetGraph().getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId());
+    }
+
+    @Override
     public void packetReceived(StFloodPacket<?> packet, ContextView context) {
         Objects.requireNonNull(packet);
         Objects.requireNonNull(context);
 
         final Node receiver = packet.getReceiver();
-        final NodeState nodeState = strategies.transmissionPolicy().getNodeState(receiver, getSlot());
-        switch (nodeState) {
+        switch (getNodeState(receiver)) {
 
             case Sleep -> {
             }
@@ -96,6 +100,11 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         strategies.transmissionPolicy().printCurrentNodeStates();
 
         super.packetReceived(packet, context);
+    }
+
+    @Override
+    public NodeState getNodeState(Node node){
+        return strategies.transmissionPolicy().getNodeState(node, getSlot());
     }
 
     @Override

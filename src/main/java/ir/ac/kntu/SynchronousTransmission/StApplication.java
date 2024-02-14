@@ -30,7 +30,11 @@ public interface StApplication {
 
     void initiateFlood(ContextView context) throws RuntimeException;
 
+    Node getInitiatorNode(ContextView context);
+
     void packetReceived(StFloodPacket<?> packet, ContextView context);
+
+    NodeState getNodeState(Node node);
 
     void newRound(ContextView context);
 }

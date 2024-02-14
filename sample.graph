@@ -1,5 +1,5 @@
 # <node_id><;><Node Type><;><comma separated list of neighbors>
-# <Node_Type>: 0:normal, 1:silent, 2:FaultyInitiate, 3:FaultyFlood, 4:SilentAndFaulty 5:AlwaysFaulty
+# <Node_Type>: 0:normal, 1:silent, 2:FaultyInitiate, 3:FaultyFlood, 4:SilentAndFaulty
 0;0;1,2
 1;0;0,3
 2;0;0,3

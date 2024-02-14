@@ -19,23 +19,19 @@ public enum NodeFloodStrategy {
      * Node sends faulty packet only in its turn
      * and may send different packets in flood repeats.
      */
-    FaultyInitiate(SilentFloodStrategy.class),
+    FaultyInitiate(FaultyInitiateFloodStrategy.class),
 
     /**
      * Node floods faulty packet in all of its slots.
      */
-    FaultyFlood(SilentFloodStrategy.class),
+    FaultyFlood(FaultyFloodStrategy.class),
 
     /**
      * Node floods faulty packets or it is silent. This is the combination of
      * the previous three modes.
      */
-    SilentAndFaulty(SilentFloodStrategy.class),
-
-    /**
-     * Node floods faulty packet in all slots, not just its slots
-     */
-    AlwaysFaulty(SilentFloodStrategy.class);
+    SilentAndFaulty(SilentAndFaultyFloodStrategy.class)
+    ;
 
     private final Class<? extends FloodStrategy> floodStrategy;
 
