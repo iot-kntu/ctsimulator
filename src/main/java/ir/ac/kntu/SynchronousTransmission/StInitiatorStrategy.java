@@ -31,7 +31,7 @@ class OneInitiator implements StInitiatorStrategy{
 class RoundRobin implements StInitiatorStrategy{
 
     private final int nodesCount;
-    private int currentId = 0;
+    private int currentId = -1;
 
     public RoundRobin(int nodesCount) {
         this.nodesCount = nodesCount;

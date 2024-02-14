@@ -20,6 +20,8 @@ public class NetGraph {
     public static @NotNull NetGraph loadFrom(String path) throws Exception {
         NetGraph netGraph = new NetGraph();
 
+        HashMap<Node, List<Integer>> nodeNeighborsId = new HashMap<>();
+
         int lineCounter = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
 
@@ -44,12 +46,26 @@ public class NetGraph {
                 final int modeNo = Integer.parseInt(split1[1]);
                 newNode.setFloodStrategy(NodeFloodStrategy.values()[modeNo]);
 
+                final ArrayList<Integer> neighbors = new ArrayList<>();
+                nodeNeighborsId.put(newNode, neighbors);
+
                 final String[] neighborsStr = split1[2].split(",");
                 for (String s : neighborsStr) {
                     if (s.isBlank())
                         continue;
                     final int neighborId = Integer.parseInt(s);
-                    netGraph.neighborsMap.get(newNode).add(new Node(neighborId));
+                    neighbors.add(neighborId);
+                }
+            }
+
+            for (Node node : netGraph.getNodes()) {
+                final List<Integer> ids = nodeNeighborsId.get(node);
+                for (Integer id : ids) {
+                    final Node nodeById = netGraph.getNodeById(id);
+                    if(nodeById == null){
+                        throw new IllegalStateException("Node by id of " + id + " not found");
+                    }
+                    netGraph.neighborsMap.get(node).add(nodeById);
                 }
             }
         }

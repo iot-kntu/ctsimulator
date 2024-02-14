@@ -3,12 +3,9 @@ package ir.ac.kntu.SynchronousTransmission;
 import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFloodStrategy;
 
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class Node implements Comparable<Node>{
     public static final Node NULL_NODE = new Node(-1);
-
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final int id;
     private NodeFloodStrategy floodStrategy;

@@ -50,8 +50,10 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         Objects.requireNonNull(context);
 
         final Node inode = getInitiatorNode(context);
+
         strategies.transmissionPolicy().newRound(networkTime, inode);
 
+        // scheduling the next round to keep the simulation working even with faults
         context.getSimulator().scheduleEvent(
                 new StNewRoundEvent(context.getTime() + strategies.transmissionPolicy().getTotalSlotsOfRound()));
 
