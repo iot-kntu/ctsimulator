@@ -1,6 +1,6 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFaultMode;
+import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFloodStrategy;
 
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -11,24 +11,24 @@ public class Node implements Comparable<Node>{
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private final int id;
-    private NodeFaultMode faultMode;
+    private NodeFloodStrategy floodStrategy;
 
 
     public Node(int id) {
         this.id = id;
-        this.faultMode = NodeFaultMode.Normal;
+        this.floodStrategy = NodeFloodStrategy.Normal;
     }
 
     public int getId() {
         return id;
     }
 
-    public NodeFaultMode getFaultMode() {
-        return faultMode;
+    public NodeFloodStrategy getFloodStrategy() {
+        return floodStrategy;
     }
 
-    public Node setFaultMode(NodeFaultMode faultMode) {
-        this.faultMode = faultMode;
+    public Node setFloodStrategy(NodeFloodStrategy floodStrategy) {
+        this.floodStrategy = floodStrategy;
         return this;
     }
 
@@ -54,6 +54,8 @@ public class Node implements Comparable<Node>{
 
     @Override
     public int compareTo(Node o) {
+        Objects.requireNonNull(o);
+
         return this.getId() - o.getId();
     }
 }

@@ -1,6 +1,6 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFaultMode;
+import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFloodStrategy;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -42,7 +42,7 @@ public class NetGraph {
                 netGraph.neighborsMap.put(newNode, new ArrayList<>());
 
                 final int modeNo = Integer.parseInt(split1[1]);
-                newNode.setFaultMode(NodeFaultMode.values()[modeNo]);
+                newNode.setFloodStrategy(NodeFloodStrategy.values()[modeNo]);
 
                 final String[] neighborsStr = split1[2].split(",");
                 for (String s : neighborsStr) {
@@ -68,7 +68,7 @@ public class NetGraph {
                 fileWriter.write(node.getId());
                 fileWriter.write(";");
 
-                fileWriter.write(node.getFaultMode().ordinal());
+                fileWriter.write(node.getFloodStrategy().ordinal());
                 fileWriter.write(";");
 
                 final List<Node> neighbors = neighborsMap.get(node);

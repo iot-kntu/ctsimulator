@@ -12,8 +12,8 @@ import java.util.logging.Logger;
 public class NonFaultyFloodStrategy implements FloodStrategy {
 
     private final Logger logger = Logger.getLogger("NormalFloodStrategy");
-
     private final Random random = new Random(new Date().getTime());
+    
     private final BlueFloodSettings settings;
 
     public NonFaultyFloodStrategy(BlueFloodSettings settings) {

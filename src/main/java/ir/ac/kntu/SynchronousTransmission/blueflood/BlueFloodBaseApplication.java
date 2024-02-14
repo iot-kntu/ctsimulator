@@ -4,6 +4,7 @@ import ir.ac.kntu.SynchronousTransmission.*;
 import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
 import ir.ac.kntu.SynchronousTransmission.events.StInitiateFloodEvent;
 
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.logging.Level;
 
@@ -11,11 +12,13 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
 
     protected final BlueFloodStrategies strategies;
     private final BlueFloodSettings settings;
+    private final HashMap<Node, FloodStrategy> nodeFloodStrategies;
     private StNetworkTime networkTime;
 
     public BlueFloodBaseApplication(BlueFloodSettings settings, BlueFloodStrategies strategies) {
         this.settings = settings;
         this.strategies = strategies;
+        this.nodeFloodStrategies = new HashMap<>();
     }
 
     public abstract StMessage<?> buildMessage(ContextView context);
@@ -43,7 +46,7 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
     }
 
     @Override
-    public void initiateFlood(ContextView context) {
+    public void initiateFlood(ContextView context) throws RuntimeException {
         Objects.requireNonNull(context);
 
         final Node inode = context.getNetGraph().getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId());
@@ -56,7 +59,8 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         logger.log(Level.INFO, "[" + context.getTime() + "] Node-" + inode.getId() +
                 " initiated message [" + message.messageNo() + "]");
 
-        strategies.floodStrategy().floodMessage(context, inode, message);
+        final FloodStrategy floodStrategy = getNodeFloodStrategy(inode);
+        floodStrategy.floodMessage(context, inode, message);
 
         strategies.transmissionPolicy().printCurrentNodeStates();
 
@@ -82,8 +86,9 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
                                                           receiver.getId(), packet.getStMessage().messageNo()));
 
                 strategies.transmissionPolicy().newPacketReceived(receiver, getSlot());
-                strategies.floodStrategy().floodMessage(context, receiver, packet.getStMessage());
 
+                final FloodStrategy floodStrategy = getNodeFloodStrategy(receiver);
+                floodStrategy.floodMessage(context, receiver, packet.getStMessage());
             }
             case Flood -> getLogger().log(Level.WARNING, "Received packet while in the flooding state");
         }
@@ -115,6 +120,21 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
 
     public int getSlot() {
         return networkTime.slot();
+    }
+
+    private FloodStrategy getNodeFloodStrategy(Node inode) {
+        FloodStrategy floodStrategy = nodeFloodStrategies.get(inode);
+        if (floodStrategy == null) {
+            try {
+                floodStrategy = inode.getFloodStrategy().getStrategy(settings);
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            nodeFloodStrategies.put(inode, floodStrategy);
+        }
+        return floodStrategy;
     }
 
 

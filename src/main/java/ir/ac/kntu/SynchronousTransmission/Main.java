@@ -3,7 +3,6 @@ package ir.ac.kntu.SynchronousTransmission;
 import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodBaseApplication;
 import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodStrategies;
 import ir.ac.kntu.SynchronousTransmission.blueflood.DefaultTransmissionPolicy;
-import ir.ac.kntu.SynchronousTransmission.blueflood.NonFaultyFloodStrategy;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,10 +30,8 @@ public class Main {
 
             BlueFloodStrategies strategies = new BlueFloodStrategies(
                     new RoundRobin(netGraph.getNodeCount()), //initiator strategy
-                    new DefaultTransmissionPolicy(settings, netGraph),
-                    new NonFaultyFloodStrategy(settings)
+                    new DefaultTransmissionPolicy(settings, netGraph)
             );
-
 
             BlueFloodBaseApplication blueFloodApplication = new BlueFloodBaseApplication(settings, strategies) {
                 static int counter = 1;

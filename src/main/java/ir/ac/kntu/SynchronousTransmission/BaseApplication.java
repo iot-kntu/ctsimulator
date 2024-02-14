@@ -43,7 +43,7 @@ public abstract class BaseApplication implements StApplication {
         next().simulationTimeProgressed(context);
     }
 
-    public void initiateFlood(ContextView context) {
+    public void initiateFlood(ContextView context) throws RuntimeException {
         next().initiateFlood(context);
     }
 

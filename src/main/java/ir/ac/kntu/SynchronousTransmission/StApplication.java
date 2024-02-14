@@ -28,7 +28,7 @@ public interface StApplication {
      */
     void simulationTimeProgressed(ContextView context);
 
-    void initiateFlood(ContextView context);
+    void initiateFlood(ContextView context) throws RuntimeException;
 
     void packetReceived(StFloodPacket<?> packet, ContextView context);
 
