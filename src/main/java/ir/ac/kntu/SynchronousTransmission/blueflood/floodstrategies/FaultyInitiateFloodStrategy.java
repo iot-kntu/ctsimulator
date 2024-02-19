@@ -1,9 +1,9 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies;
 
+import ir.ac.kntu.SynchronousTransmission.CiMessage;
 import ir.ac.kntu.SynchronousTransmission.ContextView;
 import ir.ac.kntu.SynchronousTransmission.Node;
 import ir.ac.kntu.SynchronousTransmission.NodeState;
-import ir.ac.kntu.SynchronousTransmission.StMessage;
 
 public abstract class FaultyInitiateFloodStrategy extends FaultyFloodStrategy {
 
@@ -14,7 +14,7 @@ public abstract class FaultyInitiateFloodStrategy extends FaultyFloodStrategy {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, Node sender, StMessage<T> message) {
+    public <T> void floodMessage(ContextView context, Node sender, CiMessage<T> message) {
 
         if (context.getApplication().getInitiatorNode(context).equals(sender) &&
                 context.getApplication().getNodeState(sender) == NodeState.Flood) {

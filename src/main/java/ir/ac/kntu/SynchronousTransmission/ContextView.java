@@ -2,9 +2,9 @@ package ir.ac.kntu.SynchronousTransmission;
 
 public interface ContextView {
 
-    StSimulator getSimulator();
+    CtSimulator getSimulator();
 
-    StApplication getApplication();
+    ConcurrentTransmissionApplication getApplication();
 
     long getTime();
 

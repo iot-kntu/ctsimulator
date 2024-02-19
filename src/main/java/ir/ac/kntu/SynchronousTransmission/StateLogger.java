@@ -7,14 +7,14 @@ import java.util.*;
  */
 public class StateLogger {
 
-    private final SortedMap<StNetworkTime, Map<Integer, NodeState>> nodeStates = new TreeMap<>();
+    private final SortedMap<CtNetworkTime, Map<Integer, NodeState>> nodeStates = new TreeMap<>();
     private final List<Node> nodes;
 
     public StateLogger(List<Node> nodes) {
         this.nodes = nodes;
     }
 
-    public void timeForward(StNetworkTime networkTime) {
+    public void timeForward(CtNetworkTime networkTime) {
 
         Map<Integer, NodeState> nodeStateMap = new HashMap<>();
 
@@ -24,7 +24,7 @@ public class StateLogger {
         nodeStates.put(networkTime, nodeStateMap);
     }
 
-    public void setState(StNetworkTime networkTime, Node node, NodeState nodeState) {
+    public void setState(CtNetworkTime networkTime, Node node, NodeState nodeState) {
 
         final Map<Integer, NodeState> stateMap = nodeStates.get(networkTime);
 
@@ -40,13 +40,13 @@ public class StateLogger {
 
         builder.append(String.format("%1$5s", "*"));
 
-        for (StNetworkTime StNetworkTime : nodeStates.keySet())
-            builder.append(String.format("%1$5s", StNetworkTime.round()));
+        for (CtNetworkTime CtNetworkTime : nodeStates.keySet())
+            builder.append(String.format("%1$5s", CtNetworkTime.round()));
         builder.append('\n');
 
         builder.append(String.format("%1$5s", "*"));
-        for (StNetworkTime StNetworkTime : nodeStates.keySet())
-            builder.append(String.format("%1$5s", StNetworkTime.slot()));
+        for (CtNetworkTime CtNetworkTime : nodeStates.keySet())
+            builder.append(String.format("%1$5s", CtNetworkTime.slot()));
         builder.append('\n');
 
         final List<String> rows = new ArrayList<>();

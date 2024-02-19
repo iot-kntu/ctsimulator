@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class BlueFloodBaseApplication implements StApplication {
+public abstract class BlueFloodBaseApplication implements ConcurrentTransmissionApplication {
 
     private final Logger logger = Logger.getLogger("BlueFloodApplication");
 
@@ -17,7 +17,7 @@ public abstract class BlueFloodBaseApplication implements StApplication {
     private final BlueFloodSettings settings;
     private final HashMap<Node, NodeFloodStrategy> nodeFloodStrategies;
     private final Random random = new Random(new Date().getTime());
-    private StNetworkTime networkTime;
+    private CtNetworkTime networkTime;
 
     public BlueFloodBaseApplication(BlueFloodSettings settings, BlueFloodStrategies strategies) {
         this.settings = settings;
@@ -25,7 +25,7 @@ public abstract class BlueFloodBaseApplication implements StApplication {
         this.nodeFloodStrategies = new HashMap<>();
     }
 
-    public abstract StMessage<?> buildMessage(ContextView context);
+    public abstract CiMessage<?> buildMessage(ContextView context);
 
     @Override
     public void simulationStarting(ContextView context) {
@@ -58,7 +58,7 @@ public abstract class BlueFloodBaseApplication implements StApplication {
         context.getSimulator().scheduleEvent(
                 new SimNewRoundEvent(context.getTime() + strategies.transmissionPolicy().getTotalSlotsOfRound()));
 
-        final StMessage<?> message = buildMessage(context);
+        final CiMessage<?> message = buildMessage(context);
         logger.log(Level.INFO, "[" + context.getTime() + "] Node-" + inode.getId() +
                 " initiated message [" + message.messageNo() + "]");
 
@@ -93,7 +93,7 @@ public abstract class BlueFloodBaseApplication implements StApplication {
                                                           context.getTime(),
                                                           networkTime.round(),
                                                           networkTime.slot(),
-                                                          receiver.getId(), thePacket.stMessage().messageNo()));
+                                                          receiver.getId(), thePacket.ciMessage().messageNo()));
 
                 strategies.transmissionPolicy().newPacketReceived(receiver, getSlot());
 
@@ -103,7 +103,7 @@ public abstract class BlueFloodBaseApplication implements StApplication {
 
                 if (random.nextDouble() >= receiveProbability) { // no loss
                     final NodeFloodStrategy floodStrategy = getNodeFloodStrategy(receiver);
-                    floodStrategy.floodMessage(context, receiver, thePacket.stMessage());
+                    floodStrategy.floodMessage(context, receiver, thePacket.ciMessage());
                 }
                 else {
                     logger.log(Level.INFO, "PKT[" + thePacket + "] lost due to "

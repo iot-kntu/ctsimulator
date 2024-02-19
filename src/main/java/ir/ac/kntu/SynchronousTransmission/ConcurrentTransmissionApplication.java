@@ -7,7 +7,7 @@ import ir.ac.kntu.SynchronousTransmission.events.CtPacketsEvent;
  * An interface defining applications on the Synch. Transmission base. Applications can be
  * chained.
  */
-public interface StApplication {
+public interface ConcurrentTransmissionApplication {
 
     /**
      * Called by simulator to announce simulation start

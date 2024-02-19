@@ -1,13 +1,17 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-public interface StInitiatorStrategy {
+/**
+ * Constructive Interference message initiation
+ * strategy
+ */
+public interface CiInitiatorStrategy {
 
     int getCurrentInitiatorId();
 
     int getNextInitiatorId();
 }
 
-class OneInitiator implements StInitiatorStrategy{
+class OneInitiator implements CiInitiatorStrategy {
 
     private final int initiatorNodeId;
 
@@ -28,7 +32,7 @@ class OneInitiator implements StInitiatorStrategy{
 
 }
 
-class RoundRobin implements StInitiatorStrategy{
+class RoundRobin implements CiInitiatorStrategy {
 
     private final int nodesCount;
     private int currentId = -1;

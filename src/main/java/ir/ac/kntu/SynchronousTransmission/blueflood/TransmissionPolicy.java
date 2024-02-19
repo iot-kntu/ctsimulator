@@ -1,16 +1,16 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
+import ir.ac.kntu.SynchronousTransmission.CtNetworkTime;
 import ir.ac.kntu.SynchronousTransmission.Node;
 import ir.ac.kntu.SynchronousTransmission.NodeState;
-import ir.ac.kntu.SynchronousTransmission.StNetworkTime;
 
 public interface TransmissionPolicy {
 
     int getFloodRepeatCount();
 
-    StNetworkTime getNetworkTime(long time);
+    CtNetworkTime getNetworkTime(long time);
 
-    void newRound(StNetworkTime networkTime, Node initiator);
+    void newRound(CtNetworkTime networkTime, Node initiator);
 
     void newSlot(int slot);
 

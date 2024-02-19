@@ -2,9 +2,9 @@ package ir.ac.kntu.SynchronousTransmission;
 
 public class SimulationContext implements ContextView {
 
-    StSimulator simulator;
+    CtSimulator simulator;
     NetGraph netGraph;
-    StApplication rootApplication;
+    ConcurrentTransmissionApplication rootApplication;
     long time;
     //int round;
     //int slot;
@@ -14,12 +14,12 @@ public class SimulationContext implements ContextView {
     }
 
     @Override
-    public StSimulator getSimulator() {
+    public CtSimulator getSimulator() {
         return simulator;
     }
 
     @Override
-    public StApplication getApplication() {
+    public ConcurrentTransmissionApplication getApplication() {
         return rootApplication;
     }
 

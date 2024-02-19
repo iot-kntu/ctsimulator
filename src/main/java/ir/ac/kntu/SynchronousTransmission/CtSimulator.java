@@ -8,13 +8,16 @@ import java.util.PriorityQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class StSimulator {
+/**
+ * Concurrent Transmission network simulator
+ */
+public class CtSimulator {
 
     private final PriorityQueue<SimEvent> eventQueue = new PriorityQueue<>();
     private final SimulationContext context;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
-    private StSimulator(NetGraph graph, StApplication application) {
+    private CtSimulator(NetGraph graph, ConcurrentTransmissionApplication application) {
         Objects.requireNonNull(graph);
         Objects.requireNonNull(application);
 
@@ -23,8 +26,8 @@ public class StSimulator {
         this.context.rootApplication = application;
     }
 
-    public static StSimulator createInstance(NetGraph graph, StApplication application) {
-        StSimulator instance = new StSimulator(graph, application);
+    public static CtSimulator createInstance(NetGraph graph, ConcurrentTransmissionApplication application) {
+        CtSimulator instance = new CtSimulator(graph, application);
         instance.context.simulator = instance;
         return instance;
     }

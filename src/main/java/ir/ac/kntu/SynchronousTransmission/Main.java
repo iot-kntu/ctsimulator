@@ -38,14 +38,14 @@ public class Main {
                 static int counter = 1;
 
                 @Override
-                public StMessage<String> buildMessage(ContextView context) {
+                public CiMessage<String> buildMessage(ContextView context) {
                     String msg = "MSG-" + strategies.initiatorStrategy().getCurrentInitiatorId() + "-" + counter++;
-                    return new StMessage<>(netGraph.getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId()),
+                    return new CiMessage<>(netGraph.getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId()),
                                            msg);
                 }
             };
 
-            StSimulator simulator = StSimulator.createInstance(netGraph, blueFloodApplication);
+            CtSimulator simulator = CtSimulator.createInstance(netGraph, blueFloodApplication);
             simulator.start();
 
             System.out.println(blueFloodApplication.printTimeline());

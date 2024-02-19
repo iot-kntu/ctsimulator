@@ -5,10 +5,10 @@ import ir.ac.kntu.SynchronousTransmission.blueflood.TransmissionPolicy;
 import ir.ac.kntu.SynchronousTransmission.events.CtPacketsEvent;
 
 /**
- * This class is default null implementation of the {@link StApplication} interface
+ * This class is default null implementation of the {@link ConcurrentTransmissionApplication} interface
  * and does nothing. It can be used as a terminator of an application chain.
  */
-public class NullApplication implements StApplication {
+public class NullApplication implements ConcurrentTransmissionApplication {
 
 
     @Override

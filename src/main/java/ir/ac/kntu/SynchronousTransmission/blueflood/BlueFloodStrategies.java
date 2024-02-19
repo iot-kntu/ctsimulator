@@ -1,8 +1,8 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
-import ir.ac.kntu.SynchronousTransmission.StInitiatorStrategy;
+import ir.ac.kntu.SynchronousTransmission.CiInitiatorStrategy;
 
-public record BlueFloodStrategies(StInitiatorStrategy initiatorStrategy,
+public record BlueFloodStrategies(CiInitiatorStrategy initiatorStrategy,
                                   TransmissionPolicy transmissionPolicy) {
 
 }

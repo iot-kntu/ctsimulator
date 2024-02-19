@@ -1,8 +1,8 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies;
 
+import ir.ac.kntu.SynchronousTransmission.CiMessage;
 import ir.ac.kntu.SynchronousTransmission.ContextView;
 import ir.ac.kntu.SynchronousTransmission.Node;
-import ir.ac.kntu.SynchronousTransmission.StMessage;
 
 import java.util.Date;
 import java.util.Random;
@@ -22,7 +22,7 @@ public abstract class SilentAndFaultyFloodStrategy extends FaultyFloodStrategy {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, Node sender, StMessage<T> message) {
+    public <T> void floodMessage(ContextView context, Node sender, CiMessage<T> message) {
         if (random.nextDouble() > silencePercent)
             super.floodMessage(context, sender, message);
 

@@ -1,9 +1,9 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
+import ir.ac.kntu.SynchronousTransmission.CtNetworkTime;
 import ir.ac.kntu.SynchronousTransmission.NetGraph;
 import ir.ac.kntu.SynchronousTransmission.Node;
 import ir.ac.kntu.SynchronousTransmission.NodeState;
-import ir.ac.kntu.SynchronousTransmission.StNetworkTime;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -16,7 +16,7 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
 
     private final int floodRepeatCount;
     private final NetGraph netGraph;
-    private final SortedMap<StNetworkTime, SortedMap<Node, List<NodeState>>> stateHistory;
+    private final SortedMap<CtNetworkTime, SortedMap<Node, List<NodeState>>> stateHistory;
     private SortedMap<Node, List<NodeState>> nodeStateMap;
 
     public DefaultTransmissionPolicy(int floodRepeatCount, NetGraph netGraph) {
@@ -31,16 +31,16 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
     }
 
     @Override
-    public StNetworkTime getNetworkTime(long time) {
+    public CtNetworkTime getNetworkTime(long time) {
         final int totalSlotsOfRound = getTotalSlotsOfRound();
         int round = (int) (1.0 * time / totalSlotsOfRound);
         int slot = (int) (time % totalSlotsOfRound);
 
-        return new StNetworkTime(round, slot);
+        return new CtNetworkTime(round, slot);
     }
 
     @Override
-    public void newRound(StNetworkTime networkTime, Node initiator) {
+    public void newRound(CtNetworkTime networkTime, Node initiator) {
         Objects.requireNonNull(networkTime);
         Objects.requireNonNull(initiator);
 
@@ -95,9 +95,9 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
 
         builder.append(String.format("%1$5s", "R"));
 
-        for (StNetworkTime StNetworkTime : stateHistory.keySet()) {
+        for (CtNetworkTime CtNetworkTime : stateHistory.keySet()) {
             for (int i = 0; i < getTotalSlotsOfRound(); i++) {
-                builder.append(String.format("%1$5s", StNetworkTime.round()));
+                builder.append(String.format("%1$5s", CtNetworkTime.round()));
             }
 
             builder.append(String.format("%1$5s", "|"));
