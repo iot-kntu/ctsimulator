@@ -1,9 +1,7 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodBaseApplication;
-import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodStrategies;
-import ir.ac.kntu.SynchronousTransmission.blueflood.DefaultTransmissionPolicy;
-import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFloodStrategy;
+import ir.ac.kntu.SynchronousTransmission.blueflood.*;
+import ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies.SilentFloodStrategy;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +42,8 @@ public class Main {
                                            msg);
                 }
             };
+
+            blueFloodApplication.setFloodStrategy(NodeFloodStrategyType.Silent, new SilentFloodStrategy());
 
             CtSimulator simulator = CtSimulator.createInstance(netGraph, blueFloodApplication);
             simulator.start();

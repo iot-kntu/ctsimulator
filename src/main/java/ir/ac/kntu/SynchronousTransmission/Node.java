@@ -1,6 +1,6 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFloodStrategyTypes;
+import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFloodStrategyType;
 
 import java.util.Objects;
 
@@ -8,23 +8,23 @@ public class Node implements Comparable<Node>{
     public static final Node NULL_NODE = new Node(-1);
 
     private final int id;
-    private NodeFloodStrategyTypes floodStrategy;
+    private NodeFloodStrategyType floodStrategy;
 
 
     public Node(int id) {
         this.id = id;
-        this.floodStrategy = NodeFloodStrategyTypes.Normal;
+        this.floodStrategy = NodeFloodStrategyType.Normal;
     }
 
     public int getId() {
         return id;
     }
 
-    public NodeFloodStrategyTypes getFloodStrategy() {
+    public NodeFloodStrategyType getFloodStrategy() {
         return floodStrategy;
     }
 
-    public Node setFloodStrategy(NodeFloodStrategyTypes floodStrategy) {
+    public Node setFloodStrategy(NodeFloodStrategyType floodStrategy) {
         this.floodStrategy = floodStrategy;
         return this;
     }

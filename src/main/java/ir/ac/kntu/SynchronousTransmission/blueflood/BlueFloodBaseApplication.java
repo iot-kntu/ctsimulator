@@ -1,6 +1,7 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
 import ir.ac.kntu.SynchronousTransmission.*;
+import ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies.NonFaultyFloodStrategy;
 import ir.ac.kntu.SynchronousTransmission.events.CtPacketsEvent;
 import ir.ac.kntu.SynchronousTransmission.events.FloodPacket;
 import ir.ac.kntu.SynchronousTransmission.events.SimInitiateFloodEvent;
@@ -15,14 +16,16 @@ public abstract class BlueFloodBaseApplication implements ConcurrentTransmission
 
     protected final BlueFloodStrategies strategies;
     private final BlueFloodSettings settings;
-    private final HashMap<Node, NodeFloodStrategy> nodeFloodStrategies;
     private final Random random = new Random(new Date().getTime());
     private CtNetworkTime networkTime;
+    private final HashMap<NodeFloodStrategyType, NodeFloodStrategy> floodStrategies;
 
     public BlueFloodBaseApplication(BlueFloodSettings settings, BlueFloodStrategies strategies) {
         this.settings = settings;
         this.strategies = strategies;
-        this.nodeFloodStrategies = new HashMap<>();
+
+        this.floodStrategies = new HashMap<>();
+        this.floodStrategies.put(NodeFloodStrategyType.Normal, new NonFaultyFloodStrategy());
     }
 
     public abstract CiMessage<?> buildMessage(ContextView context);
@@ -163,18 +166,18 @@ public abstract class BlueFloodBaseApplication implements ConcurrentTransmission
     }
 
     private NodeFloodStrategy getNodeFloodStrategy(Node inode) {
-        NodeFloodStrategy floodStrategy = nodeFloodStrategies.get(inode);
-        if (floodStrategy == null) {
-            try {
-                floodStrategy = inode.getFloodStrategy().getStrategy();
-            }
-            catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        final NodeFloodStrategy floodStrategy = floodStrategies.get(inode.getFloodStrategy());
+        if(floodStrategy == null)
+            throw new IllegalStateException("No strategy is set for type:" + inode.getFloodStrategy()
+             + " for node " + inode);
 
-            nodeFloodStrategies.put(inode, floodStrategy);
-        }
         return floodStrategy;
+    }
+
+
+    public NodeFloodStrategy setFloodStrategy(NodeFloodStrategyType type, NodeFloodStrategy floodStrategy){
+        final NodeFloodStrategy oldValue = this.floodStrategies.put(type, floodStrategy);
+        return oldValue;
     }
 }
 

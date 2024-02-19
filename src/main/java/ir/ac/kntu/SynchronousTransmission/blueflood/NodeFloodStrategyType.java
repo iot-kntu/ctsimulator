@@ -2,9 +2,7 @@ package ir.ac.kntu.SynchronousTransmission.blueflood;
 
 import ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies.*;
 
-import java.lang.reflect.InvocationTargetException;
-
-public enum NodeFloodStrategyTypes {
+public enum NodeFloodStrategyType {
     /**
      * No faulty
      */
@@ -13,7 +11,7 @@ public enum NodeFloodStrategyTypes {
     /**
      * Node does not send anything
      */
-    OnlySilent(SilentFloodStrategy.class),
+    Silent(SilentFloodStrategy.class),
 
     /**
      * Node sends faulty packet only in its turn
@@ -34,21 +32,13 @@ public enum NodeFloodStrategyTypes {
 
     private final Class<? extends NodeFloodStrategy> floodStrategy;
 
-    NodeFloodStrategyTypes(Class<? extends NodeFloodStrategy> floodStrategy) {
+    NodeFloodStrategyType(Class<? extends NodeFloodStrategy> floodStrategy) {
         this.floodStrategy = floodStrategy;
     }
 
-    public Class<? extends NodeFloodStrategy> getFloodStrategy() {
+    public Class<? extends NodeFloodStrategy> getFloodStrategyClass() {
         return floodStrategy;
     }
-
-    public NodeFloodStrategy getStrategy() throws NoSuchMethodException,
-            InvocationTargetException, InstantiationException, IllegalAccessException {
-
-        return getFloodStrategy().getDeclaredConstructor()
-                                 .newInstance();
-    }
-
 
 }
 
