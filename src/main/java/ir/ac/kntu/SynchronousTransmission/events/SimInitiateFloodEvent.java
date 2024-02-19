@@ -1,11 +1,12 @@
 package ir.ac.kntu.SynchronousTransmission.events;
 
+import ir.ac.kntu.SynchronousTransmission.BaseSimEvent;
 import ir.ac.kntu.SynchronousTransmission.ContextView;
-import ir.ac.kntu.SynchronousTransmission.StEvent;
 
+import java.util.Objects;
 import java.util.StringJoiner;
 
-public class StInitiateFloodEvent extends StEvent {
+public class SimInitiateFloodEvent extends BaseSimEvent {
 
     private final int nextInitiator;
 
@@ -13,21 +14,21 @@ public class StInitiateFloodEvent extends StEvent {
         return nextInitiator;
     }
 
-    public StInitiateFloodEvent(long time, int nextInitiator) {
+    public SimInitiateFloodEvent(long time, int nextInitiator) {
         super(time);
         this.nextInitiator = nextInitiator;
     }
 
     @Override
     public void handle(ContextView context) {
-        super.handle(context);
+        Objects.requireNonNull(context);
 
         context.getApplication().initiateFlood(context);
     }
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", StInitiateFloodEvent.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", SimInitiateFloodEvent.class.getSimpleName() + "[", "]")
                 .add("t="+getTime())
                 .toString();
     }

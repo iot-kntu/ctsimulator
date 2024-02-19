@@ -1,18 +1,13 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
+import ir.ac.kntu.SynchronousTransmission.blueflood.TransmissionPolicy;
+import ir.ac.kntu.SynchronousTransmission.events.CtPacketsEvent;
 
 /**
  * An interface defining applications on the Synch. Transmission base. Applications can be
  * chained.
  */
 public interface StApplication {
-
-    default StApplication next() {
-        return new NullApplication();
-    }
-
-    void addNextApplication(StApplication application);
 
     /**
      * Called by simulator to announce simulation start
@@ -28,14 +23,16 @@ public interface StApplication {
      */
     void simulationTimeProgressed(ContextView context);
 
+    void newRound(ContextView context);
+
     void initiateFlood(ContextView context) throws RuntimeException;
+
+    void ctPacketsReceived(CtPacketsEvent ctEvent, ContextView context);
 
     Node getInitiatorNode(ContextView context);
 
-    void packetReceived(StFloodPacket<?> packet, ContextView context);
-
     NodeState getNodeState(Node node);
 
-    void newRound(ContextView context);
+    TransmissionPolicy getTransmissionPolicy();
 }
 

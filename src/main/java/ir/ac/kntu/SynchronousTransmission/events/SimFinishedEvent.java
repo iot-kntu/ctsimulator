@@ -5,17 +5,16 @@ import ir.ac.kntu.SynchronousTransmission.ContextView;
 
 import java.util.Objects;
 
-public class SimulationStartEvent extends BaseSimEvent {
+public class SimFinishedEvent extends BaseSimEvent {
 
-    public SimulationStartEvent(long time) {
-        super(time, SimEventPriority.High);
+    public SimFinishedEvent(long time) {
+        super(time, SimEventPriority.Low);
     }
 
     @Override
     public void handle(ContextView context) {
         Objects.requireNonNull(context);
 
-        context.getApplication().simulationStarting(context);
+        context.getApplication().simulationFinishing(context);
     }
 }
-

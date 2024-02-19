@@ -1,6 +1,8 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
+import ir.ac.kntu.SynchronousTransmission.blueflood.DefaultTransmissionPolicy;
+import ir.ac.kntu.SynchronousTransmission.blueflood.TransmissionPolicy;
+import ir.ac.kntu.SynchronousTransmission.events.CtPacketsEvent;
 
 /**
  * This class is default null implementation of the {@link StApplication} interface
@@ -8,10 +10,6 @@ import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
  */
 public class NullApplication implements StApplication {
 
-    @Override
-    public void addNextApplication(StApplication application) {
-
-    }
 
     @Override
     public void simulationStarting(ContextView context) {
@@ -34,18 +32,23 @@ public class NullApplication implements StApplication {
     }
 
     @Override
+    public void ctPacketsReceived(CtPacketsEvent packets, ContextView context) {
+
+    }
+
+    @Override
     public Node getInitiatorNode(ContextView context) {
         return Node.NULL_NODE;
     }
 
     @Override
-    public void packetReceived(StFloodPacket<?> packet, ContextView context) {
-
+    public NodeState getNodeState(Node node) {
+        return NodeState.Sleep;
     }
 
     @Override
-    public NodeState getNodeState(Node node) {
-        return NodeState.Sleep;
+    public TransmissionPolicy getTransmissionPolicy() {
+        return new DefaultTransmissionPolicy(0, NetGraph.EMPTY_GRAPH);
     }
 
     @Override

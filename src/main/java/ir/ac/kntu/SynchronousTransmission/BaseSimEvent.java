@@ -1,21 +1,23 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import java.util.Objects;
+import ir.ac.kntu.SynchronousTransmission.events.SimEvent;
+import ir.ac.kntu.SynchronousTransmission.events.SimEventPriority;
+
 import java.util.StringJoiner;
 import java.util.logging.Logger;
 
-public class StEvent implements Comparable<StEvent> {
+public abstract class BaseSimEvent implements SimEvent, Comparable<BaseSimEvent> {
 
     private final long time;
-    private final StEventPriority priority;
+    private final SimEventPriority priority;
     private final Logger logger = Logger.getLogger("StEvent");
 
-    public StEvent(long time) {
+    public BaseSimEvent(long time) {
         this.time = time;
-        this.priority = StEventPriority.Normal;
+        this.priority = SimEventPriority.Normal;
     }
 
-    public StEvent(long time, StEventPriority priority) {
+    public BaseSimEvent(long time, SimEventPriority priority) {
         this.time = time;
         this.priority = priority;
     }
@@ -24,7 +26,7 @@ public class StEvent implements Comparable<StEvent> {
         return time;
     }
 
-    public StEventPriority getPriority() {
+    public SimEventPriority getPriority() {
         return priority;
     }
 
@@ -38,12 +40,10 @@ public class StEvent implements Comparable<StEvent> {
      *
      * @param context gives the read only state of simulation instance
      */
-    public void handle(ContextView context) {
-        Objects.requireNonNull(context);
-    }
+    public abstract void handle(ContextView context);
 
     @Override
-    public int compareTo(StEvent o) {
+    public int compareTo(BaseSimEvent o) {
         if (this.time == o.time)
             // as high priorities has higher value
             //  the reverse of comparison result should be considered
@@ -54,7 +54,7 @@ public class StEvent implements Comparable<StEvent> {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", StEvent.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", BaseSimEvent.class.getSimpleName() + "[", "]")
                 .add("t=" + time)
                 .toString();
     }

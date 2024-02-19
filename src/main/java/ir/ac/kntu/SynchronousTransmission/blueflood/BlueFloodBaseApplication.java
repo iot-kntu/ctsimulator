@@ -1,18 +1,22 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
 import ir.ac.kntu.SynchronousTransmission.*;
-import ir.ac.kntu.SynchronousTransmission.events.StFloodPacket;
-import ir.ac.kntu.SynchronousTransmission.events.StInitiateFloodEvent;
+import ir.ac.kntu.SynchronousTransmission.events.CtPacketsEvent;
+import ir.ac.kntu.SynchronousTransmission.events.FloodPacket;
+import ir.ac.kntu.SynchronousTransmission.events.SimInitiateFloodEvent;
 
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public abstract class BlueFloodBaseApplication extends BaseApplication {
+public abstract class BlueFloodBaseApplication implements StApplication {
+
+    private final Logger logger = Logger.getLogger("BlueFloodApplication");
 
     protected final BlueFloodStrategies strategies;
     private final BlueFloodSettings settings;
-    private final HashMap<Node, FloodStrategy> nodeFloodStrategies;
+    private final HashMap<Node, NodeFloodStrategy> nodeFloodStrategies;
+    private final Random random = new Random(new Date().getTime());
     private StNetworkTime networkTime;
 
     public BlueFloodBaseApplication(BlueFloodSettings settings, BlueFloodStrategies strategies) {
@@ -26,13 +30,11 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
     @Override
     public void simulationStarting(ContextView context) {
         newRound(context);
-
-        super.simulationStarting(context);
     }
 
     @Override
     public void simulationFinishing(ContextView context) {
-        super.simulationFinishing(context);
+
     }
 
     @Override
@@ -42,7 +44,6 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         final TransmissionPolicy transmissionPolicy = strategies.transmissionPolicy();
         this.networkTime = transmissionPolicy.getNetworkTime(context.getTime());
 
-        super.simulationTimeProgressed(context);
     }
 
     @Override
@@ -55,31 +56,34 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
 
         // scheduling the next round to keep the simulation working even with faults
         context.getSimulator().scheduleEvent(
-                new StNewRoundEvent(context.getTime() + strategies.transmissionPolicy().getTotalSlotsOfRound()));
+                new SimNewRoundEvent(context.getTime() + strategies.transmissionPolicy().getTotalSlotsOfRound()));
 
         final StMessage<?> message = buildMessage(context);
         logger.log(Level.INFO, "[" + context.getTime() + "] Node-" + inode.getId() +
                 " initiated message [" + message.messageNo() + "]");
 
-        final FloodStrategy floodStrategy = getNodeFloodStrategy(inode);
+        final NodeFloodStrategy floodStrategy = getNodeFloodStrategy(inode);
         floodStrategy.floodMessage(context, inode, message);
 
         strategies.transmissionPolicy().printCurrentNodeStates();
-
-        next().initiateFlood(context);
     }
 
     @Override
-    public Node getInitiatorNode(ContextView context) {
-        return context.getNetGraph().getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId());
-    }
-
-    @Override
-    public void packetReceived(StFloodPacket<?> packet, ContextView context) {
-        Objects.requireNonNull(packet);
+    public void ctPacketsReceived(CtPacketsEvent ctEvent, ContextView context) {
+        Objects.requireNonNull(ctEvent);
         Objects.requireNonNull(context);
 
-        final Node receiver = packet.getReceiver();
+        final List<FloodPacket<?>> packets = ctEvent.getPackets();
+
+        if (packets.isEmpty())
+            return;
+
+        FloodPacket<?> thePacket = packets.size() == 1
+                ? packets.get(0)
+                : packets.get(random.nextInt(packets.size()));
+
+        final Node receiver = ctEvent.getReceiver();
+
         switch (getNodeState(receiver)) {
 
             case Sleep -> {
@@ -89,23 +93,43 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
                                                           context.getTime(),
                                                           networkTime.round(),
                                                           networkTime.slot(),
-                                                          receiver.getId(), packet.getStMessage().messageNo()));
+                                                          receiver.getId(), thePacket.stMessage().messageNo()));
 
                 strategies.transmissionPolicy().newPacketReceived(receiver, getSlot());
 
-                final FloodStrategy floodStrategy = getNodeFloodStrategy(receiver);
-                floodStrategy.floodMessage(context, receiver, packet.getStMessage());
+                double receiveProbability = ctEvent.arePacketsSimilar()
+                        ? settings.lossProbability()
+                        : settings.conflictProbability();
+
+                if (random.nextDouble() >= receiveProbability) { // no loss
+                    final NodeFloodStrategy floodStrategy = getNodeFloodStrategy(receiver);
+                    floodStrategy.floodMessage(context, receiver, thePacket.stMessage());
+                }
+                else {
+                    logger.log(Level.INFO, "PKT[" + thePacket + "] lost due to "
+                            + ((ctEvent.arePacketsSimilar()) ? "general loss" : "conflict"));
+                }
             }
-            case Flood -> getLogger().log(Level.WARNING, "Received packet while in the flooding state");
+            case Flood -> {
+                //getLogger().log(Level.WARNING, "Received packet while in the flooding state");
+            }
         }
 
         strategies.transmissionPolicy().printCurrentNodeStates();
 
-        super.packetReceived(packet, context);
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
     @Override
-    public NodeState getNodeState(Node node){
+    public Node getInitiatorNode(ContextView context) {
+        return context.getNetGraph().getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId());
+    }
+
+    @Override
+    public NodeState getNodeState(Node node) {
         return strategies.transmissionPolicy().getNodeState(node, getSlot());
     }
 
@@ -116,7 +140,7 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
 
         if (getRound() < settings.roundLimit()) {
             final int nextInitiator = strategies.initiatorStrategy().getNextInitiatorId();
-            StInitiateFloodEvent initiateFloodEvent = new StInitiateFloodEvent(context.getTime(), nextInitiator);
+            SimInitiateFloodEvent initiateFloodEvent = new SimInitiateFloodEvent(context.getTime(), nextInitiator);
             context.getSimulator().scheduleEvent(initiateFloodEvent);
         }
     }
@@ -133,11 +157,16 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         return networkTime.slot();
     }
 
-    private FloodStrategy getNodeFloodStrategy(Node inode) {
-        FloodStrategy floodStrategy = nodeFloodStrategies.get(inode);
+    @Override
+    public TransmissionPolicy getTransmissionPolicy() {
+        return strategies.transmissionPolicy();
+    }
+
+    private NodeFloodStrategy getNodeFloodStrategy(Node inode) {
+        NodeFloodStrategy floodStrategy = nodeFloodStrategies.get(inode);
         if (floodStrategy == null) {
             try {
-                floodStrategy = inode.getFloodStrategy().getStrategy(settings);
+                floodStrategy = inode.getFloodStrategy().getStrategy();
             }
             catch (Exception e) {
                 throw new RuntimeException(e);
@@ -147,7 +176,5 @@ public abstract class BlueFloodBaseApplication extends BaseApplication {
         }
         return floodStrategy;
     }
-
-
 }
 

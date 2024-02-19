@@ -1,15 +1,16 @@
-package ir.ac.kntu.SynchronousTransmission.blueflood;
+package ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies;
 
-import ir.ac.kntu.SynchronousTransmission.*;
+import ir.ac.kntu.SynchronousTransmission.ContextView;
+import ir.ac.kntu.SynchronousTransmission.Node;
+import ir.ac.kntu.SynchronousTransmission.NodeState;
+import ir.ac.kntu.SynchronousTransmission.StMessage;
 
 public abstract class FaultyInitiateFloodStrategy extends FaultyFloodStrategy {
 
     final NonFaultyFloodStrategy nonFaultyFloodStrategy;
 
-    public FaultyInitiateFloodStrategy(BlueFloodSettings settings) {
-        super(settings);
-
-        nonFaultyFloodStrategy = new NonFaultyFloodStrategy(settings);
+    public FaultyInitiateFloodStrategy() {
+        nonFaultyFloodStrategy = new NonFaultyFloodStrategy();
     }
 
     @Override

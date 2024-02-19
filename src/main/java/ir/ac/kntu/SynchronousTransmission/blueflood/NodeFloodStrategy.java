@@ -1,54 +1,13 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
-import ir.ac.kntu.SynchronousTransmission.BlueFloodSettings;
+import ir.ac.kntu.SynchronousTransmission.ContextView;
+import ir.ac.kntu.SynchronousTransmission.Node;
+import ir.ac.kntu.SynchronousTransmission.StMessage;
 
-import java.lang.reflect.InvocationTargetException;
+public interface NodeFloodStrategy {
 
-public enum NodeFloodStrategy {
-    /**
-     * No faulty
-     */
-    Normal(NonFaultyFloodStrategy.class),
+    double DEFAULT_INTERFERENCE_PROB = 0.9;
 
-    /**
-     * Node does not send anything
-     */
-    OnlySilent(SilentFloodStrategy.class),
-
-    /**
-     * Node sends faulty packet only in its turn
-     * and may send different packets in flood repeats.
-     */
-    FaultyInitiate(FaultyInitiateFloodStrategy.class),
-
-    /**
-     * Node floods faulty packet in all of its slots.
-     */
-    FaultyFlood(FaultyFloodStrategy.class),
-
-    /**
-     * Node floods faulty packets or it is silent. This is the combination of
-     * the previous three modes.
-     */
-    SilentAndFaulty(SilentAndFaultyFloodStrategy.class)
-    ;
-
-    private final Class<? extends FloodStrategy> floodStrategy;
-
-    NodeFloodStrategy(Class<? extends FloodStrategy> floodStrategy) {
-        this.floodStrategy = floodStrategy;
-    }
-
-    public Class<? extends FloodStrategy> getFloodStrategy() {
-        return floodStrategy;
-    }
-
-    public FloodStrategy getStrategy(BlueFloodSettings settings) throws NoSuchMethodException,
-            InvocationTargetException, InstantiationException, IllegalAccessException {
-
-        return getFloodStrategy().getDeclaredConstructor(BlueFloodSettings.class).newInstance(settings);
-    }
-
-
+    <T> void floodMessage(ContextView context, Node sender, StMessage<T> message);
 }
 

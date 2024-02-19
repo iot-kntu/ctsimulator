@@ -3,6 +3,7 @@ package ir.ac.kntu.SynchronousTransmission;
 import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodBaseApplication;
 import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodStrategies;
 import ir.ac.kntu.SynchronousTransmission.blueflood.DefaultTransmissionPolicy;
+import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFloodStrategy;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,17 +23,18 @@ public class Main {
                 throw new IllegalArgumentException("Invalid graph file format, it is not loaded");
 
             BlueFloodSettings settings = new BlueFloodSettings(
-                    0.0,    // loss probability
-                    5,      // rounds limit
-                    2       // flood repeat times
+                    0.0,
+                    NodeFloodStrategy.DEFAULT_INTERFERENCE_PROB,
+                    5      // rounds limit
             );
 
             BlueFloodStrategies strategies = new BlueFloodStrategies(
                     new RoundRobin(netGraph.getNodeCount()), //initiator strategy
-                    new DefaultTransmissionPolicy(settings, netGraph)
+                    new DefaultTransmissionPolicy(3, netGraph)
             );
 
             BlueFloodBaseApplication blueFloodApplication = new BlueFloodBaseApplication(settings, strategies) {
+
                 static int counter = 1;
 
                 @Override

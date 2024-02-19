@@ -1,7 +1,8 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.events.SimulationStartEvent;
+import ir.ac.kntu.SynchronousTransmission.events.*;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.logging.Level;
@@ -9,7 +10,7 @@ import java.util.logging.Logger;
 
 public class StSimulator {
 
-    private final PriorityQueue<StEvent> eventQueue = new PriorityQueue<>();
+    private final PriorityQueue<SimEvent> eventQueue = new PriorityQueue<>();
     private final SimulationContext context;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -36,7 +37,7 @@ public class StSimulator {
         while (!eventQueue.isEmpty()) {
 
             try {
-                final StEvent event = eventQueue.poll();
+                final SimEvent event = eventQueue.poll();
                 logger.log(Level.FINE, "Event popped:" + event);
 
                 final int timeDiff = (int) (event.getTime() - context.time);
@@ -53,9 +54,31 @@ public class StSimulator {
         }
     }
 
-    public void scheduleEvent(StEvent stEvent) {
-        eventQueue.add(stEvent);
-        logger.log(Level.FINE, "Event scheduled:" + stEvent);
+    public void schedulePacket(FloodPacket<?> packet) {
+        final List<SimEvent> existingCtEvents = eventQueue
+                .stream()
+                .filter(ev -> ev instanceof CtPacketsEvent)
+                .filter(ev -> {
+                    CtPacketsEvent event = (CtPacketsEvent) ev;
+                    return event.getTime() == packet.time() && event.getReceiver().equals(packet.receiver());
+                }).toList();
+
+        if (existingCtEvents.isEmpty()) {
+            CtPacketsEvent packetsEvent = new CtPacketsEvent(packet.time(), packet);
+            eventQueue.add(packetsEvent);
+        }
+        else {
+            if (existingCtEvents.size() > 1)
+                throw new IllegalStateException("Several CtEvents exists:\n" + existingCtEvents);
+
+            final CtEvent existingCtEvent = (CtEvent) existingCtEvents.get(0);
+            existingCtEvent.addPacket(packet);
+        }
+    }
+
+    public void scheduleEvent(SimEvent simEvent) {
+        eventQueue.add(simEvent);
+        logger.log(Level.FINE, "Event scheduled:" + simEvent);
     }
 
 }

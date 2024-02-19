@@ -1,6 +1,9 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
-import ir.ac.kntu.SynchronousTransmission.*;
+import ir.ac.kntu.SynchronousTransmission.NetGraph;
+import ir.ac.kntu.SynchronousTransmission.Node;
+import ir.ac.kntu.SynchronousTransmission.NodeState;
+import ir.ac.kntu.SynchronousTransmission.StNetworkTime;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -16,8 +19,8 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
     private final SortedMap<StNetworkTime, SortedMap<Node, List<NodeState>>> stateHistory;
     private SortedMap<Node, List<NodeState>> nodeStateMap;
 
-    public DefaultTransmissionPolicy(BlueFloodSettings settings, NetGraph netGraph) {
-        this.floodRepeatCount = settings.floodRepeatCount();
+    public DefaultTransmissionPolicy(int floodRepeatCount, NetGraph netGraph) {
+        this.floodRepeatCount = floodRepeatCount;
         this.netGraph = netGraph;
         this.stateHistory = new TreeMap<>();
     }

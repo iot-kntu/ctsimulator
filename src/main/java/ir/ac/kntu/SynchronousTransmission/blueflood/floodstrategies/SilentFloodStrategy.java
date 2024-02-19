@@ -1,18 +1,15 @@
-package ir.ac.kntu.SynchronousTransmission.blueflood;
+package ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies;
 
-import ir.ac.kntu.SynchronousTransmission.BlueFloodSettings;
 import ir.ac.kntu.SynchronousTransmission.ContextView;
 import ir.ac.kntu.SynchronousTransmission.Node;
 import ir.ac.kntu.SynchronousTransmission.StMessage;
+import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFloodStrategy;
 
-public class SilentFloodStrategy implements FloodStrategy {
-
-
-    public SilentFloodStrategy(BlueFloodSettings settings) {
-    }
+public class SilentFloodStrategy implements NodeFloodStrategy {
 
     @Override
     public <T> void floodMessage(ContextView context, Node sender, StMessage<T> message) {
         // do nothing
     }
+
 }
