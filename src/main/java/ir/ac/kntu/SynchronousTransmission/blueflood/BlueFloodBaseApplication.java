@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class BlueFloodBaseApplication implements ConcurrentTransmissionApplication {
+public class BlueFloodBaseApplication implements ConcurrentTransmissionApplication {
 
     private final Logger logger = Logger.getLogger("BlueFloodApplication");
 
@@ -27,8 +27,6 @@ public abstract class BlueFloodBaseApplication implements ConcurrentTransmission
         this.floodStrategies = new HashMap<>();
         this.floodStrategies.put(NodeFloodStrategyType.Normal, new NonFaultyFloodStrategy());
     }
-
-    public abstract CiMessage<?> buildMessage(ContextView context);
 
     @Override
     public void simulationStarting(ContextView context) {
@@ -61,7 +59,7 @@ public abstract class BlueFloodBaseApplication implements ConcurrentTransmission
         context.getSimulator().scheduleEvent(
                 new SimNewRoundEvent(context.getTime() + strategies.transmissionPolicy().getTotalSlotsOfRound()));
 
-        final CiMessage<?> message = buildMessage(context);
+        final CiMessage<?> message = strategies.messageBuilder().buildMessage(context, inode);
         logger.log(Level.INFO, "[" + context.getTime() + "] Node-" + inode.getId() +
                 " initiated message [" + message.messageNo() + "]");
 

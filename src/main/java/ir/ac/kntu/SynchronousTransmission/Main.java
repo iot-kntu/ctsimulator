@@ -1,12 +1,15 @@
 package ir.ac.kntu.SynchronousTransmission;
 
 import ir.ac.kntu.SynchronousTransmission.blueflood.*;
+import ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies.NonFaultyFloodStrategy;
+import ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies.SilentAndFaultyFloodStrategy;
 import ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies.SilentFloodStrategy;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.LogManager;
+
 
 public class Main {
 
@@ -27,23 +30,28 @@ public class Main {
             );
 
             BlueFloodStrategies strategies = new BlueFloodStrategies(
-                    new RoundRobin(netGraph.getNodeCount()), //initiator strategy
-                    new DefaultTransmissionPolicy(3, netGraph)
+                    new RoundRobin(netGraph.getNodeCount()),    //initiator strategy
+                    new DefaultTransmissionPolicy(3, netGraph),  // flood repeat count
+                    new SimpleStringBlueFloodMessageBuilder()
             );
 
-            BlueFloodBaseApplication blueFloodApplication = new BlueFloodBaseApplication(settings, strategies) {
+            BlueFloodBaseApplication blueFloodApplication = new BlueFloodBaseApplication(settings, strategies);
 
-                static int counter = 1;
-
-                @Override
-                public CiMessage<String> buildMessage(ContextView context) {
-                    String msg = "MSG-" + strategies.initiatorStrategy().getCurrentInitiatorId() + "-" + counter++;
-                    return new CiMessage<>(netGraph.getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId()),
-                                           msg);
-                }
-            };
-
+            blueFloodApplication.setFloodStrategy(NodeFloodStrategyType.Normal, new NonFaultyFloodStrategy());
             blueFloodApplication.setFloodStrategy(NodeFloodStrategyType.Silent, new SilentFloodStrategy());
+            blueFloodApplication.setFloodStrategy(NodeFloodStrategyType.Silent, new SilentFloodStrategy());
+            blueFloodApplication.setFloodStrategy(NodeFloodStrategyType.SilentAndFaulty,
+                                                  new SilentAndFaultyFloodStrategy(0.3) {
+                                                      @Override
+                                                      protected <T> CiMessage<T> createFaultyMessage(ContextView context, Node sender, CiMessage<T> message, int whichRepeat) {
+
+                                                          final CiMessage<String> ciMessage = new CiMessage<>(
+                                                                  message.initiator(),
+                                                                  "  ");
+
+                                                          return (CiMessage<T>) ciMessage;
+                                                      }
+                                                  });
 
             CtSimulator simulator = CtSimulator.createInstance(netGraph, blueFloodApplication);
             simulator.start();

@@ -12,6 +12,10 @@ public abstract class SilentAndFaultyFloodStrategy extends FaultyFloodStrategy {
     private final Random random = new Random(new Date().getTime());
     private double silencePercent = 0.5;
 
+    public SilentAndFaultyFloodStrategy(double silencePercent) {
+        this.silencePercent = silencePercent;
+    }
+
     public double getSilencePercent() {
         return silencePercent;
     }

@@ -21,19 +21,19 @@ public abstract class FaultyFloodStrategy implements NodeFloodStrategy {
 
         for (int i = 0; i < floodRepeatCount; i++) {
 
-            createFaultyMessage(context, sender, message, i);
+            CiMessage<?> newMessage = createFaultyMessage(context, sender, message, i);
 
             for (Node neighbor : neighbors) {
 
-                final FloodPacket<T> packet = new FloodPacket<>(context.getTime() + 1 + i,
-                                                                message, sender, neighbor);
+                final FloodPacket<?> packet = new FloodPacket<>(context.getTime() + 1 + i,
+                                                                newMessage, sender, neighbor);
                 context.getSimulator().schedulePacket(packet);
             }
         }
     }
 
-    protected abstract <T> void createFaultyMessage(ContextView context, Node sender, CiMessage<T> message,
-                                                    int whichRepeat);
+    protected abstract <T> CiMessage<T> createFaultyMessage(ContextView context, Node sender,
+                                                            CiMessage<T> message, int whichRepeat);
 
 }
 
