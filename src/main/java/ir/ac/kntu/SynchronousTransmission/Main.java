@@ -30,8 +30,7 @@ public class Main {
 
             BlueFloodStrategies strategies = new BlueFloodStrategies(
                     new RoundRobin(netGraph.getNodeCount()),    //initiator strategy
-                    new DefaultTransmissionPolicy(3, netGraph),  // flood repeat count
-                    new SimpleStringBlueFloodMessageBuilder()
+                    new DefaultTransmissionPolicy(3, netGraph)  // flood repeat count
             );
 
             BlueFloodApplication blueFloodApplication = new BlueFloodApplication(settings, strategies);
