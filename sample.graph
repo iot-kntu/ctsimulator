@@ -2,7 +2,7 @@
 # <node class name>:
 #    0 means default LoyalCtNode
 #    otherwise: the exact name of the node class name which should be in the
-#       ir.ac.kntu.SynchronousTransmission.blueflood.nodes namespace
+#       ir.ac.kntu.concurrenttransmission.blueflood.nodes namespace
 0;1,2;0
 1;0,3;0
 2;0,3;0
