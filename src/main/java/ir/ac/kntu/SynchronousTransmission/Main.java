@@ -1,12 +1,15 @@
 package ir.ac.kntu.SynchronousTransmission;
 
 import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodApplication;
+import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodListener;
 import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodStrategies;
 import ir.ac.kntu.SynchronousTransmission.blueflood.DefaultTransmissionPolicy;
+import ir.ac.kntu.SynchronousTransmission.events.FloodPacket;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.logging.LogManager;
 
 
@@ -34,6 +37,29 @@ public class Main {
             );
 
             BlueFloodApplication blueFloodApplication = new BlueFloodApplication(settings, strategies);
+            blueFloodApplication.setListener(new BlueFloodListener() {
+                @Override
+                public void ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets) {
+
+                }
+
+                @Override
+                public void ctPacketsLost(ContextView context, List<FloodPacket<?>> packets,
+                                          boolean arePacketsSimilar) {
+
+                }
+
+                @Override
+                public CiMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat) {
+                    return null;
+                }
+
+                @Override
+                public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage,
+                                               int whichRepeat) {
+                    return null;
+                }
+            });
 
             CtSimulator simulator = CtSimulator.createInstance(netGraph, blueFloodApplication);
             simulator.start();

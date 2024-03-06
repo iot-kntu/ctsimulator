@@ -52,6 +52,16 @@ public class NullApplication implements ConcurrentTransmissionApplication {
     }
 
     @Override
+    public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
+        return CiMessage.NULL_MESSAGE;
+    }
+
+    @Override
+    public CiMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
+        return CiMessage.NULL_MESSAGE;
+    }
+
+    @Override
     public void newRound(ContextView context) {
 
     }

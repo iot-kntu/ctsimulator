@@ -9,7 +9,7 @@ import java.util.Random;
 
 /**
  * This node type somtimes sends faulty messages and sometimes remains silent
- * based on silencePercent parameter
+ * based on silencePercent parameter. The default silence probability is 50%
  */
 public class MixedFaultyCtNode extends FaultyCtNode {
 
@@ -26,6 +26,14 @@ public class MixedFaultyCtNode extends FaultyCtNode {
 
     public void setSilencePercent(double silencePercent) {
         this.silencePercent = silencePercent;
+    }
+
+    @Override
+    public void initiateFlood(ContextView context, CtNode initiatorNode) {
+        if (random.nextDouble() > silencePercent) {
+            super.initiateFlood(context, initiatorNode);
+        }
+        // else remain silent
     }
 
     @Override

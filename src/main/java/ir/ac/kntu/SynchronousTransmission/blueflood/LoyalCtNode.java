@@ -1,6 +1,5 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
-import ir.ac.kntu.SynchronousTransmission.BlueFloodSettings;
 import ir.ac.kntu.SynchronousTransmission.CiMessage;
 import ir.ac.kntu.SynchronousTransmission.ContextView;
 import ir.ac.kntu.SynchronousTransmission.CtNode;
@@ -23,13 +22,25 @@ public class LoyalCtNode implements CtNode {
     }
 
     @Override
-    public int getId() {
-        return id;
-    }
+    public void initiateFlood(ContextView context, CtNode initiatorNode) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(initiatorNode);
 
-    @Override
-    public CiMessage<?> initiateFlood(ContextView context) {
-        return null;
+        final int floodRepeatCount = context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
+        final List<CtNode> neighbors = context.getNetGraph().getNodeNeighbors(initiatorNode);
+
+        final CiMessage<?> ciMessage = context
+                .getApplication()
+                .getRoundInitiationMessage(context, initiatorNode, 0);
+
+        for (CtNode node : neighbors) {
+            for (int repeat = 0; repeat < floodRepeatCount; repeat++) {
+
+                final FloodPacket<?> stFloodPacket = new FloodPacket<>(context.getTime() + repeat, ciMessage,
+                                                                       initiatorNode, node);
+                context.getSimulator().schedulePacket(stFloodPacket);
+            }
+        }
     }
 
     @Override
@@ -39,26 +50,21 @@ public class LoyalCtNode implements CtNode {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(message);
 
+        final int floodRepeatCount = context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
         final List<CtNode> neighbors = context.getNetGraph().getNodeNeighbors(sender);
 
         for (CtNode node : neighbors) {
-            final FloodPacket<T> stFloodPacket = new FloodPacket<>(context.getTime() + 1, message, sender, node);
-            floodPacket(context, stFloodPacket);
+            for (int repeat = 0; repeat < floodRepeatCount; repeat++) {
+                final FloodPacket<T> stFloodPacket = new FloodPacket<>(context.getTime() + repeat, message, sender,
+                                                                       node);
+                context.getSimulator().schedulePacket(stFloodPacket);
+            }
         }
     }
 
-    /**
-     * Floods the given packet for {@link TransmissionPolicy#getFloodRepeatCount()} times, and
-     * also considers {@link BlueFloodSettings#lossProbability()}
-     *
-     * @param context simulation context
-     * @param packet  packet for flooding
-     */
-    protected void floodPacket(ContextView context, FloodPacket<?> packet) {
-
-        final int floodRepeatCount = context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
-        for (int i = 0; i < floodRepeatCount; i++)
-            context.getSimulator().schedulePacket(packet.buildPacketWithDelayedSchedule(i));
+    @Override
+    public int getId() {
+        return id;
     }
 
     @Override

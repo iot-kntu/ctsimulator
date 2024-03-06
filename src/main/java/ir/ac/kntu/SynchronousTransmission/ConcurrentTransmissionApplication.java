@@ -36,5 +36,18 @@ public interface ConcurrentTransmissionApplication {
     NodeState getNodeState(CtNode node);
 
     TransmissionPolicy getTransmissionPolicy();
+
+    /**
+     * Receives message for flooding. It is expected the application relay this call to listeners.
+     * @param context the simulation context
+     * @param sender which neighbor has sent the message
+     * @param receivedMessage the full received message, if this argument is {@link CiMessage#NULL_MESSAGE} then
+     *                        flooding is called for message initiation
+     * @param whichRepeat determines the nth repeat of flooding based on transmission policy
+     * @return the new message
+     */
+    CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat);
+
+    CiMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat);
 }
 

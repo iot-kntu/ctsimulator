@@ -12,6 +12,11 @@ public class SilentCtNode extends LoyalCtNode {
     }
 
     @Override
+    public void initiateFlood(ContextView context, CtNode initiatorNode) {
+
+    }
+
+    @Override
     public <T> void floodMessage(ContextView context, CtNode sender, CiMessage<T> message) {
 
     }
