@@ -118,13 +118,11 @@ public class BlueFloodApplication implements ConcurrentTransmissionApplication {
                                                               networkTime.slot(),
                                                               receiver.getId(), thePacket.ciMessage().messageNo()));
 
-                    listener.ctPacketsReceived(context, packets);
+                    listener.ctPacketsReceived(context, packets, thePacket);
                     receiver.floodMessage(context, receiver, thePacket.ciMessage());
                 }
                 else {
                     listener.ctPacketsLost(context, packets, ctEvent.arePacketsSimilar());
-                    logger.log(Level.INFO, "PKT[" + thePacket + "] lost due to "
-                            + ((ctEvent.arePacketsSimilar()) ? "general loss" : "conflict"));
                 }
             }
             case Flood -> {

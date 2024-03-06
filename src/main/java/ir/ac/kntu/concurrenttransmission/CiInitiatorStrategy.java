@@ -32,7 +32,7 @@ class OneInitiator implements CiInitiatorStrategy {
 
 }
 
-class RoundRobin implements CiInitiatorStrategy {
+public class RoundRobin implements CiInitiatorStrategy {
 
     private final int nodesCount;
     private int currentId = -1;

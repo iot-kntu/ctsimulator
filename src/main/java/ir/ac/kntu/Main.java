@@ -1,12 +1,16 @@
-package ir.ac.kntu.concurrenttransmission;
+package ir.ac.kntu;
 
-import ir.ac.kntu.concurrenttransmission.blueflood.*;
-import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.concurrenttransmission.CtSimulator;
+import ir.ac.kntu.concurrenttransmission.NetGraph;
+import ir.ac.kntu.concurrenttransmission.RoundRobin;
+import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodApplication;
+import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodSettings;
+import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodStrategies;
+import ir.ac.kntu.concurrenttransmission.blueflood.DefaultTransmissionPolicy;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.logging.LogManager;
 
 
@@ -34,29 +38,7 @@ public class Main {
             );
 
             BlueFloodApplication blueFloodApplication = new BlueFloodApplication(settings, strategies);
-            blueFloodApplication.setListener(new BlueFloodListener() {
-                @Override
-                public void ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets) {
-
-                }
-
-                @Override
-                public void ctPacketsLost(ContextView context, List<FloodPacket<?>> packets,
-                                          boolean arePacketsSimilar) {
-
-                }
-
-                @Override
-                public CiMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat) {
-                    return null;
-                }
-
-                @Override
-                public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage,
-                                               int whichRepeat) {
-                    return null;
-                }
-            });
+            blueFloodApplication.setListener(new AllLoyalScenario());
 
             CtSimulator simulator = CtSimulator.createInstance(netGraph, blueFloodApplication);
             simulator.start();
