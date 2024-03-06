@@ -10,12 +10,14 @@ import java.util.List;
 public interface BlueFloodListener {
 
     /**
-     * Called when some simultaneous packets are received by a node
+     * Called when some simultaneous packets are received by a node and
+     * just before scheduling of descendant floods
      *
-     * @param context the simulation context
-     * @param packets simultaneous received packets
+     * @param context   the simulation context
+     * @param packets   simultaneous received packets
+     * @param selectedPacket the selected packet
      */
-    void ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets);
+    void ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket);
 
     /**
      * Called when some simultaneous packets are lost and not delivered to an intended node
