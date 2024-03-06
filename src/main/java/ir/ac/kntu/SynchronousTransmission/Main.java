@@ -1,9 +1,8 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.blueflood.*;
-import ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies.NonFaultyFloodStrategy;
-import ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies.SilentAndFaultyFloodStrategy;
-import ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies.SilentFloodStrategy;
+import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodApplication;
+import ir.ac.kntu.SynchronousTransmission.blueflood.BlueFloodStrategies;
+import ir.ac.kntu.SynchronousTransmission.blueflood.DefaultTransmissionPolicy;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class Main {
 
             BlueFloodSettings settings = new BlueFloodSettings(
                     0.0,
-                    NodeFloodStrategy.DEFAULT_INTERFERENCE_PROB,
+                    BlueFloodApplication.DEFAULT_INTERFERENCE_PROB,
                     5      // rounds limit
             );
 
@@ -35,23 +34,7 @@ public class Main {
                     new SimpleStringBlueFloodMessageBuilder()
             );
 
-            BlueFloodBaseApplication blueFloodApplication = new BlueFloodBaseApplication(settings, strategies);
-
-            blueFloodApplication.setFloodStrategy(NodeFloodStrategyType.Normal, new NonFaultyFloodStrategy());
-            blueFloodApplication.setFloodStrategy(NodeFloodStrategyType.Silent, new SilentFloodStrategy());
-            blueFloodApplication.setFloodStrategy(NodeFloodStrategyType.Silent, new SilentFloodStrategy());
-            blueFloodApplication.setFloodStrategy(NodeFloodStrategyType.SilentAndFaulty,
-                                                  new SilentAndFaultyFloodStrategy(0.3) {
-                                                      @Override
-                                                      protected <T> CiMessage<T> createFaultyMessage(ContextView context, Node sender, CiMessage<T> message, int whichRepeat) {
-
-                                                          final CiMessage<String> ciMessage = new CiMessage<>(
-                                                                  message.initiator(),
-                                                                  "  ");
-
-                                                          return (CiMessage<T>) ciMessage;
-                                                      }
-                                                  });
+            BlueFloodApplication blueFloodApplication = new BlueFloodApplication(settings, strategies);
 
             CtSimulator simulator = CtSimulator.createInstance(netGraph, blueFloodApplication);
             simulator.start();

@@ -1,16 +1,20 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
 import ir.ac.kntu.SynchronousTransmission.*;
-import ir.ac.kntu.SynchronousTransmission.blueflood.floodstrategies.NonFaultyFloodStrategy;
 import ir.ac.kntu.SynchronousTransmission.events.CtPacketsEvent;
 import ir.ac.kntu.SynchronousTransmission.events.FloodPacket;
 import ir.ac.kntu.SynchronousTransmission.events.SimInitiateFloodEvent;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BlueFloodBaseApplication implements ConcurrentTransmissionApplication {
+public class BlueFloodApplication implements ConcurrentTransmissionApplication {
+
+    public static double DEFAULT_INTERFERENCE_PROB = 0.9;
 
     private final Logger logger = Logger.getLogger("BlueFloodApplication");
 
@@ -18,14 +22,10 @@ public class BlueFloodBaseApplication implements ConcurrentTransmissionApplicati
     private final BlueFloodSettings settings;
     private final Random random = new Random(new Date().getTime());
     private CtNetworkTime networkTime;
-    private final HashMap<NodeFloodStrategyType, NodeFloodStrategy> floodStrategies;
 
-    public BlueFloodBaseApplication(BlueFloodSettings settings, BlueFloodStrategies strategies) {
+    public BlueFloodApplication(BlueFloodSettings settings, BlueFloodStrategies strategies) {
         this.settings = settings;
         this.strategies = strategies;
-
-        this.floodStrategies = new HashMap<>();
-        this.floodStrategies.put(NodeFloodStrategyType.Normal, new NonFaultyFloodStrategy());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class BlueFloodBaseApplication implements ConcurrentTransmissionApplicati
     public void initiateFlood(ContextView context) throws RuntimeException {
         Objects.requireNonNull(context);
 
-        final Node inode = getInitiatorNode(context);
+        final CtNode inode = getInitiatorNode(context);
 
         strategies.transmissionPolicy().newRound(networkTime, inode);
 
@@ -59,12 +59,9 @@ public class BlueFloodBaseApplication implements ConcurrentTransmissionApplicati
         context.getSimulator().scheduleEvent(
                 new SimNewRoundEvent(context.getTime() + strategies.transmissionPolicy().getTotalSlotsOfRound()));
 
-        final CiMessage<?> message = strategies.messageBuilder().buildMessage(context, inode);
+        final CiMessage<?> message = inode.initiateFlood(context);
         logger.log(Level.INFO, "[" + context.getTime() + "] Node-" + inode.getId() +
                 " initiated message [" + message.messageNo() + "]");
-
-        final NodeFloodStrategy floodStrategy = getNodeFloodStrategy(inode);
-        floodStrategy.floodMessage(context, inode, message);
 
         strategies.transmissionPolicy().printCurrentNodeStates();
     }
@@ -83,7 +80,7 @@ public class BlueFloodBaseApplication implements ConcurrentTransmissionApplicati
                 ? packets.get(0)
                 : packets.get(random.nextInt(packets.size()));
 
-        final Node receiver = ctEvent.getReceiver();
+        final CtNode receiver = ctEvent.getReceiver();
 
         switch (getNodeState(receiver)) {
 
@@ -103,8 +100,7 @@ public class BlueFloodBaseApplication implements ConcurrentTransmissionApplicati
                         : settings.conflictProbability();
 
                 if (random.nextDouble() >= receiveProbability) { // no loss
-                    final NodeFloodStrategy floodStrategy = getNodeFloodStrategy(receiver);
-                    floodStrategy.floodMessage(context, receiver, thePacket.ciMessage());
+                    receiver.floodMessage(context, receiver, thePacket.ciMessage());
                 }
                 else {
                     logger.log(Level.INFO, "PKT[" + thePacket + "] lost due to "
@@ -125,12 +121,12 @@ public class BlueFloodBaseApplication implements ConcurrentTransmissionApplicati
     }
 
     @Override
-    public Node getInitiatorNode(ContextView context) {
+    public CtNode getInitiatorNode(ContextView context) {
         return context.getNetGraph().getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId());
     }
 
     @Override
-    public NodeState getNodeState(Node node) {
+    public NodeState getNodeState(CtNode node) {
         return strategies.transmissionPolicy().getNodeState(node, getSlot());
     }
 
@@ -161,21 +157,6 @@ public class BlueFloodBaseApplication implements ConcurrentTransmissionApplicati
     @Override
     public TransmissionPolicy getTransmissionPolicy() {
         return strategies.transmissionPolicy();
-    }
-
-    private NodeFloodStrategy getNodeFloodStrategy(Node inode) {
-        final NodeFloodStrategy floodStrategy = floodStrategies.get(inode.getFloodStrategy());
-        if(floodStrategy == null)
-            throw new IllegalStateException("No strategy is set for type:" + inode.getFloodStrategy()
-             + " for node " + inode);
-
-        return floodStrategy;
-    }
-
-
-    public NodeFloodStrategy setFloodStrategy(NodeFloodStrategyType type, NodeFloodStrategy floodStrategy){
-        final NodeFloodStrategy oldValue = this.floodStrategies.put(type, floodStrategy);
-        return oldValue;
     }
 }
 

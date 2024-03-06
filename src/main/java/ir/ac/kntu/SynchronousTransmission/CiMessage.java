@@ -8,11 +8,11 @@ import java.util.Objects;
  */
 public final class CiMessage<T> {
 
-    public static CiMessage<Object> NULL_MESSAGE = new CiMessage<>(Node.NULL_NODE, 0, null);
+    public static CiMessage NULL_MESSAGE = new CiMessage<>(CtNode.NULL_NODE, 0, null);
 
     private static int MessageNoGen = 0;
 
-    private final Node initiator;
+    private final CtNode initiator;
     private final int messageNo;
     private final T content;
 
@@ -20,23 +20,23 @@ public final class CiMessage<T> {
      * @param initiator
      * @param content
      */
-    public CiMessage(Node initiator, T content) {
+    public CiMessage(CtNode initiator, T content) {
         this.initiator = initiator;
         this.messageNo = ++MessageNoGen;
         this.content = content;
     }
 
-    private CiMessage(Node initiator, int messageNo, T content) {
+    private CiMessage(CtNode initiator, int messageNo, T content) {
         this.initiator = initiator;
         this.messageNo = messageNo;
         this.content = content;
     }
 
     public boolean isNull() {
-        return messageNo == 0 || initiator.equals(Node.NULL_NODE);
+        return messageNo == 0 || initiator.equals(CtNode.NULL_NODE);
     }
 
-    public Node initiator() {
+    public CtNode initiator() {
         return initiator;
     }
 

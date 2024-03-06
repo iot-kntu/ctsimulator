@@ -11,6 +11,7 @@ public interface ConcurrentTransmissionApplication {
 
     /**
      * Called by simulator to announce simulation start
+     *
      * @param context
      */
     void simulationStarting(ContextView context);
@@ -19,6 +20,7 @@ public interface ConcurrentTransmissionApplication {
 
     /**
      * Called when simulation time progresses by one unit
+     *
      * @param context
      */
     void simulationTimeProgressed(ContextView context);
@@ -29,9 +31,9 @@ public interface ConcurrentTransmissionApplication {
 
     void ctPacketsReceived(CtPacketsEvent ctEvent, ContextView context);
 
-    Node getInitiatorNode(ContextView context);
+    CtNode getInitiatorNode(ContextView context);
 
-    NodeState getNodeState(Node node);
+    NodeState getNodeState(CtNode node);
 
     TransmissionPolicy getTransmissionPolicy();
 }

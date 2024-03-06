@@ -1,23 +1,25 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
 import ir.ac.kntu.SynchronousTransmission.CtNetworkTime;
+import ir.ac.kntu.SynchronousTransmission.CtNode;
 import ir.ac.kntu.SynchronousTransmission.NetGraph;
-import ir.ac.kntu.SynchronousTransmission.Node;
 import ir.ac.kntu.SynchronousTransmission.NodeState;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
 /**
- * Default transmission policy is listen all slots to receive a valid packet
- * then flood N consecutive slots, then go to deep sleep.
+ * Based on BlueFlood design, every node in DefaultTransmissionPolicy listens in all slots
+ * by default to receive a valid packet. The initiator node state is changed to Flood and starts flooding.
+ * Then, receiver nodes receive a valid packet and flood N consecutive slots, and then
+ * go to deep sleep state until the next round.
  */
 public class DefaultTransmissionPolicy implements TransmissionPolicy {
 
     private final int floodRepeatCount;
     private final NetGraph netGraph;
-    private final SortedMap<CtNetworkTime, SortedMap<Node, List<NodeState>>> stateHistory;
-    private SortedMap<Node, List<NodeState>> nodeStateMap;
+    private final SortedMap<CtNetworkTime, SortedMap<CtNode, List<NodeState>>> stateHistory;
+    private SortedMap<CtNode, List<NodeState>> nodeStateMap;
 
     public DefaultTransmissionPolicy(int floodRepeatCount, NetGraph netGraph) {
         this.floodRepeatCount = floodRepeatCount;
@@ -40,7 +42,7 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
     }
 
     @Override
-    public void newRound(CtNetworkTime networkTime, Node initiator) {
+    public void newRound(CtNetworkTime networkTime, CtNode initiator) {
         Objects.requireNonNull(networkTime);
         Objects.requireNonNull(initiator);
 
@@ -68,7 +70,7 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
     }
 
     @Override
-    public void newPacketReceived(Node node, int slot) {
+    public void newPacketReceived(CtNode node, int slot) {
         // when a new packet is received by a node, it floods
         //  it for floodRepeatCount times and then goes to sleep
         for (int i = slot + 1; i <= slot + floodRepeatCount; i++)
@@ -79,7 +81,7 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
     }
 
     @Override
-    public NodeState getNodeState(Node node, int slot) {
+    public NodeState getNodeState(CtNode node, int slot) {
         return nodeStateMap.get(node).get(slot);
     }
 
@@ -124,10 +126,10 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
         }
         builder.append('\n');
 
-        for (Node node : netGraph.getNodes()) {
+        for (CtNode node : netGraph.getNodes()) {
             StringBuilder row = new StringBuilder(String.format("%1$5s", "N[" + node.getId() + "]"));
-            final Collection<SortedMap<Node, List<NodeState>>> values = stateHistory.values();
-            for (Map<Node, List<NodeState>> value : values) {
+            final Collection<SortedMap<CtNode, List<NodeState>>> values = stateHistory.values();
+            for (Map<CtNode, List<NodeState>> value : values) {
                 final List<NodeState> states = value.get(node);
                 for (NodeState state : states)
                     row.append(String.format("%1$5c", state.getSymbol()));
@@ -144,7 +146,7 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
 
         StringBuilder builder = new StringBuilder();
 
-        for (Node node : netGraph.getNodes()) {
+        for (CtNode node : netGraph.getNodes()) {
             StringBuilder row = new StringBuilder(String.format("%1$5s", "N[" + node.getId() + "]"));
             nodeStateMap.get(node).stream()
                         .map(state -> String.format("%1$5c", state.getSymbol()))

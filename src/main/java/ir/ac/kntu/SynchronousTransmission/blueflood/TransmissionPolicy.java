@@ -1,7 +1,7 @@
 package ir.ac.kntu.SynchronousTransmission.blueflood;
 
 import ir.ac.kntu.SynchronousTransmission.CtNetworkTime;
-import ir.ac.kntu.SynchronousTransmission.Node;
+import ir.ac.kntu.SynchronousTransmission.CtNode;
 import ir.ac.kntu.SynchronousTransmission.NodeState;
 
 public interface TransmissionPolicy {
@@ -10,13 +10,13 @@ public interface TransmissionPolicy {
 
     CtNetworkTime getNetworkTime(long time);
 
-    void newRound(CtNetworkTime networkTime, Node initiator);
+    void newRound(CtNetworkTime networkTime, CtNode initiator);
 
     void newSlot(int slot);
 
-    void newPacketReceived(Node node, int slot);
+    void newPacketReceived(CtNode node, int slot);
 
-    NodeState getNodeState(Node node, int slot);
+    NodeState getNodeState(CtNode node, int slot);
 
     int getTotalSlotsOfRound();
 

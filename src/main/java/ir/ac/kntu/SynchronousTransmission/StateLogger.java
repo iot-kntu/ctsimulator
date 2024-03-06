@@ -1,5 +1,7 @@
 package ir.ac.kntu.SynchronousTransmission;
 
+import ir.ac.kntu.SynchronousTransmission.blueflood.LoyalCtNode;
+
 import java.util.*;
 
 /**
@@ -8,9 +10,9 @@ import java.util.*;
 public class StateLogger {
 
     private final SortedMap<CtNetworkTime, Map<Integer, NodeState>> nodeStates = new TreeMap<>();
-    private final List<Node> nodes;
+    private final List<LoyalCtNode> nodes;
 
-    public StateLogger(List<Node> nodes) {
+    public StateLogger(List<LoyalCtNode> nodes) {
         this.nodes = nodes;
     }
 
@@ -18,13 +20,13 @@ public class StateLogger {
 
         Map<Integer, NodeState> nodeStateMap = new HashMap<>();
 
-        for (Node node : nodes)
+        for (LoyalCtNode node : nodes)
             nodeStateMap.put(node.getId(), NodeState.Listen);
 
         nodeStates.put(networkTime, nodeStateMap);
     }
 
-    public void setState(CtNetworkTime networkTime, Node node, NodeState nodeState) {
+    public void setState(CtNetworkTime networkTime, LoyalCtNode node, NodeState nodeState) {
 
         final Map<Integer, NodeState> stateMap = nodeStates.get(networkTime);
 
@@ -51,12 +53,12 @@ public class StateLogger {
 
         final List<String> rows = new ArrayList<>();
 
-        for (Node node : nodes)
+        for (LoyalCtNode node : nodes)
             rows.add(String.format("%1$5s", "N[" + node.getId() + "]"));
 
         for (Map<Integer, NodeState> valueMap : nodeStates.values()) {
             for (int i = 0; i < nodes.size(); i++) {
-                Node node = nodes.get(i);
+                LoyalCtNode node = nodes.get(i);
                 rows.set(i, rows.get(i) + String.format("%1$5c", valueMap.get(node.getId()).getSymbol()));
             }
         }

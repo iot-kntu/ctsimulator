@@ -1,6 +1,5 @@
 package ir.ac.kntu.SynchronousTransmission;
 
-import ir.ac.kntu.SynchronousTransmission.blueflood.NodeFloodStrategyType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -13,8 +12,8 @@ public class NetGraph {
 
     public static final NetGraph EMPTY_GRAPH = new NetGraph();
 
-    private final List<Node> nodes = new ArrayList<>();
-    private final HashMap<Node, List<Node>> neighborsMap = new HashMap<>();
+    private final List<CtNode> nodes = new ArrayList<>();
+    private final HashMap<CtNode, List<CtNode>> neighborsMap = new HashMap<>();
 
     private NetGraph() {
     }
@@ -22,7 +21,7 @@ public class NetGraph {
     public static @NotNull NetGraph loadFrom(String path) throws Exception {
         NetGraph netGraph = new NetGraph();
 
-        HashMap<Node, List<Integer>> nodeNeighborsId = new HashMap<>();
+        HashMap<CtNode, List<Integer>> nodeNeighborsId = new HashMap<>();
 
         int lineCounter = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
@@ -34,37 +33,40 @@ public class NetGraph {
                 if (line.startsWith("#"))
                     continue;
 
-                final String[] split1 = line.split(";");
-                if (split1.length < 3)
+                final String[] splitWithSemicolon = line.split(";");
+                if (splitWithSemicolon.length < 3)
                     throw new IllegalStateException(
                             "Line " + lineCounter + ": each row must have format of <node_id>;<Node " +
                                     "Type>;<comma separated list of neighbors>");
 
-                final int nodeId = Integer.parseInt(split1[0]);
-                final Node newNode = new Node(nodeId);
-                netGraph.nodes.add(newNode);
-                netGraph.neighborsMap.put(newNode, new ArrayList<>());
+                final int nodeId = Integer.parseInt(splitWithSemicolon[0]);
 
-                final int modeNo = Integer.parseInt(split1[1]);
-                newNode.setFloodStrategy(NodeFloodStrategyType.values()[modeNo]);
+                final String className = splitWithSemicolon[2];
+                final Class<?> nodeClass = Class.forName(
+                        "ir.ac.kntu.SynchronousTransmission.blueflood.nodes." + className);
+                final CtNode instance = (CtNode) nodeClass.getDeclaredConstructor(Integer.class).newInstance(nodeId);
+
+                netGraph.nodes.add(instance);
+                netGraph.neighborsMap.put(instance, new ArrayList<>());
 
                 final ArrayList<Integer> neighbors = new ArrayList<>();
-                nodeNeighborsId.put(newNode, neighbors);
+                nodeNeighborsId.put(instance, neighbors);
 
-                final String[] neighborsStr = split1[2].split(",");
+                final String[] neighborsStr = splitWithSemicolon[1].split(",");
                 for (String s : neighborsStr) {
                     if (s.isBlank())
                         continue;
                     final int neighborId = Integer.parseInt(s);
                     neighbors.add(neighborId);
                 }
+
             }
 
-            for (Node node : netGraph.getNodes()) {
+            for (CtNode node : netGraph.getNodes()) {
                 final List<Integer> ids = nodeNeighborsId.get(node);
                 for (Integer id : ids) {
-                    final Node nodeById = netGraph.getNodeById(id);
-                    if(nodeById == null){
+                    final CtNode nodeById = netGraph.getNodeById(id);
+                    if (nodeById == null) {
                         throw new IllegalStateException("Node by id of " + id + " not found");
                     }
                     netGraph.neighborsMap.get(node).add(nodeById);
@@ -81,24 +83,19 @@ public class NetGraph {
     public void saveGraph(String path) throws IOException {
 
         try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(path))) {
-            for (Node node : nodes) {
+            for (CtNode node : nodes) {
 
                 fileWriter.write(node.getId());
                 fileWriter.write(";");
 
-                fileWriter.write(node.getFloodStrategy().ordinal());
+                for (CtNode node1 : neighborsMap.get(node))
+                    fileWriter.write(node1.getId() + ",");
+
                 fileWriter.write(";");
 
-                final List<Node> neighbors = neighborsMap.get(node);
-                neighbors.forEach(node1 -> {
-                    try {
-                        fileWriter.write(node1.getId() + ",");
-                        fileWriter.newLine();
-                    }
-                    catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                fileWriter.write(node.getClass().getSimpleName());
+
+                fileWriter.newLine();
             }
         }
     }
@@ -111,24 +108,25 @@ public class NetGraph {
         return nodes.size();
     }
 
-    public Node getNodeById(int nodeId) {
+    public CtNode getNodeById(int nodeId) {
 
-        final List<Node> list = nodes.stream().filter(node -> node.getId() == nodeId).toList();
+        final List<CtNode> list = nodes.stream().filter(node -> node.getId() == nodeId).toList();
         if (list.isEmpty())
-            return Node.NULL_NODE;
+            return CtNode.NULL_NODE;
 
         return list.get(0);
     }
 
-    public List<Node> getNodeNeighbors(Node node) {
-        return (node.getId() < 0) ? Collections.emptyList() : neighborsMap.get(node);
+    public List<CtNode> getNodeNeighbors(CtNode node) {
+        return (node == null || node.getId() < 0) ? Collections.emptyList() : neighborsMap.get(node);
     }
 
-    public List<Node> getNodes() {
+    public List<CtNode> getNodes() {
         return Collections.unmodifiableList(nodes);
     }
-    public int getDiameter(){
-        //fixme put algoruthm here
+
+    public int getDiameter() {
+        //fixme put algorithm here
         return 2;
     }
 }

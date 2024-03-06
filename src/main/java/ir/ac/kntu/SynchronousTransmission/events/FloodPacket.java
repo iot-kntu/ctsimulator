@@ -1,7 +1,7 @@
 package ir.ac.kntu.SynchronousTransmission.events;
 
 import ir.ac.kntu.SynchronousTransmission.CiMessage;
-import ir.ac.kntu.SynchronousTransmission.Node;
+import ir.ac.kntu.SynchronousTransmission.CtNode;
 
 // TODO: 2/19/24 In future we may have different types of packet,
 //  which may necessitates to define a packet interface
@@ -9,14 +9,7 @@ import ir.ac.kntu.SynchronousTransmission.Node;
 /**
  * Represents a data sent between two adjacent nodes
  */
-public record FloodPacket<T>(long time, CiMessage<T> ciMessage, Node sender, Node receiver) {
-
-    //@Override
-    //public void handle(ContextView context) {
-    //    Objects.requireNonNull(context);
-    //
-    //    context.getApplication().packetReceived(this, context);
-    //}
+public record FloodPacket<T>(long time, CiMessage<T> ciMessage, CtNode sender, CtNode receiver) {
 
     @Override
     public String toString() {

@@ -2,7 +2,7 @@ package ir.ac.kntu.SynchronousTransmission.events;
 
 import ir.ac.kntu.SynchronousTransmission.BaseSimEvent;
 import ir.ac.kntu.SynchronousTransmission.ContextView;
-import ir.ac.kntu.SynchronousTransmission.Node;
+import ir.ac.kntu.SynchronousTransmission.CtNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class CtPacketsEvent extends BaseSimEvent implements CtEvent {
     }
 
     @Override
-    public Node getReceiver() {
+    public CtNode getReceiver() {
         return packets.get(0).receiver();
     }
 

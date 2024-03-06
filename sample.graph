@@ -1,6 +1,9 @@
-# <node_id><;><Node Type><;><comma separated list of neighbors>
-# <Node_Type>: 0:normal, 1:silent, 2:FaultyInitiate, 3:FaultyFlood, 4:SilentAndFaulty
-0;0;1,2
-1;1;0,3
-2;0;0,3
-3;0;1,2
+# <node_id><;><comma separated list of neighbors><;><node class name>
+# <node class name>:
+#    0 means default LoyalCtNode
+#    otherwise: the exact name of the node class name which should be in the
+#       ir.ac.kntu.SynchronousTransmission.blueflood.nodes namespace
+0;1,2;0
+1;0,3;0
+2;0,3;0
+3;1,2;0

@@ -37,12 +37,12 @@ public class NullApplication implements ConcurrentTransmissionApplication {
     }
 
     @Override
-    public Node getInitiatorNode(ContextView context) {
-        return Node.NULL_NODE;
+    public CtNode getInitiatorNode(ContextView context) {
+        return CtNode.NULL_NODE;
     }
 
     @Override
-    public NodeState getNodeState(Node node) {
+    public NodeState getNodeState(CtNode node) {
         return NodeState.Sleep;
     }
 
