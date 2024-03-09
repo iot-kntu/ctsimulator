@@ -33,10 +33,13 @@ public class LoyalCtNode implements CtNode {
                 .getApplication()
                 .getRoundInitiationMessage(context, initiatorNode, 0);
 
+        if(ciMessage.isNull())
+            return;
+
         for (CtNode node : neighbors) {
             for (int repeat = 0; repeat < floodRepeatCount; repeat++) {
 
-                final FloodPacket<?> stFloodPacket = new FloodPacket<>(context.getTime() + repeat, ciMessage,
+                final FloodPacket<?> stFloodPacket = new FloodPacket<>(context.getTime() + 1 + repeat, ciMessage,
                                                                        initiatorNode, node);
                 context.getSimulator().schedulePacket(stFloodPacket);
             }
@@ -55,7 +58,7 @@ public class LoyalCtNode implements CtNode {
 
         for (CtNode node : neighbors) {
             for (int repeat = 0; repeat < floodRepeatCount; repeat++) {
-                final FloodPacket<T> stFloodPacket = new FloodPacket<>(context.getTime() + repeat, message, sender,
+                final FloodPacket<T> stFloodPacket = new FloodPacket<>(context.getTime() + 1 + repeat, message, sender,
                                                                        node);
                 context.getSimulator().schedulePacket(stFloodPacket);
             }

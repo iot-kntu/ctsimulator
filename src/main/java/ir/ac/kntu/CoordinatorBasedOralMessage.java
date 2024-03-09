@@ -20,8 +20,8 @@ import java.util.logging.Logger;
  */
 public class CoordinatorBasedOralMessage implements BlueFloodNodeListener {
 
+    public static final int GENERAL_ID = 0;
     final static Actions DEFAULT_ACTION = Actions.Retreat;
-
     private final Logger logger = Logger.getLogger("AllLoyalScenario");
 
     /**
@@ -37,50 +37,40 @@ public class CoordinatorBasedOralMessage implements BlueFloodNodeListener {
                                      FloodPacket<?> selectedPacket,
                                      boolean areSimilar) {
 
+        // General does not participate in flooding
+        if (selectedPacket.receiver().getId() == GENERAL_ID) {
+            this.finished = true;
+            return false;
+        }
+
+        // ensure data structures initialization
+        initialize(context);
+
+        // if the node has made the final decision just ignore incoming messages
         if (this.finished)
             return false;
 
-        CtNode thisNode = selectedPacket.receiver();
-
-        initialize(context);
-
-        boolean newPacket = false;
-        for (FloodPacket<?> packet : packets) {
-            final CtNode sender = packet.sender();
-            final CiMessage<Message> ciMessage = (CiMessage<Message>) packet.ciMessage();
-            CtNode initiator = ciMessage.initiator();
-            final Actions nodeAction = ciMessage.content().nodeAction();
-
-            MessageStatus status = new MessageStatus(sender, nodeAction, initiator);
-
-            newPacket = msgCache.add(status);
+        if (!msgCache.isEmpty() && selectedPacket.ciMessage().initiator().getId() == GENERAL_ID) {
+            // all nodes have initiated a message and General have sent a command again!
+            this.finished = true;
+            makeDecision(context, selectedPacket);
+            return false;
         }
 
+        // for debug
+        CtNode thisNode = selectedPacket.receiver();
+
+        final CiMessage<Message> ciMessage = (CiMessage<Message>) selectedPacket.ciMessage();
+        CtNode initiator = ciMessage.initiator();
+        final Actions nodeAction = ciMessage.content().nodeAction();
+
+        MessageStatus status = new MessageStatus(initiator, nodeAction);
+        boolean newPacket = msgCache.add(status);
+
         // if the node has received message from all of its neighbors
-        if (newPacket && msgCache.size() == context.getNetGraph().getNodeNeighbors(thisNode).size()) {
+        if (newPacket && msgCache.size() == networkSize - 1) {
             this.finished = true;
-
-            final IntCounterMap<Actions> actionMap = findMajorActionInCache();
-
-            // add DEFAULT_ACTION for nodes, this node has not received any data
-            for (int i = actionMap.size(); i < networkSize; i++)
-                actionMap.inc(DEFAULT_ACTION);
-
-            if (actionMap.hasSeveralMaxKeys() <= 1) {
-                Actions decision = actionMap.getMaxKey().getKey();
-
-                logger.log(Level.INFO, "FINAL_DECISION::Node-" + selectedPacket.receiver().getId() +
-                        " decided as " + decision
-                        + " in round " + context.getApplication().getNetworkTime().round());
-            }
-            else {
-                logger.log(Level.INFO, "FINAL_DECISION::Node-" + selectedPacket.receiver().getId() +
-                        " CANNOT DECIDE in round " +
-                        context.getApplication().getNetworkTime().round() +
-                        " due to equal number of different decisions"
-                );
-
-            }
+            makeDecision(context, selectedPacket);
         }
 
         return newPacket;
@@ -97,29 +87,59 @@ public class CoordinatorBasedOralMessage implements BlueFloodNodeListener {
         initialize(context);
 
         // node0 is Major General!
-        if (initiator.getId() == 0) {
-            return new CiMessage<>(initiator, new Message(Actions.Attack, ""));
-        }
+        if (initiator.getId() == GENERAL_ID)
+            if (this.finished) // the app is written only for one message transmission
+                return CiMessage.NULL_MESSAGE;
+            else
+                return new CiMessage<>(initiator, new Message(Actions.Attack, ""));
+
 
         for (MessageStatus messageStatus : msgCache) {
             // find if this node has received the command directly from the general
-            if (messageStatus.senderNode().equals(messageStatus.initiator())) {
+            if (messageStatus.initiator().getId() == GENERAL_ID)
                 return new CiMessage<>(initiator, new Message(messageStatus.nodeAction, ""));
-            }
         }
 
         // when execution reaches here, the node has received the general command through other
-        //  intermediate nodes. The node sends the mostly-received command
-        final IntCounterMap<Actions> actionCounter = findMajorActionInCache();
-        final Actions maxAction = actionCounter.getMaxKey().getKey();
+        //  intermediate nodes. The node sends the mostly-received command or the default action
+        if (msgCache.isEmpty()) {
+            return new CiMessage<>(initiator, new Message(DEFAULT_ACTION, ""));
+        }
+        else {
+            final IntCounterMap<Actions> actionCounter = findMajorActionInCache();
+            final Actions maxAction = actionCounter.getMaxKey().getKey();
 
-        return new CiMessage<>(initiator, new Message(maxAction, ""));
+            return new CiMessage<>(initiator, new Message(maxAction, ""));
+        }
     }
 
     @Override
     public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
         // relay the same message, acting as a loyal node
         return receivedMessage;
+    }
+
+    private void makeDecision(ContextView context, FloodPacket<?> selectedPacket) {
+        final IntCounterMap<Actions> actionMap = findMajorActionInCache();
+
+        // add DEFAULT_ACTION for nodes, this node has not received any data
+        for (int i = actionMap.size(); i < networkSize - 1; i++)
+            actionMap.inc(DEFAULT_ACTION);
+
+        if (actionMap.hasSeveralMaxKeys() <= 1) {
+            Actions decision = actionMap.getMaxKey().getKey();
+
+            logger.log(Level.INFO, "FINAL_DECISION::Node-" + selectedPacket.receiver().getId() +
+                    " decided as " + decision
+                    + " in round " + context.getApplication().getNetworkTime().round());
+        }
+        else {
+            logger.log(Level.INFO, "FINAL_DECISION::Node-" + selectedPacket.receiver().getId() +
+                    " CANNOT DECIDE in round " +
+                    context.getApplication().getNetworkTime().round() +
+                    " due to equal number of different decisions"
+            );
+        }
     }
 
     @NotNull
@@ -136,7 +156,7 @@ public class CoordinatorBasedOralMessage implements BlueFloodNodeListener {
     }
 
     private void initialize(ContextView context) {
-        if (networkSize == 0) {
+        if (networkSize == GENERAL_ID) {
             networkSize = context.getNetGraph().getNodeCount();
             msgCache = new HashSet<>();
         }
@@ -147,7 +167,7 @@ public class CoordinatorBasedOralMessage implements BlueFloodNodeListener {
     record Message(Actions nodeAction, String body) {
     }
 
-    record MessageStatus(CtNode senderNode, Actions nodeAction, CtNode initiator) {
+    record MessageStatus(CtNode initiator, Actions nodeAction) {
     }
 
 }

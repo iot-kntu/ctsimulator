@@ -33,6 +33,9 @@ public class FaultyCtNode extends LoyalCtNode {
                         .getApplication()
                         .getRoundInitiationMessage(context, initiatorNode, repeat);
 
+                if(ciMessage.isNull())
+                    continue;
+
                 final FloodPacket<?> stFloodPacket = new FloodPacket<>(context.getTime() + repeat, ciMessage,
                                                                        initiatorNode, node);
                 context.getSimulator().schedulePacket(stFloodPacket);
