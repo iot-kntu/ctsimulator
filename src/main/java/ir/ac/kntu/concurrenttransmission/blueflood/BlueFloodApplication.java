@@ -124,8 +124,9 @@ public class BlueFloodApplication implements ConcurrentTransmissionApplication {
                                                               networkTime.slot(),
                                                               receiver.getId(), thePacket.ciMessage().messageNo()));
 
-                    getBlueFloodListener(receiver).ctPacketsReceived(context, packets, thePacket, ctEvent.areMessagesSimilar());
-                    receiver.floodMessage(context, receiver, thePacket.ciMessage());
+                    boolean shouldFlood = getBlueFloodListener(receiver).ctPacketsReceived(context, packets, thePacket, ctEvent.areMessagesSimilar());
+                    if(shouldFlood)
+                        receiver.floodMessage(context, receiver, thePacket.ciMessage());
                 }
                 else {
                     getBlueFloodListener(receiver).ctPacketsLost(context, packets, ctEvent.areMessagesSimilar());

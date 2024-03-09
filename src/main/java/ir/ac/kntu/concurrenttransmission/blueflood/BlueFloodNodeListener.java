@@ -17,9 +17,10 @@ public interface BlueFloodNodeListener {
      * @param context        the simulation context
      * @param packets        simultaneous received packets
      * @param selectedPacket the selected packet
-     * @param b
+     * @param areSimilar are received packets similar
+     * @return tells the application if the received packet should be flooded
      */
-    void ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket, boolean b);
+    boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket, boolean areSimilar);
 
     /**
      * Called when some simultaneous packets are lost and not delivered to an intended node

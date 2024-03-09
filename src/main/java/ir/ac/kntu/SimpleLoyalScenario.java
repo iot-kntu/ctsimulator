@@ -39,16 +39,8 @@ public class SimpleLoyalScenario implements BlueFloodNodeListener {
     }
 
     @Override
-    public void ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket, boolean areSimilar) {
-        CtNode initiator = selectedPacket.ciMessage().initiator();
-        final CtNode sender = selectedPacket.sender();
-        Message msg = (Message) selectedPacket.ciMessage().content();
-        final Actions[] nodeActionVector = msg.actionVector();
-
-        MessageStatus status = new MessageStatus(sender, nodeActionVector, initiator);
-        msgCache.put(selectedPacket.ciMessage(), status);
-
-        // TODO: 3/6/24 implement if majority has voted set as finished
+    public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket, boolean areSimilar) {
+        return true;
     }
 
     @Override

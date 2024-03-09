@@ -8,7 +8,7 @@ import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,34 +27,37 @@ public class CoordinatorBasedOralMessage implements BlueFloodNodeListener {
     /**
      * We assume only one action is circulated in the graph
      */
-    private List<MessageStatus> msgCache;
+    private HashSet<MessageStatus> msgCache;
     private int networkSize;
     private boolean finished;
 
 
     @Override
-    public void ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets,
-                                  FloodPacket<?> selectedPacket,
-                                  boolean areSimilar) {
+    public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets,
+                                     FloodPacket<?> selectedPacket,
+                                     boolean areSimilar) {
 
         if (this.finished)
-            return;
+            return false;
+
+        CtNode thisNode = selectedPacket.receiver();
 
         initialize(context);
 
+        boolean newPacket = false;
         for (FloodPacket<?> packet : packets) {
             final CtNode sender = packet.sender();
-            final CiMessage<Message> ciMessage = (CiMessage<Message>)packet.ciMessage();
+            final CiMessage<Message> ciMessage = (CiMessage<Message>) packet.ciMessage();
             CtNode initiator = ciMessage.initiator();
             final Actions nodeAction = ciMessage.content().nodeAction();
 
             MessageStatus status = new MessageStatus(sender, nodeAction, initiator);
-            msgCache.add(status);
+
+            newPacket = msgCache.add(status);
         }
 
-        // check whether the node can find the majority vote
-
-        if (msgCache.size() == networkSize) {
+        // if the node has received message from all of its neighbors
+        if (newPacket && msgCache.size() == context.getNetGraph().getNodeNeighbors(thisNode).size()) {
             this.finished = true;
 
             final IntCounterMap<Actions> actionMap = findMajorActionInCache();
@@ -79,6 +82,8 @@ public class CoordinatorBasedOralMessage implements BlueFloodNodeListener {
 
             }
         }
+
+        return newPacket;
     }
 
     @Override
@@ -91,7 +96,8 @@ public class CoordinatorBasedOralMessage implements BlueFloodNodeListener {
     public CiMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat) {
         initialize(context);
 
-        if(initiator.getId() == 0){
+        // node0 is Major General!
+        if (initiator.getId() == 0) {
             return new CiMessage<>(initiator, new Message(Actions.Attack, ""));
         }
 
@@ -132,7 +138,7 @@ public class CoordinatorBasedOralMessage implements BlueFloodNodeListener {
     private void initialize(ContextView context) {
         if (networkSize == 0) {
             networkSize = context.getNetGraph().getNodeCount();
-            msgCache = new ArrayList<>();
+            msgCache = new HashSet<>();
         }
     }
 
