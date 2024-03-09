@@ -12,6 +12,11 @@ public class NullApplication implements ConcurrentTransmissionApplication {
 
 
     @Override
+    public CtNetworkTime getNetworkTime() {
+        return new CtNetworkTime(-1, -1);
+    }
+
+    @Override
     public void simulationStarting(ContextView context) {
 
     }
@@ -23,6 +28,11 @@ public class NullApplication implements ConcurrentTransmissionApplication {
 
     @Override
     public void simulationTimeProgressed(ContextView context) {
+
+    }
+
+    @Override
+    public void newRound(ContextView context) {
 
     }
 
@@ -59,10 +69,5 @@ public class NullApplication implements ConcurrentTransmissionApplication {
     @Override
     public CiMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
         return CiMessage.NULL_MESSAGE;
-    }
-
-    @Override
-    public void newRound(ContextView context) {
-
     }
 }

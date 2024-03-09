@@ -23,7 +23,7 @@ public class CtSimulator {
 
         this.context = new SimulationContext();
         this.context.netGraph = graph;
-        this.context.rootApplication = application;
+        this.context.application = application;
     }
 
     public static CtSimulator createInstance(NetGraph graph, ConcurrentTransmissionApplication application) {

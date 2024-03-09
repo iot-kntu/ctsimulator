@@ -16,7 +16,7 @@ public class MixedFaultyCtNode extends FaultyCtNode {
     private final Random random = new Random(new Date().getTime());
     private double silencePercent = 0.5;
 
-    public MixedFaultyCtNode(int id) {
+    public MixedFaultyCtNode(Integer id) {
         super(id);
     }
 

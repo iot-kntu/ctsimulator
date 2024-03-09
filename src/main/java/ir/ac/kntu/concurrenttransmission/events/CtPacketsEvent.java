@@ -1,6 +1,7 @@
 package ir.ac.kntu.concurrenttransmission.events;
 
 import ir.ac.kntu.concurrenttransmission.BaseSimEvent;
+import ir.ac.kntu.concurrenttransmission.CiMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 
@@ -25,14 +26,14 @@ public class CtPacketsEvent extends BaseSimEvent implements CtEvent {
         return packets;
     }
 
-    public boolean arePacketsSimilar() {
+    public boolean areMessagesSimilar() {
 
         boolean areTheSame;
 
-        FloodPacket<?> first = packets.get(0);
+        CiMessage<?> first = packets.get(0).ciMessage();
         areTheSame = IntStream.range(1, packets.size())
-                              .mapToObj(packets::get)
-                              .allMatch(packet -> packet.equals(first));
+                              .mapToObj(i -> packets.get(i).ciMessage())
+                              .allMatch(ciMessage -> ciMessage.equals(first));
 
         return areTheSame;
     }

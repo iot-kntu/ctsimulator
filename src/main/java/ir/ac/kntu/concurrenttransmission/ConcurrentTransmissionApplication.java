@@ -9,6 +9,8 @@ import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
  */
 public interface ConcurrentTransmissionApplication {
 
+    CtNetworkTime getNetworkTime();
+
     /**
      * Called by simulator to announce simulation start
      *

@@ -4,7 +4,7 @@ public class SimulationContext implements ContextView {
 
     CtSimulator simulator;
     NetGraph netGraph;
-    ConcurrentTransmissionApplication rootApplication;
+    ConcurrentTransmissionApplication application;
     long time;
     //int round;
     //int slot;
@@ -20,7 +20,7 @@ public class SimulationContext implements ContextView {
 
     @Override
     public ConcurrentTransmissionApplication getApplication() {
-        return rootApplication;
+        return application;
     }
 
     @Override

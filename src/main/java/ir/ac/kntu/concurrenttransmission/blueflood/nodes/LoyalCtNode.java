@@ -1,4 +1,4 @@
-package ir.ac.kntu.concurrenttransmission.blueflood;
+package ir.ac.kntu.concurrenttransmission.blueflood.nodes;
 
 import ir.ac.kntu.concurrenttransmission.CiMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
@@ -17,7 +17,7 @@ public class LoyalCtNode implements CtNode {
 
     private final int id;
 
-    public LoyalCtNode(int id) {
+    public LoyalCtNode(Integer id) {
         this.id = id;
     }
 

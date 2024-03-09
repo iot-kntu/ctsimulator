@@ -3,21 +3,23 @@ package ir.ac.kntu.concurrenttransmission.blueflood;
 import ir.ac.kntu.concurrenttransmission.CiMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 import java.util.List;
 
-public interface BlueFloodListener {
+public interface BlueFloodNodeListener {
 
     /**
      * Called when some simultaneous packets are received by a node and
      * just before scheduling of descendant floods
      *
-     * @param context   the simulation context
-     * @param packets   simultaneous received packets
+     * @param context        the simulation context
+     * @param packets        simultaneous received packets
      * @param selectedPacket the selected packet
+     * @param b
      */
-    void ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket);
+    void ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket, boolean b);
 
     /**
      * Called when some simultaneous packets are lost and not delivered to an intended node
@@ -50,6 +52,5 @@ public interface BlueFloodListener {
      * @return the new message
      */
     CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat);
-
 
 }

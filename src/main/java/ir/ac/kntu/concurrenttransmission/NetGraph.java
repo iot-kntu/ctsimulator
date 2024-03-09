@@ -43,7 +43,7 @@ public class NetGraph {
 
                 final String className = splitWithSemicolon[2];
                 final Class<?> nodeClass = Class.forName(
-                        "ir.ac.kntu.SynchronousTransmission.blueflood.nodes." + className);
+                        "ir.ac.kntu.concurrenttransmission.blueflood.nodes." + className);
                 final CtNode instance = (CtNode) nodeClass.getDeclaredConstructor(Integer.class).newInstance(nodeId);
 
                 netGraph.nodes.add(instance);

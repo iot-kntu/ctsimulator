@@ -2,7 +2,7 @@ package ir.ac.kntu;
 
 import ir.ac.kntu.concurrenttransmission.CtSimulator;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
-import ir.ac.kntu.concurrenttransmission.RoundRobin;
+import ir.ac.kntu.concurrenttransmission.RoundRobinInitiatorStrategy;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodApplication;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodSettings;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodStrategies;
@@ -23,6 +23,7 @@ public class Main {
 
             final NetGraph netGraph = NetGraph.loadFrom("sample.graph");
 
+            //noinspection
             if (netGraph.isEmpty())
                 throw new IllegalArgumentException("Invalid graph file format, it is not loaded");
 
@@ -33,12 +34,12 @@ public class Main {
             );
 
             BlueFloodStrategies strategies = new BlueFloodStrategies(
-                    new RoundRobin(netGraph.getNodeCount()),    //initiator strategy
+                    new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),    //initiator strategy
                     new DefaultTransmissionPolicy(3, netGraph)  // flood repeat count
             );
 
             BlueFloodApplication blueFloodApplication = new BlueFloodApplication(settings, strategies);
-            blueFloodApplication.setListener(new AllLoyalScenario());
+            netGraph.getNodes().forEach(node -> blueFloodApplication.setListener(node, new CoordinatorBasedOralMessage()));
 
             CtSimulator simulator = CtSimulator.createInstance(netGraph, blueFloodApplication);
             simulator.start();

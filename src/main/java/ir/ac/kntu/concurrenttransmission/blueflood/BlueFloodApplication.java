@@ -5,10 +5,7 @@ import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,15 +17,24 @@ public class BlueFloodApplication implements ConcurrentTransmissionApplication {
     private final BlueFloodSettings settings;
     private final Random random = new Random(new Date().getTime());
     private CtNetworkTime networkTime;
-    private BlueFloodListener listener;
+    private final SortedMap<CtNode, BlueFloodNodeListener> listeners;
 
     public BlueFloodApplication(BlueFloodSettings settings, BlueFloodStrategies strategies) {
         this.settings = settings;
         this.strategies = strategies;
+        this.listeners = new TreeMap<>();
     }
 
-    public void setListener(BlueFloodListener listener) {
-        this.listener = listener;
+    public void setListener(CtNode node, BlueFloodNodeListener listener) {
+        Objects.requireNonNull(node);
+        Objects.requireNonNull(listener);
+
+        this.listeners.put(node, listener);
+    }
+
+    @Override
+    public CtNetworkTime getNetworkTime() {
+        return networkTime;
     }
 
     @Override
@@ -106,7 +112,7 @@ public class BlueFloodApplication implements ConcurrentTransmissionApplication {
 
                 strategies.transmissionPolicy().newPacketReceived(receiver, getSlot());
 
-                double receiveProbability = ctEvent.arePacketsSimilar()
+                double receiveProbability = ctEvent.areMessagesSimilar()
                         ? settings.lossProbability()
                         : settings.conflictProbability();
 
@@ -118,11 +124,11 @@ public class BlueFloodApplication implements ConcurrentTransmissionApplication {
                                                               networkTime.slot(),
                                                               receiver.getId(), thePacket.ciMessage().messageNo()));
 
-                    listener.ctPacketsReceived(context, packets, thePacket);
+                    getBlueFloodListener(receiver).ctPacketsReceived(context, packets, thePacket, ctEvent.areMessagesSimilar());
                     receiver.floodMessage(context, receiver, thePacket.ciMessage());
                 }
                 else {
-                    listener.ctPacketsLost(context, packets, ctEvent.arePacketsSimilar());
+                    getBlueFloodListener(receiver).ctPacketsLost(context, packets, ctEvent.areMessagesSimilar());
                 }
             }
             case Flood -> {
@@ -150,12 +156,12 @@ public class BlueFloodApplication implements ConcurrentTransmissionApplication {
 
     @Override
     public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
-        return listener.getMessage(context, sender,receivedMessage, whichRepeat);
+        return getBlueFloodListener(sender).getMessage(context, sender, receivedMessage, whichRepeat);
     }
 
     @Override
     public CiMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
-        return listener.initiateMessage(context, initiator, whichRepeat);
+        return getBlueFloodListener(initiator).initiateMessage(context, initiator, whichRepeat);
     }
 
     public Logger getLogger() {
@@ -172,6 +178,14 @@ public class BlueFloodApplication implements ConcurrentTransmissionApplication {
 
     public int getSlot() {
         return networkTime.slot();
+    }
+
+    private BlueFloodNodeListener getBlueFloodListener(CtNode node) {
+        final BlueFloodNodeListener listener = listeners.get(node);
+        if (listener == null)
+            throw new IllegalStateException("No listener defined for node " + node);
+
+        return listener;
     }
 }
 

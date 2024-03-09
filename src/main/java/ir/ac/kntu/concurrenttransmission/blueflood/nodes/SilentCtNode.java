@@ -3,11 +3,10 @@ package ir.ac.kntu.concurrenttransmission.blueflood.nodes;
 import ir.ac.kntu.concurrenttransmission.CiMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.CtNode;
-import ir.ac.kntu.concurrenttransmission.blueflood.LoyalCtNode;
 
 public class SilentCtNode extends LoyalCtNode {
 
-    public SilentCtNode(int id) {
+    public SilentCtNode(Integer id) {
         super(id);
     }
 

@@ -1,6 +1,6 @@
 package ir.ac.kntu.concurrenttransmission;
 
-import ir.ac.kntu.concurrenttransmission.blueflood.LoyalCtNode;
+import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
 
 import java.util.*;
 
