@@ -30,8 +30,7 @@ public class CoordinatorBasedOralMessage implements BlueFloodNodeListener {
     private HashSet<MessageStatus> msgCache;
     private int networkSize;
     private boolean finished;
-
-
+    
     @Override
     public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets,
                                      FloodPacket<?> selectedPacket,

@@ -8,6 +8,10 @@ import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 import java.util.List;
 
+/**
+ * New applications must implement this interface. Methods of this interface is called from
+ * {@link CtNode} instances.
+ */
 public interface BlueFloodNodeListener {
 
     /**
@@ -44,7 +48,12 @@ public interface BlueFloodNodeListener {
     CiMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat);
 
     /**
-     * Receives message for flooding.
+     * gets message for flooding in response to receiving a flood message from a neighbor. In loyal nodes
+     * this method is not called and the received message is returned, directly.
+     * This method is called from non-loyal nodes, and it is possible these nodes
+     * return no message, a corrupted message or the same message based on traitorous strategy.
+     * It is called after {@link BlueFloodNodeListener#ctPacketsReceived(ContextView, List, FloodPacket, boolean)} method
+     * from {@link ir.ac.kntu.concurrenttransmission.blueflood.nodes.FaultyCtNode} and inside its floodMessage method.
      *
      * @param context         the simulation context
      * @param sender          which neighbor has sent the message
