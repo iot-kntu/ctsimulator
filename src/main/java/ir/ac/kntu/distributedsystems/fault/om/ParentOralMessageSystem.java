@@ -1,7 +1,10 @@
 package ir.ac.kntu.distributedsystems.fault.om;
 
 import ir.ac.kntu.common.IntCounterMap;
+import ir.ac.kntu.concurrenttransmission.CiMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public abstract class ParentOralMessageSystem {
+public abstract class ParentOralMessageSystem implements BlueFloodNodeListener {
 
     protected final static OmActions DEFAULT_ACTION = OmActions.Retreat;
     protected final Logger logger = Logger.getLogger(getClass().getSimpleName());
@@ -23,6 +26,12 @@ public abstract class ParentOralMessageSystem {
     public void ctPacketsLost(ContextView context, List<FloodPacket<?>> packets, boolean arePacketsSimilar) {
         logger.log(Level.INFO, "PKT lost due to " +
                 ((arePacketsSimilar) ? "general loss" : "conflict"));
+    }
+
+    @Override
+    public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
+        // relay the same message, acting as a loyal node
+        return receivedMessage;
     }
 
     protected void makeDecision(ContextView context, FloodPacket<?> selectedPacket) {

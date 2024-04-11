@@ -95,10 +95,5 @@ public class PrimaryBasedOralMessage extends ParentOralMessageSystem implements 
         }
     }
 
-    @Override
-    public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
-        // relay the same message, acting as a loyal node
-        return receivedMessage;
-    }
 
 }

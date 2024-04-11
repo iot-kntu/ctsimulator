@@ -76,10 +76,4 @@ public class ReplicatedWriteOralMessage extends ParentOralMessageSystem implemen
         }
     }
 
-    @Override
-    public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
-        return receivedMessage;
-    }
-
-
 }
