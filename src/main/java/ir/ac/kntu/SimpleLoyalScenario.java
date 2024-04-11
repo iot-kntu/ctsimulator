@@ -11,22 +11,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+/**
+ * NotIpe
+ */
 public class SimpleLoyalScenario implements BlueFloodNodeListener {
 
-    enum Actions {Unknown, Retreat, Attack}
-
-    record Message(Actions[] actionVector, String body) {
-    }
-
-    record MessageStatus(CtNode receivedNode, Actions[] nodesVector, CtNode initiator){
-
-    }
-
     final static Actions DEFAULT_ACTION = Actions.Retreat;
-
     private final Logger logger = Logger.getLogger("AllLoyalScenario");
-
     /**
      * key: message body
      * value:
@@ -39,7 +30,8 @@ public class SimpleLoyalScenario implements BlueFloodNodeListener {
     }
 
     @Override
-    public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket, boolean areSimilar) {
+    public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket
+            , boolean areSimilar) {
         return true;
     }
 
@@ -52,7 +44,7 @@ public class SimpleLoyalScenario implements BlueFloodNodeListener {
     @Override
     public CiMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat) {
         // FIXME: 3/9/24 not implemented
-        return null;
+        throw new UnsupportedOperationException("Not implemented");
     }
 
     /**
@@ -61,6 +53,15 @@ public class SimpleLoyalScenario implements BlueFloodNodeListener {
     @Override
     public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
         return receivedMessage;
+    }
+
+    enum Actions {Unknown, Retreat, Attack}
+
+    record Message(Actions[] actionVector, String body) {
+    }
+
+    record MessageStatus(CtNode receivedNode, Actions[] nodesVector, CtNode initiator) {
+
     }
 
 }
