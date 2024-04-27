@@ -22,25 +22,28 @@ public class Main {
         try {
             startLogger();
 
-            //final NetGraph netGraph = NetGraph.loadFrom("sample.graph");
-            final NetGraph netGraph = NetGraph.loadFrom("complex1.graph");
-            final int graphDiameter = netGraph.getDiameter();
-            System.out.println("graphDiameter = " + graphDiameter);
-            System.out.println("================================");
+            final NetGraph netGraph = NetGraph.loadFrom("sample.graph");
+            //final int graphDiameter = netGraph.getDiameter();
+            //System.out.println("graphDiameter = " + graphDiameter);
+            //System.out.println("================================");
 
             //noinspection
             if (netGraph.isEmpty())
                 throw new IllegalArgumentException("Invalid graph file format, it is not loaded");
 
+            final double lossProbability = 0.0;
+            final int executionRounds = 5;
+            final int blueFloodRepeatSlots = 3;
+
             BlueFloodSettings settings = new BlueFloodSettings(
-                    0.0,
+                    lossProbability,
                     BlueFloodApplication.DEFAULT_INTERFERENCE_PROB,
-                    5      // rounds limit
+                    executionRounds
             );
 
             BlueFloodStrategies strategies = new BlueFloodStrategies(
-                    new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),    //initiator strategy
-                    new DefaultTransmissionPolicy(3, netGraph)  // flood repeat count
+                    new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),
+                    new DefaultTransmissionPolicy(blueFloodRepeatSlots, netGraph)
             );
 
             BlueFloodApplication blueFloodApplication = new BlueFloodApplication(settings, strategies);

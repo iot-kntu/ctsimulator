@@ -6,8 +6,11 @@ import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * The implementation of Oral Message algorithm for coordinator-based group
@@ -18,81 +21,94 @@ public class PrimaryBasedOralMessage extends ParentOralMessageSystem implements 
 
     public static final int COORDINATOR_ID = 0;
 
-    private boolean finished;
+    private HashMap<CtNode, OmNodeStatus> nodeStatusMap = new HashMap<>();
 
     @Override
     public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets,
-                                     FloodPacket<?> selectedPacket,
+                                     FloodPacket<?> packet,
                                      boolean areSimilar) {
-
-        // General does not participate in flooding
-        if (selectedPacket.receiver().getId() == COORDINATOR_ID) {
-            this.finished = true;
-            return false;
-        }
-
         // ensure data structures initialization
         initialize(context);
 
-        // if the node has made the final decision just ignore incoming messages
-        if (this.finished)
+        final CtNode thisNode = packet.receiver();
+        final OmNodeStatus thisNodeStatus = getNodeStatus(thisNode);
+
+        // this has made the decision
+        if (thisNodeStatus.isFinished())
             return false;
 
-        if (!msgCache.isEmpty() && selectedPacket.ciMessage().initiator().getId() == COORDINATOR_ID) {
-            // all nodes have initiated a message and General have sent a command again!
-            this.finished = true;
-            makeDecision(context, selectedPacket);
-            return false;
-        }
-
-        // for debug
-        CtNode thisNode = selectedPacket.receiver();
-
-        final CiMessage<OmMessage> ciMessage = (CiMessage<OmMessage>) selectedPacket.ciMessage();
+        final CiMessage<OmMessage> ciMessage = (CiMessage<OmMessage>) packet.ciMessage();
         CtNode initiator = ciMessage.initiator();
-        final OmActions nodeAction = ciMessage.content().nodeAction();
+        final OmAction nodeAction = ciMessage.content().nodeAction();
 
-        OmMessageStatus status = new OmMessageStatus(initiator, nodeAction);
-        boolean newPacket = msgCache.add(status);
+        // if this is a new message
+        if (!thisNodeStatus.isActionRecordedForNode(initiator)) {
+            thisNodeStatus.getReceivedNodeActions().put(initiator, nodeAction);
 
-        // if the node has received message from all of its neighbors
-        if (newPacket && msgCache.size() == networkSize - 1) {
-            this.finished = true;
-            makeDecision(context, selectedPacket);
+            // if the node has received message from all of its neighbors
+            if (thisNodeStatus.getReceivedNodeActions().size() == networkSize - 1) {
+                thisNodeStatus.setFinished(true);
+                final OmAction decision = makeDecision(context, thisNodeStatus);
+                logger.log(Level.INFO, context.getApplication().getNetworkTime() + "::" +
+                        thisNode + " made the decision as " + decision);
+            }
+
+            return true;
         }
 
-        return newPacket;
+        return false;
     }
 
     @Override
     public CiMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat) {
         initialize(context);
 
-        // node0 is Major General!
-        if (initiator.getId() == COORDINATOR_ID)
-            if (this.finished) // the app is written only for one message transmission
+        final CtNode thisNode = initiator;
+        final OmNodeStatus thisNodeStatus = getNodeStatus(thisNode);
+
+        // if node is the General
+        if (thisNode.getId() == COORDINATOR_ID) {
+            if (thisNodeStatus.isFinished())
                 return CiMessage.NULL_MESSAGE;
-            else
-                return new CiMessage<>(initiator, new OmMessage(OmActions.Attack, ""));
-
-
-        for (OmMessageStatus messageStatus : msgCache) {
-            // find if this node has received the command directly from the general
-            if (messageStatus.initiator().getId() == COORDINATOR_ID)
-                return new CiMessage<>(initiator, new OmMessage(messageStatus.nodeAction(), ""));
+            else {
+                // this app is written only for one message decision
+                thisNodeStatus.setFinished(true);
+                return new CiMessage<>(initiator, new OmMessage(OmAction.Attack, ""));
+            }
         }
 
-        // when execution reaches here, the node has received the general command through other
-        //  intermediate nodes. The node sends the mostly-received command or the default action
-        if (msgCache.isEmpty()) {
-            return new CiMessage<>(initiator, new OmMessage(DEFAULT_ACTION, ""));
-        }
-        else {
-            final IntCounterMap<OmActions> actionCounter = findMajorActionInCache();
-            final OmActions maxAction = actionCounter.getMaxKey().getKey();
+        OmAction action = thisNodeStatus.findActionOfNode(COORDINATOR_ID, DEFAULT_ACTION);
+        return new CiMessage<>(initiator, new OmMessage(action, ""));
+    }
 
-            return new CiMessage<>(initiator, new OmMessage(maxAction, ""));
+    private OmAction makeDecision(ContextView context, OmNodeStatus thisNodeStatus) {
+        IntCounterMap<OmAction> actionsMap = new IntCounterMap<>();
+
+        for (CtNode ctNode : nodeStatusMap.keySet()) {
+            final OmAction action = thisNodeStatus.findActionOfNode(ctNode, DEFAULT_ACTION);
+            actionsMap.inc(action);
         }
+
+        final OmAction maxAction = actionsMap.getMaxKey().getKey();
+        return maxAction;
+    }
+
+    protected void initialize(ContextView context) {
+        if (networkSize == 0) {
+            networkSize = context.getNetGraph().getNodeCount();
+            nodeStatusMap = new HashMap<>();
+        }
+    }
+
+    @NotNull
+    private OmNodeStatus getNodeStatus(CtNode node) {
+        OmNodeStatus nodeStatus = nodeStatusMap.get(node);
+        if (nodeStatus == null) {
+            nodeStatus = new OmNodeStatus(node);
+            nodeStatusMap.put(node, nodeStatus);
+        }
+
+        return nodeStatus;
     }
 
 

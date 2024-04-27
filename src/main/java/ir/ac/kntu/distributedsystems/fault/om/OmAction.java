@@ -1,3 +1,3 @@
 package ir.ac.kntu.distributedsystems.fault.om;
 
-public enum OmActions {Unknown, Retreat, Attack}
+public enum OmAction {Unknown, Retreat, Attack}

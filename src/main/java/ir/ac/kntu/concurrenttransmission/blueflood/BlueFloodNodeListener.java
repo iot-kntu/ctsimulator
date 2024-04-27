@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * New applications must implement this interface. Methods of this interface is called from
- * {@link CtNode} instances.
+ * {@link BlueFloodApplication}.
  */
 public interface BlueFloodNodeListener {
 

@@ -5,5 +5,5 @@ package ir.ac.kntu.distributedsystems.fault.om;
  * @param nodeAction
  * @param body
  */
-public record OmMessage(OmActions nodeAction, String body) {
+public record OmMessage(OmAction nodeAction, String body) {
 }
