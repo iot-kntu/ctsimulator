@@ -4,8 +4,7 @@ import ir.ac.kntu.concurrenttransmission.blueflood.TransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 
 /**
- * An interface defining applications on the Synch. Transmission base. Applications can be
- * chained.
+ * An interface defining a base for concurrent transmission applications.
  */
 public interface ConcurrentTransmissionApplication {
 

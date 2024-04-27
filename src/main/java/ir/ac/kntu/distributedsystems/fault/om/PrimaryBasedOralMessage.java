@@ -1,6 +1,5 @@
 package ir.ac.kntu.distributedsystems.fault.om;
 
-import ir.ac.kntu.common.IntCounterMap;
 import ir.ac.kntu.concurrenttransmission.CiMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.CtNode;
@@ -20,8 +19,14 @@ import java.util.logging.Level;
 public class PrimaryBasedOralMessage extends ParentOralMessageSystem implements BlueFloodNodeListener {
 
     public static final int COORDINATOR_ID = 0;
+    private final OmAction coordinatorAction;
 
     private HashMap<CtNode, OmNodeStatus> nodeStatusMap = new HashMap<>();
+
+    public PrimaryBasedOralMessage(OmAction DEFAULT_ACTION, OmAction coordinatorAction) {
+        super(DEFAULT_ACTION);
+        this.coordinatorAction = coordinatorAction;
+    }
 
     @Override
     public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets,
@@ -47,8 +52,11 @@ public class PrimaryBasedOralMessage extends ParentOralMessageSystem implements 
 
             // if the node has received message from all of its neighbors
             if (thisNodeStatus.getReceivedNodeActions().size() == networkSize - 1) {
+
                 thisNodeStatus.setFinished(true);
+
                 final OmAction decision = makeDecision(context, thisNodeStatus);
+
                 logger.log(Level.INFO, context.getApplication().getNetworkTime() + "::" +
                         thisNode + " made the decision as " + decision);
             }
@@ -73,24 +81,12 @@ public class PrimaryBasedOralMessage extends ParentOralMessageSystem implements 
             else {
                 // this app is written only for one message decision
                 thisNodeStatus.setFinished(true);
-                return new CiMessage<>(initiator, new OmMessage(OmAction.Attack, ""));
+                return new CiMessage<>(initiator, new OmMessage(coordinatorAction, ""));
             }
         }
 
-        OmAction action = thisNodeStatus.findActionOfNode(COORDINATOR_ID, DEFAULT_ACTION);
+        OmAction action = thisNodeStatus.findActionOfNode(COORDINATOR_ID, defaultAction);
         return new CiMessage<>(initiator, new OmMessage(action, ""));
-    }
-
-    private OmAction makeDecision(ContextView context, OmNodeStatus thisNodeStatus) {
-        IntCounterMap<OmAction> actionsMap = new IntCounterMap<>();
-
-        for (CtNode ctNode : nodeStatusMap.keySet()) {
-            final OmAction action = thisNodeStatus.findActionOfNode(ctNode, DEFAULT_ACTION);
-            actionsMap.inc(action);
-        }
-
-        final OmAction maxAction = actionsMap.getMaxKey().getKey();
-        return maxAction;
     }
 
     protected void initialize(ContextView context) {

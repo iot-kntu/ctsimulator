@@ -1,5 +1,6 @@
 package ir.ac.kntu.distributedsystems.fault.om;
 
+import ir.ac.kntu.common.IntCounterMap;
 import ir.ac.kntu.concurrenttransmission.CiMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.CtNode;
@@ -12,10 +13,13 @@ import java.util.logging.Logger;
 
 public abstract class ParentOralMessageSystem implements BlueFloodNodeListener {
 
-    protected final static OmAction DEFAULT_ACTION = OmAction.Retreat;
     protected final Logger logger = Logger.getLogger(getClass().getSimpleName());
-
+    protected final OmAction defaultAction;
     protected int networkSize;
+
+    public ParentOralMessageSystem(OmAction defaultAction) {
+        this.defaultAction = defaultAction;
+    }
 
     public void ctPacketsLost(ContextView context, List<FloodPacket<?>> packets, boolean arePacketsSimilar) {
         logger.log(Level.INFO, "PKT lost due to " +
@@ -28,4 +32,15 @@ public abstract class ParentOralMessageSystem implements BlueFloodNodeListener {
         return receivedMessage;
     }
 
+    protected OmAction makeDecision(ContextView context, OmNodeStatus thisNodeStatus) {
+        IntCounterMap<OmAction> actionsMap = new IntCounterMap<>();
+
+        for (CtNode ctNode : context.getNetGraph().getNodes()) {
+            final OmAction action = thisNodeStatus.findActionOfNode(ctNode, defaultAction);
+            actionsMap.inc(action);
+        }
+
+        final OmAction maxAction = actionsMap.getMaxKey().getKey();
+        return maxAction;
+    }
 }

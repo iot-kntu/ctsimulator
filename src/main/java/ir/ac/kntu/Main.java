@@ -7,7 +7,8 @@ import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodApplication;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodSettings;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodStrategies;
 import ir.ac.kntu.concurrenttransmission.blueflood.DefaultTransmissionPolicy;
-import ir.ac.kntu.distributedsystems.fault.om.PrimaryBasedOralMessage;
+import ir.ac.kntu.distributedsystems.fault.om.OmAction;
+import ir.ac.kntu.distributedsystems.fault.om.ReplicatedWriteOralMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +48,9 @@ public class Main {
             );
 
             BlueFloodApplication blueFloodApplication = new BlueFloodApplication(settings, strategies);
-            netGraph.getNodes().forEach(node -> blueFloodApplication.setListener(node, new PrimaryBasedOralMessage()));
+            //netGraph.getNodes().forEach(node -> blueFloodApplication.setListener(node, new PrimaryBasedOralMessage()));
+            netGraph.getNodes().forEach(node -> blueFloodApplication
+                    .setListener(node, new ReplicatedWriteOralMessage(OmAction.Retreat, 1, OmAction.Attack)));
 
             CtSimulator simulator = CtSimulator.createInstance(netGraph, blueFloodApplication);
             simulator.start();

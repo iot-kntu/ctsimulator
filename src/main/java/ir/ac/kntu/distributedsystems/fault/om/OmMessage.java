@@ -7,3 +7,4 @@ package ir.ac.kntu.distributedsystems.fault.om;
  */
 public record OmMessage(OmAction nodeAction, String body) {
 }
+
