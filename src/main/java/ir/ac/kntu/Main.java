@@ -23,9 +23,9 @@ public class Main {
             startLogger();
 
             final NetGraph netGraph = NetGraph.loadFrom("sample.graph");
-            //final int graphDiameter = netGraph.getDiameter();
-            //System.out.println("graphDiameter = " + graphDiameter);
-            //System.out.println("================================");
+            final int graphDiameter = netGraph.getDiameter();
+            System.out.println("graphDiameter = " + graphDiameter);
+            System.out.println("================================");
 
             //noinspection
             if (netGraph.isEmpty())

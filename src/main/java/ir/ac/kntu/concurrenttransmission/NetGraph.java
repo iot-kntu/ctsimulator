@@ -11,6 +11,7 @@ public class NetGraph {
 
     private final List<CtNode> nodes = new ArrayList<>();
     private final HashMap<CtNode, List<CtNode>> neighborsMap = new HashMap<>();
+    private int diameter = 0;
 
     private NetGraph() {
     }
@@ -74,8 +75,9 @@ public class NetGraph {
             for (CtNode keyNode : map.keySet()) {
                 final List<CtNode> neighbors = netGraph.neighborsMap.get(keyNode);
                 for (CtNode neighbor : neighbors) {
-                   if(!netGraph.neighborsMap.get(neighbor).contains(keyNode))
-                       throw new IllegalStateException("Node " + keyNode + " has edge to " + neighbor + " but the reverse is not true");
+                    if (!netGraph.neighborsMap.get(neighbor).contains(keyNode))
+                        throw new IllegalStateException(
+                                "Node " + keyNode + " has edge to " + neighbor + " but the reverse is not true");
                 }
             }
         }
@@ -132,22 +134,24 @@ public class NetGraph {
     }
 
     public int getDiameter() {
+        if (diameter <= 0) {
+            int grahDepth = 0;
+            int maxTries = getNodeCount() % 2 + getNodeCount() / 2;
+            int visitedRoots = 0;
 
-        int grahDepth = 0;
-        int maxTries = getNodeCount() % 2 + getNodeCount() / 2;
-        int visitedRoots = 0;
+            for (CtNode node : nodes) {
+                final int maxDepth = new GraphDepthFinder(this, node).getMaxDepth();
+                if (maxDepth > grahDepth)
+                    grahDepth = maxDepth;
 
-        for (CtNode node : nodes) {
-            final int maxDepth = new GraphDepthFinder(this, node).getMaxDepth();
-            if (maxDepth > grahDepth)
-                grahDepth = maxDepth;
-
-            visitedRoots++;
-            if (visitedRoots >= maxTries)
-                break;
+                visitedRoots++;
+                if (visitedRoots >= maxTries)
+                    break;
+            }
+            diameter = grahDepth;
         }
 
-        return grahDepth;
+        return diameter;
     }
 }
 
@@ -186,7 +190,7 @@ class GraphDepthFinder {
 
             for (CtNode neighbor : neighbors) {
 
-                if(neighbor.equals(nodeHist.parent()) || nodeHist.visitedParents().contains(neighbor))
+                if (neighbor.equals(nodeHist.parent()) || nodeHist.visitedParents().contains(neighbor))
                     continue;
 
                 final NodeHist neighborHist = nodeDepthMap.get(neighbor);
@@ -205,7 +209,7 @@ class GraphDepthFinder {
                     List<CtNode> allPrevParents = new ArrayList<>(nodeHist.visitedParents());
                     allPrevParents.add(nodeHist.parent());
 
-                    nodeDepthMap.put(neighbor, new NodeHist(neighbor, currentNode,allPrevParents , newDepth));
+                    nodeDepthMap.put(neighbor, new NodeHist(neighbor, currentNode, allPrevParents, newDepth));
                 }
             }
 
@@ -224,6 +228,7 @@ class GraphDepthFinder {
      * @param visitedParents
      * @param depth
      */
-    record NodeHist(CtNode node, CtNode parent, List<CtNode> visitedParents, int depth){}
+    record NodeHist(CtNode node, CtNode parent, List<CtNode> visitedParents, int depth) {
+    }
 
 }
