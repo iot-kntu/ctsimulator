@@ -1,0 +1,12 @@
+# <node_id><;><comma separated list of neighbors><;><node class name>
+# <node class name>:
+#    otherwise: the exact name of the node class name which should be in the
+#       ir.ac.kntu.concurrenttransmission.blueflood.nodes namespace
+0;1,2;LoyalCtNode
+1;0,3;LoyalCtNode
+2;0,4,7;LoyalCtNode
+3;1,4,6;LoyalCtNode
+4;2,3,5;LoyalCtNode
+5;4,6,7;LoyalCtNode
+6;3,5;LoyalCtNode
+7;5;LoyalCtNode

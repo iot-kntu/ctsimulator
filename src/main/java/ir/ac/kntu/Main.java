@@ -22,7 +22,11 @@ public class Main {
         try {
             startLogger();
 
-            final NetGraph netGraph = NetGraph.loadFrom("sample.graph");
+            //final NetGraph netGraph = NetGraph.loadFrom("sample.graph");
+            final NetGraph netGraph = NetGraph.loadFrom("complex1.graph");
+            final int graphDiameter = netGraph.getDiameter();
+            System.out.println("graphDiameter = " + graphDiameter);
+            System.out.println("================================");
 
             //noinspection
             if (netGraph.isEmpty())
@@ -48,7 +52,8 @@ public class Main {
             System.out.println(blueFloodApplication.printTimeline());
         }
         catch (Exception e) {
-            System.err.println("High level error occurred: " + e);
+            System.err.println("High level error occurred: ");
+            e.printStackTrace();
         }
     }
 
