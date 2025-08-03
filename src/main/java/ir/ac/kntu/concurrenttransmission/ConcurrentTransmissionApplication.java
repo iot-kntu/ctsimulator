@@ -36,7 +36,7 @@ public interface ConcurrentTransmissionApplication {
 
     NodeState getNodeState(CtNode node);
 
-    TransmissionPolicy getTransmissionPolicy();
+    ConcurrentTransmissionPolicy getTransmissionPolicy();
 
     /**
      * Receives message for flooding. It is expected the application relay this call to listeners.

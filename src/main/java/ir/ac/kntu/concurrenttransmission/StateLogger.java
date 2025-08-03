@@ -1,7 +1,5 @@
 package ir.ac.kntu.concurrenttransmission;
 
-import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
-
 import java.util.*;
 
 /**
@@ -9,62 +7,83 @@ import java.util.*;
  */
 public class StateLogger {
 
-    private final SortedMap<CtNetworkTime, Map<Integer, NodeState>> nodeStates = new TreeMap<>();
-    private final List<LoyalCtNode> nodes;
+    private final SortedMap<CtNetworkTime, Map<CtNode, NodeState>> history = new TreeMap<>();
+    private final List<CtNode> nodes;
+    private final ConcurrentTransmissionPolicy transmissionPolicy;
 
-    public StateLogger(List<LoyalCtNode> nodes) {
-        this.nodes = nodes;
+    public StateLogger(List<CtNode> nodes, ConcurrentTransmissionPolicy transmissionPolicy) {
+        this.nodes = new ArrayList<>(nodes);
+        this.nodes.sort(Comparator.comparingInt(CtNode::getId));
+        this.transmissionPolicy = transmissionPolicy;
     }
 
-    public void timeForward(CtNetworkTime networkTime) {
-
-        Map<Integer, NodeState> nodeStateMap = new HashMap<>();
-
-        for (LoyalCtNode node : nodes)
-            nodeStateMap.put(node.getId(), NodeState.Listen);
-
-        nodeStates.put(networkTime, nodeStateMap);
-    }
-
-    public void setState(CtNetworkTime networkTime, LoyalCtNode node, NodeState nodeState) {
-
-        final Map<Integer, NodeState> stateMap = nodeStates.get(networkTime);
-
-        if (stateMap == null)
-            throw new IllegalStateException("No state saved for this round and slot");
-
-        stateMap.put(node.getId(), nodeState);
+    public void setState(CtNetworkTime time, CtNode node, NodeState nodeState) {
+        final Map<CtNode, NodeState> stateMap = history.computeIfAbsent(time, k -> new TreeMap<>());
+        stateMap.put(node, nodeState);
     }
 
     public String printTimeline() {
-
-        StringBuilder builder = new StringBuilder();
-
-        builder.append(String.format("%1$5s", "*"));
-
-        for (CtNetworkTime CtNetworkTime : nodeStates.keySet())
-            builder.append(String.format("%1$5s", CtNetworkTime.round()));
-        builder.append('\n');
-
-        builder.append(String.format("%1$5s", "*"));
-        for (CtNetworkTime CtNetworkTime : nodeStates.keySet())
-            builder.append(String.format("%1$5s", CtNetworkTime.slot()));
-        builder.append('\n');
-
-        final List<String> rows = new ArrayList<>();
-
-        for (LoyalCtNode node : nodes)
-            rows.add(String.format("%1$5s", "N[" + node.getId() + "]"));
-
-        for (Map<Integer, NodeState> valueMap : nodeStates.values()) {
-            for (int i = 0; i < nodes.size(); i++) {
-                LoyalCtNode node = nodes.get(i);
-                rows.set(i, rows.get(i) + String.format("%1$5c", valueMap.get(node.getId()).getSymbol()));
-            }
+        if (history.isEmpty()) {
+            return "StateHistory is empty.";
         }
 
-        rows.forEach(s -> builder.append(s).append("\n"));
+        StringBuilder builder = new StringBuilder();
+        int totalSlotsOfRound = transmissionPolicy.getTotalSlotsOfRound();
+        int maxRound = history.lastKey().round();
 
+        // --- Print Rounds Header ---
+        builder.append(String.format("%-6s|", "R"));
+        for (int r = 0; r <= maxRound; r++) {
+            for (int s = 0; s < totalSlotsOfRound; s++) {
+                builder.append(String.format("%-5s", r));
+            }
+            builder.append(String.format("%-5s", "|"));
+        }
+        builder.append('\n');
+
+        // --- Print Slots Header ---
+        builder.append(String.format("%-6s|", "S"));
+        for (int r = 0; r <= maxRound; r++) {
+            for (int s = 0; s < totalSlotsOfRound; s++) {
+                builder.append(String.format("%-5s", s));
+            }
+            builder.append(String.format("%-5s", "|"));
+        }
+        builder.append('\n');
+
+        // --- Print Separator ---
+        builder.append(String.format("%-6s|", "------"));
+        for (int r = 0; r <= maxRound; r++) {
+            for (int s = 0; s < totalSlotsOfRound; s++) {
+                builder.append(String.format("%-5s", "-----"));
+            }
+            builder.append(String.format("%-5s", "|"));
+        }
+        builder.append('\n');
+
+        // --- Print Nodes Status ---
+        Map<CtNode, NodeState> lastKnownStates = new HashMap<>();
+
+        for (CtNode node : this.nodes) {
+            builder.append(String.format("N[%-3d]|", node.getId()));
+            for (int r = 0; r <= maxRound; r++) {
+                for (int s = 0; s < totalSlotsOfRound; s++) {
+                    CtNetworkTime currentTime = new CtNetworkTime(r, s);
+
+                    if (history.containsKey(currentTime) && history.get(currentTime).containsKey(node)) {
+                        lastKnownStates.put(node, history.get(currentTime).get(node));
+                    } else {
+                        lastKnownStates.put(node, null);
+                    }
+
+                    NodeState stateToPrint = lastKnownStates.get(node);
+                    char symbol = (stateToPrint != null) ? stateToPrint.getSymbol() : '.';
+                    builder.append(String.format("%-5c", symbol));
+                }
+                builder.append(String.format("%-5s", "|"));
+            }
+            builder.append('\n');
+        }
         return builder.toString();
     }
 }
