@@ -1,6 +1,6 @@
 package ir.ac.kntu.concurrenttransmission;
 
-public class RoundRobinInitiatorStrategy implements CiInitiatorStrategy {
+public class RoundRobinInitiatorStrategy implements CtInitiatorStrategy {
 
     private final int nodesCount;
     private int currentId = -1;

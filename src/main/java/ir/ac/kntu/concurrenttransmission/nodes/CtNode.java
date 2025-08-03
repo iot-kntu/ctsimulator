@@ -1,6 +1,7 @@
-package ir.ac.kntu.concurrenttransmission;
+package ir.ac.kntu.concurrenttransmission.nodes;
 
-import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
+import ir.ac.kntu.concurrenttransmission.ContextView;
 
 import java.util.Objects;
 
@@ -10,7 +11,7 @@ public interface CtNode extends Comparable<CtNode> {
 
     void initiateFlood(ContextView context, CtNode initiatorNode);
 
-    <T> void floodMessage(ContextView context, CtNode sender, CiMessage<T> message);
+    <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message);
 
     int getId();
 

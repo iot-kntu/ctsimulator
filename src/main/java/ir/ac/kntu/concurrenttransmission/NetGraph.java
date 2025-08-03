@@ -1,7 +1,9 @@
 package ir.ac.kntu.concurrenttransmission;
 
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.geom.Point2D;
 import java.io.*;
 import java.util.*;
 
@@ -11,6 +13,8 @@ public class NetGraph {
 
     private final List<CtNode> nodes = new ArrayList<>();
     private final HashMap<CtNode, List<CtNode>> neighborsMap = new HashMap<>();
+    private final HashMap<CtNode, Point2D.Double> coordinatesMap = new HashMap<>();
+
     private int diameter = 0;
 
     private NetGraph() {
@@ -18,46 +22,46 @@ public class NetGraph {
 
     public static @NotNull NetGraph loadFrom(String path) throws Exception {
         NetGraph netGraph = new NetGraph();
-
         HashMap<CtNode, List<Integer>> nodeNeighborsId = new HashMap<>();
-
         int lineCounter = 0;
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
 
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 lineCounter++;
 
-                if (line.startsWith("#"))
-                    continue;
+                if (line.startsWith("#") || line.isBlank()) continue;
+
 
                 final String[] splitWithSemicolon = line.split(";");
-                if (splitWithSemicolon.length < 3)
+                if (splitWithSemicolon.length < 5) {
                     throw new IllegalStateException(
-                            "Line " + lineCounter + ": each row must have format of <node_id>;<Node " +
-                                    "Type>;<comma separated list of neighbors>");
+                            "Line " + lineCounter + ": each row must have format of <node_id>;<neighbors>;<class>;<x>;<y>");
+                }
 
-                final int nodeId = Integer.parseInt(splitWithSemicolon[0]);
+                final int nodeId = Integer.parseInt(splitWithSemicolon[0].trim());
+                final String[] neighborsStr = splitWithSemicolon[1].split(",");
+                final String className = splitWithSemicolon[2].trim();
 
-                final String className = splitWithSemicolon[2];
+                final double x = Double.parseDouble(splitWithSemicolon[3].trim());
+                final double y = Double.parseDouble(splitWithSemicolon[4].trim());
+
                 final Class<?> nodeClass = Class.forName(
-                        "ir.ac.kntu.concurrenttransmission.blueflood.nodes." + className);
+                        "ir.ac.kntu.concurrenttransmission.nodes." + className);
                 final CtNode instance = (CtNode) nodeClass.getDeclaredConstructor(Integer.class).newInstance(nodeId);
 
                 netGraph.nodes.add(instance);
                 netGraph.neighborsMap.put(instance, new ArrayList<>());
 
+                netGraph.coordinatesMap.put(instance, new Point2D.Double(x, y));
+
                 final ArrayList<Integer> neighbors = new ArrayList<>();
                 nodeNeighborsId.put(instance, neighbors);
 
-                final String[] neighborsStr = splitWithSemicolon[1].split(",");
                 for (String s : neighborsStr) {
-                    if (s.isBlank())
-                        continue;
-                    final int neighborId = Integer.parseInt(s);
-                    neighbors.add(neighborId);
+                    if (s.isBlank()) continue;
+                    neighbors.add(Integer.parseInt(s.trim()));
                 }
-
             }
 
             for (CtNode node : netGraph.getNodes()) {
@@ -152,6 +156,23 @@ public class NetGraph {
         }
 
         return diameter;
+    }
+
+    public Point2D.Double getCoordinates(CtNode node) {
+        return coordinatesMap.get(node);
+    }
+
+    public double getDistanceBetween(CtNode node1, CtNode node2) {
+        Objects.requireNonNull(node1);
+        Objects.requireNonNull(node2);
+
+        Point2D.Double pos1 = getCoordinates(node1);
+        Point2D.Double pos2 = getCoordinates(node2);
+
+        Objects.requireNonNull(pos1);
+        Objects.requireNonNull(pos2);
+
+        return pos1.distance(pos2);
     }
 }
 

@@ -4,6 +4,7 @@ import ir.ac.kntu.concurrenttransmission.*;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -122,11 +123,11 @@ public class BlueFloodApplication implements ConcurrentTransmissionApplication {
                                                               context.getTime(),
                                                               networkTime.round(),
                                                               networkTime.slot(),
-                                                              receiver.getId(), thePacket.ciMessage().messageNo()));
+                                                              receiver.getId(), thePacket.ctMessage().messageNo()));
 
                     boolean shouldFlood = getBlueFloodListener(receiver).ctPacketsReceived(context, packets, thePacket, ctEvent.areMessagesSimilar());
                     if(shouldFlood)
-                        receiver.floodMessage(context, receiver, thePacket.ciMessage());
+                        receiver.floodMessage(context, receiver, thePacket.ctMessage());
                 }
                 else {
                     getBlueFloodListener(receiver).ctPacketsLost(context, packets, ctEvent.areMessagesSimilar());
@@ -156,12 +157,12 @@ public class BlueFloodApplication implements ConcurrentTransmissionApplication {
     }
 
     @Override
-    public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
+    public CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat) {
         return getBlueFloodListener(sender).getMessage(context, sender, receivedMessage, whichRepeat);
     }
 
     @Override
-    public CiMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
+    public CtMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
         return getBlueFloodListener(initiator).initiateMessage(context, initiator, whichRepeat);
     }
 

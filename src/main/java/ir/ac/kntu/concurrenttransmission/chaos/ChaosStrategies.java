@@ -1,7 +1,7 @@
 package ir.ac.kntu.concurrenttransmission.chaos;
 
-import ir.ac.kntu.concurrenttransmission.CiInitiatorStrategy;
+import ir.ac.kntu.concurrenttransmission.CtInitiatorStrategy;
 
-public record ChaosStrategies(CiInitiatorStrategy initiatorStrategy,
+public record ChaosStrategies(CtInitiatorStrategy initiatorStrategy,
                               ChaosTransmissionPolicy transmissionPolicy) {
 }

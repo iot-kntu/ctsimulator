@@ -1,9 +1,9 @@
 package ir.ac.kntu.distributedsystems.fault.om;
 
 import ir.ac.kntu.common.IntCounterMap;
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
@@ -27,7 +27,7 @@ public abstract class ParentOralMessageSystem implements BlueFloodNodeListener {
     }
 
     @Override
-    public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
+    public CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat) {
         // relay the same message, acting as a loyal node
         return receivedMessage;
     }

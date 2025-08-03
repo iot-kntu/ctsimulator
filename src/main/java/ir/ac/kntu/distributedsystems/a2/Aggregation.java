@@ -1,8 +1,8 @@
 package ir.ac.kntu.distributedsystems.a2;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosMessage;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
@@ -40,15 +40,15 @@ public class Aggregation implements ChaosNodeListener {
     }
 
     @Override
-    public CiMessage<?> newRound(ContextView context, CtNode initiator) {
+    public CtMessage<?> newRound(ContextView context, CtNode initiator) {
         BitSet flags = new BitSet(networkSize);
         flags.set(nodeId);
         roundMessage = new ChaosMessage(flags, nodeStatusMap.poll());
-        return new CiMessage<>(initiator, roundMessage);
+        return new CtMessage<>(initiator, roundMessage);
     }
 
     @Override
-    public CiMessage<?> getRoundMessage(ContextView context, CtNode initiator, int whichRepeat) {
+    public CtMessage<?> getRoundMessage(ContextView context, CtNode initiator, int whichRepeat) {
 
         initialize(context);
 
@@ -58,15 +58,15 @@ public class Aggregation implements ChaosNodeListener {
         logger.log(Level.INFO, "Sending " + roundMessage);
 
 
-        return new CiMessage<>(initiator, roundMessage);
+        return new CtMessage<>(initiator, roundMessage);
     }
 
     @Override
-    public CiMessage<?> merge(ContextView context, FloodPacket<?> receivedPacket) {
+    public CtMessage<?> merge(ContextView context, FloodPacket<?> receivedPacket) {
         initialize(context);
 
-        CiMessage<?> ciMessage = receivedPacket.ciMessage();
-        ChaosMessage message = (ChaosMessage) ciMessage.content();
+        CtMessage<?> ctMessage = receivedPacket.ctMessage();
+        ChaosMessage message = (ChaosMessage) ctMessage.content();
         BitSet flags = new BitSet(networkSize);
         flags.set(0, networkSize);
         flags.and(message.flags());
@@ -76,10 +76,10 @@ public class Aggregation implements ChaosNodeListener {
             int max = Math.max((int) message.payload(), (int) roundMessage.payload());
             logger.log(Level.INFO, "Received " + message.payload() + " and max is " + max);
             roundMessage = new ChaosMessage(flags, max);
-            return new CiMessage<>(context.getNetGraph().getNodeById(nodeId), roundMessage);
+            return new CtMessage<>(context.getNetGraph().getNodeById(nodeId), roundMessage);
         }
 
-        return new CiMessage<>(context.getNetGraph().getNodeById(nodeId), new ChaosMessage(flags, message.payload()));
+        return new CtMessage<>(context.getNetGraph().getNodeById(nodeId), new ChaosMessage(flags, message.payload()));
     }
 
     private void initialize(ContextView context) {
@@ -90,7 +90,7 @@ public class Aggregation implements ChaosNodeListener {
 
 
     @Override
-    public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
+    public CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat) {
         return null;
     }
 }

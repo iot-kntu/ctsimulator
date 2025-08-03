@@ -1,9 +1,9 @@
 package ir.ac.kntu.concurrenttransmission.blueflood;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
-import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.LoyalCtNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public interface BlueFloodNodeListener {
      * @param whichRepeat determines the n_th repeat of flooding based on transmission policy
      * @return the new message
      */
-    CiMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat);
+    CtMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat);
 
     /**
      * gets message for flooding in response to receiving a flood message from a neighbor. In loyal nodes
@@ -53,7 +53,7 @@ public interface BlueFloodNodeListener {
      * This method is called from non-loyal nodes, and it is possible these nodes
      * return no message, a corrupted message or the same message based on traitorous strategy.
      * It is called after {@link BlueFloodNodeListener#ctPacketsReceived(ContextView, List, FloodPacket, boolean)} method
-     * from {@link ir.ac.kntu.concurrenttransmission.blueflood.nodes.FaultyCtNode} and inside its floodMessage method.
+     * from {@link ir.ac.kntu.concurrenttransmission.nodes.FaultyCtNode} and inside its floodMessage method.
      *
      * @param context         the simulation context
      * @param sender          which neighbor has sent the message
@@ -61,6 +61,6 @@ public interface BlueFloodNodeListener {
      * @param whichRepeat     determines the n_th repeat of flooding based on transmission policy
      * @return the new message
      */
-    CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat);
+    CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat);
 
 }

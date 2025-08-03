@@ -1,9 +1,9 @@
 package ir.ac.kntu.concurrenttransmission.chaos;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
-import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.LoyalCtNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public interface ChaosNodeListener {
     void ctPacketsLost(ContextView context, List<FloodPacket<?>> packets, boolean arePacketsSimilar);
 
 
-    CiMessage<?> newRound(ContextView context, CtNode initiator);
+    CtMessage<?> newRound(ContextView context, CtNode initiator);
 
     /**
      * Called when a node should initiate the round. In {@link LoyalCtNode}s this method is called once independent
@@ -48,7 +48,7 @@ public interface ChaosNodeListener {
      * @param whichRepeat determines the n_th repeat of flooding based on transmission policy
      * @return the new message
      */
-    CiMessage<?> getRoundMessage(ContextView context, CtNode initiator, int whichRepeat);
+    CtMessage<?> getRoundMessage(ContextView context, CtNode initiator, int whichRepeat);
 
     /**
      * Merges the given packet into the node message.
@@ -57,7 +57,7 @@ public interface ChaosNodeListener {
      * @param receivedPacket  the packet to be merged
      * @return the merged message
      */
-    CiMessage<?> merge(ContextView context, FloodPacket<?> receivedPacket);
+    CtMessage<?> merge(ContextView context, FloodPacket<?> receivedPacket);
 
     /**
      * gets message for flooding in response to receiving a flood message from a neighbor. In loyal nodes
@@ -65,7 +65,7 @@ public interface ChaosNodeListener {
      * This method is called from non-loyal nodes, and it is possible these nodes
      * return no message, a corrupted message or the same message based on traitorous strategy.
      * It is called after {@link ChaosNodeListener#ctPacketsReceived(ContextView, List, FloodPacket, boolean)} method
-     * from {@link ir.ac.kntu.concurrenttransmission.blueflood.nodes.FaultyCtNode} and inside its floodMessage method.
+     * from {@link ir.ac.kntu.concurrenttransmission.nodes.FaultyCtNode} and inside its floodMessage method.
      *
      * @param context         the simulation context
      * @param sender          which neighbor has sent the message
@@ -73,6 +73,6 @@ public interface ChaosNodeListener {
      * @param whichRepeat     determines the n_th repeat of flooding based on transmission policy
      * @return the new message
      */
-    CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat);
+    CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat);
 
 }

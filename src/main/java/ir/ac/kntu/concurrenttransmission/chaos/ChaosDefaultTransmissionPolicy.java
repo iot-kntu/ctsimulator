@@ -1,12 +1,9 @@
 package ir.ac.kntu.concurrenttransmission.chaos;
 
 import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
-import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.NodeState;
-
-import java.util.*;
-import java.util.stream.IntStream;
 
 /**
  * Based on Chaos design, every node in DefaultTransmissionPolicy listens in all slots

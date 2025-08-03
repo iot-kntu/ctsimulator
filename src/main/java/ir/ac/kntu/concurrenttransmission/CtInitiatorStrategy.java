@@ -1,10 +1,10 @@
 package ir.ac.kntu.concurrenttransmission;
 
 /**
- * Constructive Interference message initiation
+ *  Message initiation
  * strategy
  */
-public interface CiInitiatorStrategy {
+public interface CtInitiatorStrategy {
 
     int getCurrentInitiatorId();
 

@@ -33,7 +33,6 @@ public class CtSimulator {
     }
 
     public void start() {
-
         scheduleEvent(new SimulationStartEvent(0));
 
         context.time = -1;

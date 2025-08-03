@@ -1,6 +1,6 @@
 package ir.ac.kntu.concurrenttransmission;
 
-public class OneInitiatorInitiatorStrategy implements CiInitiatorStrategy {
+public class OneInitiatorInitiatorStrategy implements CtInitiatorStrategy {
 
     private final int initiatorNodeId;
 

@@ -1,7 +1,7 @@
 package ir.ac.kntu.concurrenttransmission.events;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
-import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 
 // TODO: 2/19/24 In future we may have different types of packet,
 //  which may necessitates to define a packet interface
@@ -9,11 +9,11 @@ import ir.ac.kntu.concurrenttransmission.CtNode;
 /**
  * Represents a data sent between two adjacent nodes
  */
-public record FloodPacket<T>(long time, CiMessage<T> ciMessage, CtNode sender, CtNode receiver) {
+public record FloodPacket<T>(long time, CtMessage<T> ctMessage, CtNode sender, CtNode receiver) {
 
     @Override
     public String toString() {
-        return String.format("StFloodPacket[%d:%s->%s]=[%s]", time(), sender, receiver, ciMessage);
+        return String.format("StFloodPacket[%d:%s->%s]=[%s]", time(), sender, receiver, ctMessage);
     }
 
     public FloodPacket<T> buildPacketWithDelayedSchedule(int delay) {
@@ -22,7 +22,7 @@ public record FloodPacket<T>(long time, CiMessage<T> ciMessage, CtNode sender, C
         if (delay == 0)
             return this;
 
-        return new FloodPacket<>(time() + delay, ciMessage(), sender(), receiver());
+        return new FloodPacket<>(time() + delay, ctMessage(), sender(), receiver());
     }
 }
 

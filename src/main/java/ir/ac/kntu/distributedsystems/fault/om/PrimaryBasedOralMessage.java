@@ -1,8 +1,8 @@
 package ir.ac.kntu.distributedsystems.fault.om;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import org.jetbrains.annotations.NotNull;
@@ -42,9 +42,9 @@ public class PrimaryBasedOralMessage extends ParentOralMessageSystem implements 
         if (thisNodeStatus.isFinished())
             return false;
 
-        final CiMessage<OmMessage> ciMessage = (CiMessage<OmMessage>) packet.ciMessage();
-        CtNode initiator = ciMessage.initiator();
-        final OmAction nodeAction = ciMessage.content().nodeAction();
+        final CtMessage<OmMessage> ctMessage = (CtMessage<OmMessage>) packet.ctMessage();
+        CtNode initiator = ctMessage.initiator();
+        final OmAction nodeAction = ctMessage.content().nodeAction();
 
         // if this is a new message
         if (!thisNodeStatus.isActionRecordedForNode(initiator)) {
@@ -68,7 +68,7 @@ public class PrimaryBasedOralMessage extends ParentOralMessageSystem implements 
     }
 
     @Override
-    public CiMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat) {
+    public CtMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat) {
         initialize(context);
 
         final CtNode thisNode = initiator;
@@ -77,16 +77,16 @@ public class PrimaryBasedOralMessage extends ParentOralMessageSystem implements 
         // if node is the General
         if (thisNode.getId() == COORDINATOR_ID) {
             if (thisNodeStatus.isFinished())
-                return CiMessage.NULL_MESSAGE;
+                return CtMessage.NULL_MESSAGE;
             else {
                 // this app is written only for one message decision
                 thisNodeStatus.setFinished(true);
-                return new CiMessage<>(initiator, new OmMessage(coordinatorAction, ""));
+                return new CtMessage<>(initiator, new OmMessage(coordinatorAction, ""));
             }
         }
 
         OmAction action = thisNodeStatus.findActionOfNode(COORDINATOR_ID, defaultAction);
-        return new CiMessage<>(initiator, new OmMessage(action, ""));
+        return new CtMessage<>(initiator, new OmMessage(action, ""));
     }
 
     protected void initialize(ContextView context) {

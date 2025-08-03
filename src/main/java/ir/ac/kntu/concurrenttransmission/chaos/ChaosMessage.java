@@ -1,6 +1,5 @@
 package ir.ac.kntu.concurrenttransmission.chaos;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
 import java.util.BitSet;
 
 /**

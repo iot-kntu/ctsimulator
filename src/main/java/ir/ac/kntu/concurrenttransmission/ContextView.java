@@ -10,9 +10,4 @@ public interface ContextView {
 
     NetGraph getNetGraph();
 
-    //int getRound();
-    //
-    //int getSlot();
-
-
 }

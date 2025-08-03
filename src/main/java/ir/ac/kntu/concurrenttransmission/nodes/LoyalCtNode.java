@@ -1,8 +1,7 @@
-package ir.ac.kntu.concurrenttransmission.blueflood.nodes;
+package ir.ac.kntu.concurrenttransmission.nodes;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 import java.util.List;
@@ -29,17 +28,17 @@ public class LoyalCtNode implements CtNode {
         final int floodRepeatCount = context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
         final List<CtNode> neighbors = context.getNetGraph().getNodeNeighbors(initiatorNode);
 
-        final CiMessage<?> ciMessage = context
+        final CtMessage<?> ctMessage = context
                 .getApplication()
                 .getRoundInitiationMessage(context, initiatorNode, 0);
 
-        if(ciMessage.isNull())
+        if(ctMessage.isNull())
             return;
 
         for (CtNode node : neighbors) {
             for (int repeat = 0; repeat < floodRepeatCount; repeat++) {
 
-                final FloodPacket<?> stFloodPacket = new FloodPacket<>(context.getTime() + 1 + repeat, ciMessage,
+                final FloodPacket<?> stFloodPacket = new FloodPacket<>(context.getTime() + 1 + repeat, ctMessage,
                                                                        initiatorNode, node);
                 context.getSimulator().schedulePacket(stFloodPacket);
             }
@@ -47,7 +46,7 @@ public class LoyalCtNode implements CtNode {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CiMessage<T> message) {
+    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message) {
 
         Objects.requireNonNull(context);
         Objects.requireNonNull(sender);

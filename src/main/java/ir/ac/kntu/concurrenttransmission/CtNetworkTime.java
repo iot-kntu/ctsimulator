@@ -9,7 +9,6 @@ public record CtNetworkTime(int round, int slot) implements Comparable<CtNetwork
 
     @Override
     public int compareTo(CtNetworkTime o) {
-
         return this.round() == o.round()
                 ? this.slot() - o.slot()
                 : this.round() - o.round();

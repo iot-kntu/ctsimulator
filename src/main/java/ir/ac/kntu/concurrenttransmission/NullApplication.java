@@ -3,6 +3,7 @@ package ir.ac.kntu.concurrenttransmission;
 import ir.ac.kntu.concurrenttransmission.blueflood.DefaultTransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.blueflood.TransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 
 /**
  * This class is default null implementation of the {@link ConcurrentTransmissionApplication} interface
@@ -62,12 +63,12 @@ public class NullApplication implements ConcurrentTransmissionApplication {
     }
 
     @Override
-    public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
-        return CiMessage.NULL_MESSAGE;
+    public CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat) {
+        return CtMessage.NULL_MESSAGE;
     }
 
     @Override
-    public CiMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
-        return CiMessage.NULL_MESSAGE;
+    public CtMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
+        return CtMessage.NULL_MESSAGE;
     }
 }

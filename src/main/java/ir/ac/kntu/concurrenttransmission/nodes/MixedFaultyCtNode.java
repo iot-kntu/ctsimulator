@@ -1,8 +1,7 @@
-package ir.ac.kntu.concurrenttransmission.blueflood.nodes;
+package ir.ac.kntu.concurrenttransmission.nodes;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
 
 import java.util.Date;
 import java.util.Random;
@@ -37,7 +36,7 @@ public class MixedFaultyCtNode extends FaultyCtNode {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CiMessage<T> message) {
+    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message) {
 
         if (random.nextDouble() > silencePercent) {
             super.floodMessage(context, sender, message);

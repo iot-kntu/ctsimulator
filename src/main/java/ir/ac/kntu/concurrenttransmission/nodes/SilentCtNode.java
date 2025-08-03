@@ -1,8 +1,7 @@
-package ir.ac.kntu.concurrenttransmission.blueflood.nodes;
+package ir.ac.kntu.concurrenttransmission.nodes;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
 
 public class SilentCtNode extends LoyalCtNode {
 
@@ -16,7 +15,7 @@ public class SilentCtNode extends LoyalCtNode {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CiMessage<T> message) {
+    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message) {
 
     }
 }

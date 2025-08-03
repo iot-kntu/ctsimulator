@@ -1,7 +1,7 @@
 package ir.ac.kntu.concurrenttransmission;
 
-import ir.ac.kntu.concurrenttransmission.blueflood.TransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 
 /**
  * An interface defining a base for concurrent transmission applications.
@@ -42,13 +42,13 @@ public interface ConcurrentTransmissionApplication {
      * Receives message for flooding. It is expected the application relay this call to listeners.
      * @param context the simulation context
      * @param sender which neighbor has sent the message
-     * @param receivedMessage the full received message, if this argument is {@link CiMessage#NULL_MESSAGE} then
+     * @param receivedMessage the full received message, if this argument is {@link CtMessage#NULL_MESSAGE} then
      *                        flooding is called for message initiation
      * @param whichRepeat determines the nth repeat of flooding based on transmission policy
      * @return the new message
      */
-    CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat);
+    CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat);
 
-    CiMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat);
+    CtMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat);
 }
 

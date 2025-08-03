@@ -1,8 +1,7 @@
-package ir.ac.kntu.concurrenttransmission.blueflood.nodes;
+package ir.ac.kntu.concurrenttransmission.nodes;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 import java.util.List;
@@ -29,14 +28,14 @@ public class FaultyCtNode extends LoyalCtNode {
         for (CtNode node : neighbors) {
             for (int repeat = 0; repeat < floodRepeatCount; repeat++) {
 
-                final CiMessage<?> ciMessage = context
+                final CtMessage<?> ctMessage = context
                         .getApplication()
                         .getRoundInitiationMessage(context, initiatorNode, repeat);
 
-                if(ciMessage.isNull())
+                if(ctMessage.isNull())
                     continue;
 
-                final FloodPacket<?> stFloodPacket = new FloodPacket<>(context.getTime() + repeat, ciMessage,
+                final FloodPacket<?> stFloodPacket = new FloodPacket<>(context.getTime() + repeat, ctMessage,
                                                                        initiatorNode, node);
                 context.getSimulator().schedulePacket(stFloodPacket);
             }
@@ -45,14 +44,14 @@ public class FaultyCtNode extends LoyalCtNode {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CiMessage<T> message) {
+    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message) {
 
         final List<CtNode> neighbors = context.getNetGraph().getNodeNeighbors(sender);
         final int floodRepeatCount = context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
 
         for (int i = 0; i < floodRepeatCount; i++) {
 
-            CiMessage<?> newMessage = context.getApplication().getMessage(context, sender, message, i);
+            CtMessage<?> newMessage = context.getApplication().getMessage(context, sender, message, i);
 
             for (CtNode neighbor : neighbors) {
                 final FloodPacket<?> packet = new FloodPacket<>(context.getTime() + 1 + i,

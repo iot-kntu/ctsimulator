@@ -1,7 +1,7 @@
 package ir.ac.kntu.concurrenttransmission.blueflood;
 
 import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
-import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.NodeState;
 

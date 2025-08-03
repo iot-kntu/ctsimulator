@@ -1,10 +1,10 @@
 package ir.ac.kntu.concurrenttransmission.chaos;
 
-import ir.ac.kntu.common.IntCounterMap;
 import ir.ac.kntu.concurrenttransmission.*;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -14,7 +14,13 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
 
     private final Logger logger = Logger.getLogger("ChaosApplication");
 
-    public static double DEFAULT_INTERFERENCE_PROB = 0.9;
+    /**
+     * The minimum signal difference (in dB) required for the strongest signal
+     * to be successfully captured over the interference from other signals.
+     * A common value from literature is 3 dB.
+     */
+    private static final double CAPTURE_THRESHOLD_DB = 0;
+
     protected final ChaosStrategies strategies;
 
     private final ChaosSettings settings;
@@ -25,9 +31,10 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
 
     private final SortedMap<CtNode, ChaosNodeListener> listeners;
 
-    private final Map<CtNode, CiMessage<ChaosMessage>> nodeKnowledge;
+    private final Map<CtNode, CtMessage<ChaosMessage>> nodeKnowledge;
     private final StateLogger stateLogger;
     private final Map<CtNode, Integer> finalFloodCounter;
+    private final SignalModel signalModel;
 
     public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph) {
         this.settings = settings;
@@ -36,6 +43,8 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
         this.stateLogger = new StateLogger(new ArrayList<>(netGraph.getNodes()), strategies.transmissionPolicy());
         this.nodeKnowledge = new TreeMap<>();
         this.finalFloodCounter = new TreeMap<>();
+        this.signalModel = new SignalModel();
+
     }
 
     public void setListener(CtNode node, ChaosNodeListener listener) {
@@ -83,7 +92,7 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
             finalFloodCounter.clear();
 
             context.getNetGraph().getNodes().forEach(node -> {
-                CiMessage<ChaosMessage> initialMessage = (CiMessage<ChaosMessage>) getChaosListener(node).newRound(context, node);
+                CtMessage<ChaosMessage> initialMessage = (CtMessage<ChaosMessage>) getChaosListener(node).newRound(context, node);
                 nodeKnowledge.put(node, initialMessage);
                 for (int s = 0; s < strategies.transmissionPolicy().getTotalSlotsOfRound(); s++) {
                     stateLogger.setState(new CtNetworkTime(getNetworkTime().round(), s), node, NodeState.Listen);
@@ -122,35 +131,97 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
         Objects.requireNonNull(context);
 
         final List<FloodPacket<?>> packets = ctEvent.getPackets();
+        System.out.println("-----------");
+        System.out.println(getNetworkTime());
+        System.out.println(packets);
+        System.out.println("-----------");
 
         if (packets.isEmpty()) return;
 
-
         final CtNode receiver = ctEvent.getReceiver();
-
 
         // --- FINAL FLOOD LOGIC: Check if node is already done ---
         if (finalFloodCounter.containsKey(receiver) && finalFloodCounter.get(receiver) <= 0) {
             return;
         }
 
-
         stateLogger.setState(getNetworkTime(), receiver, NodeState.Listen);
 
-        FloodPacket<?> capturedPacket = packets.get(random.nextInt(packets.size()));
-        CiMessage<ChaosMessage> receivedMessage = (CiMessage<ChaosMessage>) capturedPacket.ciMessage();
-        CiMessage<ChaosMessage> currentMessage = nodeKnowledge.get(receiver);
+        // If only one packet was received, there's no interference. Process it directly.
+        if (packets.size() == 1) {
+            processCapturedPacket(packets.get(0), context);
+            return;
+        }
+
+        // --- NEW: Physics-based Capture Effect Logic ---
+        FloodPacket<?> strongestPacket = null;
+        double maxSignalStrengthDb = -Double.MAX_VALUE;
+        double totalInterferencePowerMw = 0;
+
+        // Find the strongest packet and sum the power of all other packets (interference).
+        for (FloodPacket<?> packet : packets) {
+            double distance = context.getNetGraph().getDistanceBetween(packet.sender(), receiver);
+            double signalStrengthDb = signalModel.calculateSignalStrengthDb(distance);
+
+            if (signalStrengthDb > maxSignalStrengthDb) {
+                // The previously strongest signal is now part of the interference.
+                if (strongestPacket != null) {
+                    totalInterferencePowerMw += signalModel.dbmToMilliwatts(maxSignalStrengthDb);
+                }
+                // We have a new strongest signal.
+                maxSignalStrengthDb = signalStrengthDb;
+                strongestPacket = packet;
+            } else {
+                // This packet is interference.
+                totalInterferencePowerMw += signalModel.dbmToMilliwatts(signalStrengthDb);
+            }
+        }
+
+        // Apply the capture effect rule.
+        double maxSignalPowerMw = signalModel.dbmToMilliwatts(maxSignalStrengthDb);
+
+        // Check for division by zero if there's no interference.
+        if (totalInterferencePowerMw <= 0) {
+            processCapturedPacket(strongestPacket, context);
+            return;
+        }
+
+        double signalToInterferenceRatioDb = 10 * Math.log10(maxSignalPowerMw / totalInterferencePowerMw);
+
+        if (signalToInterferenceRatioDb >= CAPTURE_THRESHOLD_DB) {
+            // Capture was successful.
+            logger.log(Level.INFO, String.format("[t:%d] Capture SUCCESS at Node[%d]. Packet from Node[%d] (%.2fdB) won over interference (%.2fdB)",
+                    context.getTime(), receiver.getId(), strongestPacket.sender().getId(), maxSignalStrengthDb, signalModel.milliwattsToDbm(totalInterferencePowerMw)));
+            processCapturedPacket(strongestPacket, context);
+        } else {
+            // Capture failed; all packets are lost.
+            logger.log(Level.WARNING, String.format("[t:%d] Capture FAILED at Node[%d]. Strongest packet (%.2fdB) was not strong enough over interference (%.2fdB)",
+                    context.getTime(), receiver.getId(), maxSignalStrengthDb, signalModel.milliwattsToDbm(totalInterferencePowerMw)));
+            getChaosListener(receiver).ctPacketsLost(context, packets, false);
+        }
+    }
+
+
+    /**
+     * Helper method to process a single packet that has been successfully captured.
+     * This contains the core Chaos logic for merging and deciding whether to flood.
+     *
+     * @param capturedPacket The packet that won the capture effect contention.
+     * @param context        The current simulation context.
+     */
+    private void processCapturedPacket(FloodPacket<?> capturedPacket, ContextView context) {
+        CtNode receiver = capturedPacket.receiver();
+
+        CtMessage<ChaosMessage> receivedMessage = (CtMessage<ChaosMessage>) capturedPacket.ctMessage();
+        CtMessage<ChaosMessage> currentMessage = nodeKnowledge.get(receiver);
         ChaosMessage currentContent = currentMessage.content();
         ChaosMessage receivedContent = receivedMessage.content();
 
-
-        // --- MERGE AND UPDATE KNOWLEDGE ---
-        CiMessage<ChaosMessage> mergedMessage = (CiMessage<ChaosMessage>) getChaosListener(receiver).merge(context, capturedPacket);
+        CtMessage<ChaosMessage> mergedMessage = (CtMessage<ChaosMessage>) getChaosListener(receiver).merge(context, capturedPacket);
         nodeKnowledge.put(receiver, mergedMessage);
         ChaosMessage mergedContent = mergedMessage.content();
 
 
-        // --- COMPLETION DETECTION ---
         int totalNodes = context.getNetGraph().getNodeCount();
         if (mergedContent.flags().cardinality() == totalNodes && !finalFloodCounter.containsKey(receiver)) {
             finalFloodCounter.put(receiver, getTransmissionPolicy().getFinalFloodRepeatCount());
@@ -158,7 +229,6 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
         }
 
 
-        // --- DECISION TO FLOOD ---
         boolean isInFinalFlood = finalFloodCounter.getOrDefault(receiver, 0) > 0;
         boolean hasNewInfo = !mergedContent.flags().equals(currentContent.flags());
         boolean receiverKnowsMore = currentContent.flags().cardinality() > receivedContent.flags().cardinality();
@@ -185,8 +255,6 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
             }
 
 
-
-
             if (isInFinalFlood) {
                 int remainingFloods = finalFloodCounter.get(receiver);
 
@@ -204,11 +272,12 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
                 finalFloodCounter.put(receiver, 0);
                 logger.log(Level.INFO, "Node " + receiver.getId() + " finished final flood. Will sleep.");
 
-                for (int s =  remainingFloods; s < strategies.transmissionPolicy().getTotalSlotsOfRound(); s++) {
-                    stateLogger.setState(new CtNetworkTime(getNetworkTime().round(), getNetworkTime().slot() + s + 1 ), receiver, NodeState.Sleep);
+                for (int s = remainingFloods; s < strategies.transmissionPolicy().getTotalSlotsOfRound(); s++) {
+                    stateLogger.setState(new CtNetworkTime(getNetworkTime().round(), getNetworkTime().slot() + s + 1), receiver, NodeState.Sleep);
                 }
             }
         }
+
     }
 
 
@@ -230,12 +299,12 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
 
 
     @Override
-    public CiMessage<?> getMessage(ContextView context, CtNode sender, CiMessage<?> receivedMessage, int whichRepeat) {
+    public CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat) {
         return getChaosListener(sender).getMessage(context, sender, receivedMessage, whichRepeat);
     }
 
     @Override
-    public CiMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
+    public CtMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
         return getChaosListener(initiator).getRoundMessage(context, initiator, whichRepeat);
     }
 

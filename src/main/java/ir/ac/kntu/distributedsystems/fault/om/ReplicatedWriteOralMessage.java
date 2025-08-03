@@ -1,8 +1,8 @@
 package ir.ac.kntu.distributedsystems.fault.om;
 
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import org.jetbrains.annotations.NotNull;
@@ -38,9 +38,9 @@ public class ReplicatedWriteOralMessage extends ParentOralMessageSystem implemen
         if (thisNodeStatus.isFinished())
             return false;
 
-        final CiMessage<OmMessage> ciMessage = (CiMessage<OmMessage>) packet.ciMessage();
-        CtNode initiator = ciMessage.initiator();
-        final OmAction nodeAction = ciMessage.content().nodeAction();
+        final CtMessage<OmMessage> ctMessage = (CtMessage<OmMessage>) packet.ctMessage();
+        CtNode initiator = ctMessage.initiator();
+        final OmAction nodeAction = ctMessage.content().nodeAction();
 
         // if this is a new message
         if (!thisNodeStatus.isActionRecordedForNode(initiator)) {
@@ -62,7 +62,7 @@ public class ReplicatedWriteOralMessage extends ParentOralMessageSystem implemen
     }
 
     @Override
-    public CiMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat) {
+    public CtMessage<?> initiateMessage(ContextView context, CtNode initiator, int whichRepeat) {
         initialize(context);
 
         final CtNode thisNode = initiator;
@@ -72,11 +72,11 @@ public class ReplicatedWriteOralMessage extends ParentOralMessageSystem implemen
         if (thisNode.getId() == initiatorId) {
             // this app is written only for one message decision
             thisNodeStatus.setFinished(true);
-            return new CiMessage<>(initiator, new OmMessage(action, ""));
+            return new CtMessage<>(initiator, new OmMessage(action, ""));
         }
 
         OmAction action = thisNodeStatus.findActionOfNode(initiatorId, defaultAction);
-        return new CiMessage<>(initiator, new OmMessage(action, ""));
+        return new CtMessage<>(initiator, new OmMessage(action, ""));
 
     }
 

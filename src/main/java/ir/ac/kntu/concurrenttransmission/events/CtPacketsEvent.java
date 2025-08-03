@@ -1,9 +1,9 @@
 package ir.ac.kntu.concurrenttransmission.events;
 
 import ir.ac.kntu.concurrenttransmission.BaseSimEvent;
-import ir.ac.kntu.concurrenttransmission.CiMessage;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +30,9 @@ public class CtPacketsEvent extends BaseSimEvent implements CtEvent {
 
         boolean areTheSame;
 
-        CiMessage<?> first = packets.get(0).ciMessage();
+        CtMessage<?> first = packets.get(0).ctMessage();
         areTheSame = IntStream.range(1, packets.size())
-                              .mapToObj(i -> packets.get(i).ciMessage())
+                              .mapToObj(i -> packets.get(i).ctMessage())
                               .allMatch(ciMessage -> ciMessage.equals(first));
 
         return areTheSame;
