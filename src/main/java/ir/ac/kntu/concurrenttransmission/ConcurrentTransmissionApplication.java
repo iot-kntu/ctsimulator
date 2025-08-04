@@ -1,7 +1,6 @@
 package ir.ac.kntu.concurrenttransmission;
 
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
-import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 
 /**
  * An interface defining a base for concurrent transmission applications.

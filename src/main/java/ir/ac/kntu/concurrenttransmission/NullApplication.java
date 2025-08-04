@@ -3,7 +3,6 @@ package ir.ac.kntu.concurrenttransmission;
 import ir.ac.kntu.concurrenttransmission.blueflood.DefaultTransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.blueflood.TransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
-import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 
 /**
  * This class is default null implementation of the {@link ConcurrentTransmissionApplication} interface

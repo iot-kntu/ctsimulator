@@ -4,7 +4,7 @@ import ir.ac.kntu.concurrenttransmission.*;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
-import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
+import ir.ac.kntu.concurrenttransmission.CtNode;
 
 import java.util.*;
 import java.util.logging.Level;

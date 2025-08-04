@@ -1,7 +1,5 @@
 package ir.ac.kntu.concurrenttransmission;
 
-import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
-
 import java.util.Objects;
 
 /**

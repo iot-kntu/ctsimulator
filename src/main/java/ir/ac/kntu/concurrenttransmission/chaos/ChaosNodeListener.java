@@ -2,8 +2,8 @@ package ir.ac.kntu.concurrenttransmission.chaos;
 
 import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
-import ir.ac.kntu.concurrenttransmission.nodes.LoyalCtNode;
+import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 import java.util.List;
@@ -65,7 +65,7 @@ public interface ChaosNodeListener {
      * This method is called from non-loyal nodes, and it is possible these nodes
      * return no message, a corrupted message or the same message based on traitorous strategy.
      * It is called after {@link ChaosNodeListener#ctPacketsReceived(ContextView, List, FloodPacket, boolean)} method
-     * from {@link ir.ac.kntu.concurrenttransmission.nodes.FaultyCtNode} and inside its floodMessage method.
+     * from {@link ir.ac.kntu.concurrenttransmission.blueflood.nodes.FaultyCtNode} and inside its floodMessage method.
      *
      * @param context         the simulation context
      * @param sender          which neighbor has sent the message

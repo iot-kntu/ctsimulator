@@ -1,6 +1,5 @@
 package ir.ac.kntu.concurrenttransmission;
 
-import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.geom.Point2D;
@@ -47,7 +46,7 @@ public class NetGraph {
                 final double y = Double.parseDouble(splitWithSemicolon[4].trim());
 
                 final Class<?> nodeClass = Class.forName(
-                        "ir.ac.kntu.concurrenttransmission.nodes." + className);
+                        "ir.ac.kntu.concurrenttransmission.chaos.nodes." + className);
                 final CtNode instance = (CtNode) nodeClass.getDeclaredConstructor(Integer.class).newInstance(nodeId);
 
                 netGraph.nodes.add(instance);

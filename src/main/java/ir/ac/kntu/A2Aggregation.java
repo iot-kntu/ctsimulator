@@ -61,7 +61,7 @@ public class A2Aggregation {
                 contents.add(node.getId() * 2);
 
                 chaosApplication
-                        .setListener(node, new Aggregation(contents, node.getId()));
+                        .setListener(node, new Aggregation(contents));
 
             });
 

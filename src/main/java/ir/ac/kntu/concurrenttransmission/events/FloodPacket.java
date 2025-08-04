@@ -1,7 +1,7 @@
 package ir.ac.kntu.concurrenttransmission.events;
 
 import ir.ac.kntu.concurrenttransmission.CtMessage;
-import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
+import ir.ac.kntu.concurrenttransmission.CtNode;
 
 // TODO: 2/19/24 In future we may have different types of packet,
 //  which may necessitates to define a packet interface

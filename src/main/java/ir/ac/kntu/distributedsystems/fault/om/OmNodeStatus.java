@@ -1,6 +1,6 @@
 package ir.ac.kntu.distributedsystems.fault.om;
 
-import ir.ac.kntu.concurrenttransmission.nodes.CtNode;
+import ir.ac.kntu.concurrenttransmission.CtNode;
 
 import java.util.HashMap;
 

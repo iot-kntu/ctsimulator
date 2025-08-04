@@ -1,7 +1,6 @@
-package ir.ac.kntu.concurrenttransmission.nodes;
+package ir.ac.kntu.concurrenttransmission;
 
-import ir.ac.kntu.concurrenttransmission.CtMessage;
-import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
 
 import java.util.Objects;
 

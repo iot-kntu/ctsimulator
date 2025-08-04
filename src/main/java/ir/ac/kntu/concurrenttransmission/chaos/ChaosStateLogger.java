@@ -1,24 +1,30 @@
-package ir.ac.kntu.concurrenttransmission;
+package ir.ac.kntu.concurrenttransmission.chaos;
+
+import ir.ac.kntu.concurrenttransmission.ConcurrentTransmissionPolicy;
+import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
+import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.NodeState;
+import ir.ac.kntu.concurrenttransmission.chaos.state.ChaosNodeState;
 
 import java.util.*;
 
 /**
  * This class intended for logging the state of the simulation and printing
  */
-public class StateLogger {
+public class ChaosStateLogger {
 
-    private final SortedMap<CtNetworkTime, Map<CtNode, NodeState>> history = new TreeMap<>();
+    private final SortedMap<CtNetworkTime, Map<CtNode, ChaosNodeState>> history = new TreeMap<>();
     private final List<CtNode> nodes;
     private final ConcurrentTransmissionPolicy transmissionPolicy;
 
-    public StateLogger(List<CtNode> nodes, ConcurrentTransmissionPolicy transmissionPolicy) {
+    public ChaosStateLogger(List<CtNode> nodes, ConcurrentTransmissionPolicy transmissionPolicy) {
         this.nodes = new ArrayList<>(nodes);
         this.nodes.sort(Comparator.comparingInt(CtNode::getId));
         this.transmissionPolicy = transmissionPolicy;
     }
 
-    public void setState(CtNetworkTime time, CtNode node, NodeState nodeState) {
-        final Map<CtNode, NodeState> stateMap = history.computeIfAbsent(time, k -> new TreeMap<>());
+    public void setState(CtNetworkTime time, CtNode node, ChaosNodeState nodeState) {
+        final Map<CtNode, ChaosNodeState> stateMap = history.computeIfAbsent(time, k -> new TreeMap<>());
         stateMap.put(node, nodeState);
     }
 
@@ -62,7 +68,8 @@ public class StateLogger {
         builder.append('\n');
 
         // --- Print Nodes Status ---
-        Map<CtNode, NodeState> lastKnownStates = new HashMap<>();
+        Map<CtNode, ChaosNodeState> lastKnownStates = new HashMap<>();
+        ChaosNodeState lastKnownState = null;
 
         for (CtNode node : this.nodes) {
             builder.append(String.format("N[%-3d]|", node.getId()));
@@ -72,11 +79,12 @@ public class StateLogger {
 
                     if (history.containsKey(currentTime) && history.get(currentTime).containsKey(node)) {
                         lastKnownStates.put(node, history.get(currentTime).get(node));
+                        lastKnownState =  history.get(currentTime).get(node);
                     } else {
-                        lastKnownStates.put(node, null);
+                        lastKnownStates.put(node, lastKnownState);
                     }
 
-                    NodeState stateToPrint = lastKnownStates.get(node);
+                    ChaosNodeState stateToPrint = lastKnownStates.get(node);
                     char symbol = (stateToPrint != null) ? stateToPrint.getSymbol() : '.';
                     builder.append(String.format("%-5c", symbol));
                 }
