@@ -1,10 +1,7 @@
 package ir.ac.kntu.concurrenttransmission.chaos.nodes;
 
 import ir.ac.kntu.concurrenttransmission.*;
-import ir.ac.kntu.concurrenttransmission.chaos.ChaosMessage;
-import ir.ac.kntu.concurrenttransmission.chaos.ChaosStateLogger;
-import ir.ac.kntu.concurrenttransmission.chaos.ChaosTransmissionPolicy;
-import ir.ac.kntu.concurrenttransmission.chaos.NodeStateBehavior;
+import ir.ac.kntu.concurrenttransmission.chaos.*;
 import ir.ac.kntu.concurrenttransmission.chaos.state.ChaosNodeState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.FinalFloodingState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.FloodingState;
@@ -97,10 +94,11 @@ public class LoyalCtNode implements StatefulNode {
         ChaosMessage currentContent = currentKnowledge.content();
         ChaosMessage receivedContent = receivedMessage.content();
 
-        BitSet combinedFlags = (BitSet) currentContent.flags().clone();
-        combinedFlags.or(receivedContent.flags());
-        boolean hasNewInfo = !combinedFlags.equals(currentContent.flags());
-        boolean receiverKnowsMore = currentContent.flags().cardinality() > receivedContent.flags().cardinality();
+
+        FlagField mergedFlags = currentContent.flags().merge(receivedContent.flags());
+
+        boolean hasNewInfo = !mergedFlags.equals(currentContent.flags());
+        boolean receiverKnowsMore = currentContent.flags().getParticipationCount() > receivedContent.flags().getParticipationCount();
 
         return hasNewInfo || receiverKnowsMore;
     }

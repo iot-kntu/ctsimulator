@@ -7,7 +7,7 @@ import ir.ac.kntu.concurrenttransmission.chaos.ChaosApplication;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosDefaultTransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosSettings;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosStrategies;
-import ir.ac.kntu.distributedsystems.a2.Aggregation;
+import ir.ac.kntu.distributedsystems.a2.aggregation.Aggregation;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,10 +1,11 @@
-package ir.ac.kntu.distributedsystems.a2;
+package ir.ac.kntu.distributedsystems.a2.aggregation;
 
 import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosMessage;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
+import ir.ac.kntu.concurrenttransmission.chaos.FlagField;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
@@ -41,15 +42,11 @@ public class Aggregation implements ChaosNodeListener {
     @Override
     public CtMessage<?> newRound(ContextView context, CtNode initiator) {
         int networkSize = context.getNetGraph().getNodeCount();
-        BitSet initialFlags = new BitSet(networkSize);
-        initialFlags.set(initiator.getId());
 
-        // Get the next value from the queue for this round.
         Integer initialPayload = messages.poll();
-        if (initialPayload == null) {
-            // Default to node ID if queue is empty.
-            initialPayload = initiator.getId();
-        }
+        if (initialPayload == null) initialPayload = initiator.getId();
+
+        FlagField initialFlags = FlagField.initial(initiator.getId(), ParticipationFlag.PARTICIPATED);
 
         roundMessage = new ChaosMessage(initialFlags, initialPayload);
 
@@ -80,17 +77,12 @@ public class Aggregation implements ChaosNodeListener {
         ChaosMessage currentContent = currentMessage.content();
         ChaosMessage receivedContent = receivedMessage.content();
 
-        // 1. Merge flags using bitwise OR.
-        BitSet mergedFlags = (BitSet) currentContent.flags().clone();
-        mergedFlags.or(receivedContent.flags());
-
-        // 2. Merge payload using the max function.
+        FlagField mergedFlags = currentContent.flags().merge(receivedContent.flags());
         int maxPayload = Math.max((Integer) currentContent.payload(), (Integer) receivedContent.payload());
 
         logger.fine(String.format("Node[%d] merged its value %d with received %d. New max is %d",
                 receiver.getId(), currentContent.payload(), receivedContent.payload(), maxPayload));
 
-        // 3. Create the new, merged message.
         ChaosMessage mergedContent = new ChaosMessage(mergedFlags, maxPayload);
         return new CtMessage<>(currentMessage.initiator(), mergedContent);
     }

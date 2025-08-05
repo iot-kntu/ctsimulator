@@ -27,7 +27,7 @@ public class ListeningState implements NodeStateBehavior {
 
         // Check for completion first.
         int totalNodes = context.getNetGraph().getNodeCount();
-        if (mergedMessage.content().flags().cardinality() == totalNodes) {
+        if (mergedMessage.content().flags().getParticipationCount() == totalNodes) {
             node.setState(new FinalFloodingState(), context);
             return;
         }
