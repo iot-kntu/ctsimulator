@@ -52,14 +52,9 @@ public class Aggregation implements ChaosNodeListener {
 
     @Override
     public CtMessage<?> getRoundMessage(ContextView context, CtNode initiator, int whichRepeat) {
-
-        initialize(context);
-
         if (roundMessage == null) {
             return null;
         }
-        logger.log(Level.INFO, "Sending " + roundMessage);
-
 
         return new CtMessage<>(initiator, roundMessage);
     }
