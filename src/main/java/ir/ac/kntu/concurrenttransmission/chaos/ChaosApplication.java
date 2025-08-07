@@ -77,14 +77,14 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
 
 
         if (getRound() < settings.roundLimit()) {
+            final int nextInitiatorId = strategies.initiatorStrategy().getNextInitiatorId() + 1; // TODO: fix it
             context.getNetGraph().getNodes().forEach(node -> {
                 if (node instanceof StatefulNode) {
-                    CtMessage<ChaosMessage> initialMessage = (CtMessage<ChaosMessage>) getChaosNodeListener(node).newRound(context, node);
+                    CtMessage<ChaosMessage> initialMessage = (CtMessage<ChaosMessage>) getChaosNodeListener(node).initiateMessage(context, node, context.getNetGraph().getNodeById(nextInitiatorId));
                     ((StatefulNode) node).initializeForNewRound(context, initialMessage, this.stateLogger);
                 }
             });
 
-            final int nextInitiatorId = strategies.initiatorStrategy().getNextInitiatorId();
             SimInitiateFloodEvent initiateFloodEvent = new SimInitiateFloodEvent(context.getTime(), nextInitiatorId);
             context.getSimulator().scheduleEvent(initiateFloodEvent);
             context.getSimulator().scheduleEvent(new SimNewRoundEvent(context.getTime() + strategies.transmissionPolicy().getTotalSlotsOfRound()));

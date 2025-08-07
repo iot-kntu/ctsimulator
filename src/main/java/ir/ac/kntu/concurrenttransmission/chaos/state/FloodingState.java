@@ -4,7 +4,6 @@ import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.chaos.NodeStateBehavior;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.events.Event;
-import ir.ac.kntu.concurrenttransmission.events.FinishedFloodEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
 
@@ -25,7 +24,6 @@ public class FloodingState implements NodeStateBehavior {
     public void onEnter(StatefulNode node, ContextView context) {
         // The primary action of this state is to flood the current knowledge.
         node.floodMessage(context, node, node.getKnowledge());
-
         long endOfFloodTime = context.getTime() + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
 
         context.getSimulator().scheduleEvent(Event.create("FinishedFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
@@ -33,9 +31,6 @@ public class FloodingState implements NodeStateBehavior {
                 node.setState(new ListeningState(), context);
             }
         }));
-
-//        FinishedFloodEvent endEvent = new FinishedFloodEvent(endOfFloodTime, node);
-//        context.getSimulator().scheduleEvent(endEvent);
     }
 
     @Override

@@ -37,7 +37,16 @@ public interface ChaosNodeListener {
     void ctPacketsLost(ContextView context, List<FloodPacket<?>> packets, boolean arePacketsSimilar);
 
 
-    CtMessage<?> newRound(ContextView context, CtNode initiator);
+    /**
+     * Called at the beginning of a new round for each node to create its initial message.
+     * The implementation should check if the node is the initiator and act accordingly.
+     * @param context The simulation context.
+     * @param self The node for which the message is being created.
+     * @param initiator The designated initiator for this round.
+     * @return The initial CtMessage containing a ChaosMessage for the node.
+     */
+    CtMessage<ChaosMessage> initiateMessage(ContextView context, CtNode self, CtNode initiator);
+
 
     /**
      * Called when a node should initiate the round. In {@link LoyalCtNode}s this method is called once independent

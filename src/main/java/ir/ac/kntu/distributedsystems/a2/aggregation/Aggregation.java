@@ -9,7 +9,6 @@ import ir.ac.kntu.concurrenttransmission.chaos.FlagField;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
-import java.util.BitSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Level;
@@ -40,17 +39,15 @@ public class Aggregation implements ChaosNodeListener {
     }
 
     @Override
-    public CtMessage<?> newRound(ContextView context, CtNode initiator) {
-        int networkSize = context.getNetGraph().getNodeCount();
-
+    public CtMessage<ChaosMessage> initiateMessage(ContextView context, CtNode self, CtNode initiator) {
         Integer initialPayload = messages.poll();
-        if (initialPayload == null) initialPayload = initiator.getId();
+        if (initialPayload == null) initialPayload = self.getId();
 
-        FlagField initialFlags = FlagField.initial(initiator.getId(), ParticipationFlag.PARTICIPATED);
+        FlagField initialFlags = FlagField.initial(self.getId(), ParticipationFlag.PARTICIPATED);
 
         roundMessage = new ChaosMessage(initialFlags, initialPayload);
 
-        return new CtMessage<>(initiator, roundMessage);
+        return new CtMessage<>(self, roundMessage);
     }
 
     @Override

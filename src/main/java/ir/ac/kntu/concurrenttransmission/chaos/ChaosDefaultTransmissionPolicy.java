@@ -51,7 +51,7 @@ public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
 
     @Override
     public int getTotalSlotsOfRound() {
-        return netGraph.getNodeCount() + 2 * netGraph.getDiameter() + floodRepeatCount + finalFloodRepeatCount + 1;
+        return netGraph.getNodeCount() + 2 * netGraph.getDiameter() + floodRepeatCount + finalFloodRepeatCount + 1; // TODO: fix it
     }
 
 }

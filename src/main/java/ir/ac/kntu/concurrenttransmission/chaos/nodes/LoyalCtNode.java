@@ -2,13 +2,11 @@ package ir.ac.kntu.concurrenttransmission.chaos.nodes;
 
 import ir.ac.kntu.concurrenttransmission.*;
 import ir.ac.kntu.concurrenttransmission.chaos.*;
-import ir.ac.kntu.concurrenttransmission.chaos.state.ChaosNodeState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.FinalFloodingState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.FloodingState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.ListeningState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
-import java.util.BitSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -94,6 +92,10 @@ public class LoyalCtNode implements StatefulNode {
         ChaosMessage currentContent = currentKnowledge.content();
         ChaosMessage receivedContent = receivedMessage.content();
 
+        // Ensure content is not null before proceeding
+        if (currentContent == null || receivedContent == null) {
+            return false;
+        }
 
         FlagField mergedFlags = currentContent.flags().merge(receivedContent.flags());
 
