@@ -3,7 +3,6 @@ package ir.ac.kntu.concurrenttransmission.events;
 import ir.ac.kntu.concurrenttransmission.BaseSimEvent;
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
-import ir.ac.kntu.concurrenttransmission.chaos.state.ChaosNodeState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FloodingState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.ListeningState;
 

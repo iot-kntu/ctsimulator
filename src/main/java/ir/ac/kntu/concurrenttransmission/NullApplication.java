@@ -5,11 +5,11 @@ import ir.ac.kntu.concurrenttransmission.blueflood.TransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 
 /**
- * This class is default null implementation of the {@link ConcurrentTransmissionApplication} interface
+ * This class is default null implementation of the
+ * {@link ConcurrentTransmissionApplication} interface
  * and does nothing. It can be used as a terminator of an application chain.
  */
 public class NullApplication implements ConcurrentTransmissionApplication {
-
 
     @Override
     public CtNetworkTime getNetworkTime() {
@@ -50,7 +50,6 @@ public class NullApplication implements ConcurrentTransmissionApplication {
     public CtNode getInitiatorNode(ContextView context) {
         return CtNode.NULL_NODE;
     }
-
 
     @Override
     public TransmissionPolicy getTransmissionPolicy() {

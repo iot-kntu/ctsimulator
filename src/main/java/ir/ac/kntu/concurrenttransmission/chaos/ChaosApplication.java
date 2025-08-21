@@ -6,7 +6,6 @@ import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
-
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +27,8 @@ public class ChaosApplication implements CtChaosApplication {
     private final SignalModel signalModel;
     private NodeState startingPoint;
 
-    public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph, NodeState startingPoint) {
+    public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph,
+            NodeState startingPoint) {
         this.settings = settings;
         this.strategies = strategies;
         this.listeners = new TreeMap<>();
@@ -58,7 +58,6 @@ public class ChaosApplication implements CtChaosApplication {
         newRound(context);
     }
 
-
     @Override
     public void simulationFinishing(ContextView context) {
 
@@ -85,19 +84,21 @@ public class ChaosApplication implements CtChaosApplication {
         if (this.networkTime != null && this.networkTime.round() > 0)
             logger.log(Level.INFO, "======== round " + getRound() + " completed ===========");
 
-
         if (getRound() < settings.roundLimit()) {
             final int nextInitiatorId = strategies.initiatorStrategy().getNextInitiatorId(); // TODO: fix it
             context.getNetGraph().getNodes().forEach(node -> {
                 if (node instanceof StatefulNode) {
-                    CtMessage<ChaosMessage> initialMessage = (CtMessage<ChaosMessage>) getChaosNodeListener(node).initiateMessage(context, node, context.getNetGraph().getNodeById(nextInitiatorId));
-                    ((StatefulNode) node).initializeForNewRound(context, initialMessage, this.stateLogger, startingPoint);
+                    CtMessage<ChaosMessage> initialMessage = (CtMessage<ChaosMessage>) getChaosNodeListener(node)
+                            .initiateMessage(context, node, context.getNetGraph().getNodeById(nextInitiatorId));
+                    ((StatefulNode) node).initializeForNewRound(context, initialMessage, this.stateLogger,
+                            startingPoint);
                 }
             });
 
             SimInitiateFloodEvent initiateFloodEvent = new SimInitiateFloodEvent(context.getTime(), nextInitiatorId);
             context.getSimulator().scheduleEvent(initiateFloodEvent);
-            context.getSimulator().scheduleEvent(new SimNewRoundEvent(context.getTime() + strategies.transmissionPolicy().getTotalSlotsOfRound()));
+            context.getSimulator().scheduleEvent(
+                    new SimNewRoundEvent(context.getTime() + strategies.transmissionPolicy().getTotalSlotsOfRound()));
         }
     }
 
@@ -116,10 +117,12 @@ public class ChaosApplication implements CtChaosApplication {
 
         final List<FloodPacket<?>> packets = ctEvent.getPackets();
 
-        if (packets.isEmpty()) return;
+        if (packets.isEmpty())
+            return;
 
         final CtNode receiver = ctEvent.getReceiver();
-        if (!(receiver instanceof StatefulNode)) return; // Only process for stateful nodes
+        if (!(receiver instanceof StatefulNode))
+            return; // Only process for stateful nodes
         FloodPacket<?> capturedPacket = selectPacketBySignal(packets, (StatefulNode) receiver, context);
 
         if (capturedPacket != null) {
@@ -129,7 +132,8 @@ public class ChaosApplication implements CtChaosApplication {
         }
     }
 
-    private FloodPacket<?> selectPacketBySignal(List<FloodPacket<?>> packets, StatefulNode receiver, ContextView context) {
+    private FloodPacket<?> selectPacketBySignal(List<FloodPacket<?>> packets, StatefulNode receiver,
+            ContextView context) {
         if (packets.size() == 1) {
             return packets.get(0);
         }
@@ -157,7 +161,8 @@ public class ChaosApplication implements CtChaosApplication {
             return strongestPacket;
         }
 
-        double signalToInterferenceRatioDb = 10 * Math.log10(signalModel.dbmToMilliwatts(maxSignalStrengthDb) / totalInterferencePowerMw);
+        double signalToInterferenceRatioDb = 10
+                * Math.log10(signalModel.dbmToMilliwatts(maxSignalStrengthDb) / totalInterferencePowerMw);
 
         if (signalToInterferenceRatioDb >= CAPTURE_THRESHOLD_DB) {
             return strongestPacket;
@@ -172,12 +177,10 @@ public class ChaosApplication implements CtChaosApplication {
         return context.getNetGraph().getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId());
     }
 
-
     @Override
     public ChaosTransmissionPolicy getTransmissionPolicy() {
         return strategies.transmissionPolicy();
     }
-
 
     @Override
     public CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat) {
@@ -186,7 +189,8 @@ public class ChaosApplication implements CtChaosApplication {
 
     /**
      * Retrieves the specific listener for a given node.
-     * The listener contains the application-specific logic (e.g., how to merge messages).
+     * The listener contains the application-specific logic (e.g., how to merge
+     * messages).
      *
      * @param node The node for which to get the listener.
      * @return The ChaosNodeListener associated with the node.

@@ -20,5 +20,4 @@ public interface CtNode extends Comparable<CtNode> {
         return this.getId() - o.getId();
     }
 
-
 }

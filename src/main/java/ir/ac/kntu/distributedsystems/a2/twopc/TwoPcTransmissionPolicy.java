@@ -12,7 +12,6 @@ public class TwoPcTransmissionPolicy extends ChaosDefaultTransmissionPolicy {
         super(floodRepeatCount, finalFloodRepeatCount, netGraph);
     }
 
-
     @Override
     public NodeState getInitialState() {
         return new VoteListeningState();

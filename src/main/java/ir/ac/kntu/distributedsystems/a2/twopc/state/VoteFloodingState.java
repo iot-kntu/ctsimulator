@@ -11,10 +11,6 @@ import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
 import ir.ac.kntu.distributedsystems.a2.vote.VoteFlag;
 import ir.ac.kntu.distributedsystems.a2.vote.VoteValue;
 
-/**
- * Behavior of a node when it decides to flood.
- * It sends its knowledge once and then transitions back to Listening.
- */
 public class VoteFloodingState implements NodeState {
 
     @Override
@@ -31,17 +27,19 @@ public class VoteFloodingState implements NodeState {
                 .allMatch(flag -> (flag instanceof VoteFlag) && ((VoteFlag) flag).value() != VoteValue.UNDECIDED);
 
         node.floodMessage(context, node, message);
-        long endOfFloodTime = context.getTime() + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
+        long endOfFloodTime = context.getTime()
+                + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
 
-        context.getSimulator().scheduleEvent(Event.create("FinishedFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
-            if (node.getCurrentState() instanceof VoteFloodingState) {
-                if (votingWouldBeComplete && allVotesKnown) {
-                    node.setState(new WaitingState(), context);
-                } else {
-                    node.setState(new VoteListeningState(), context);
-                }
-            }
-        }));
+        context.getSimulator().scheduleEvent(
+                Event.create("FinishedFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
+                    if (node.getCurrentState() instanceof VoteFloodingState) {
+                        if (votingWouldBeComplete && allVotesKnown) {
+                            node.setState(new WaitingState(), context);
+                        } else {
+                            node.setState(new VoteListeningState(), context);
+                        }
+                    }
+                }));
     }
 
     @Override

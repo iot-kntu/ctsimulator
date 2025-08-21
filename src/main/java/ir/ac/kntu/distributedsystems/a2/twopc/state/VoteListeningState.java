@@ -27,7 +27,6 @@ public class VoteListeningState implements NodeState {
             return;
         }
 
-
         if (node.shouldFlood(currentKnowledge, (CtMessage<ChaosMessage>) capturedPacket.ctMessage())) {
             node.setState(new VoteFloodingState(), context);
         }

@@ -26,9 +26,9 @@ public class Aggregation implements ChaosNodeListener {
         this.messages = nodeStatusMap;
     }
 
-
     @Override
-    public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket, boolean areSimilar) {
+    public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket,
+            boolean areSimilar) {
         initialize(context);
         return true;
     }
@@ -41,7 +41,8 @@ public class Aggregation implements ChaosNodeListener {
     @Override
     public CtMessage<ChaosMessage> initiateMessage(ContextView context, CtNode self, CtNode initiator) {
         Integer initialPayload = messages.poll();
-        if (initialPayload == null) initialPayload = self.getId();
+        if (initialPayload == null)
+            initialPayload = self.getId();
 
         FlagField initialFlags = FlagField.initial(self.getId(), ParticipationFlag.PARTICIPATED);
 
@@ -84,7 +85,6 @@ public class Aggregation implements ChaosNodeListener {
             networkSize = context.getNetGraph().getNodeCount();
         }
     }
-
 
     @Override
     public CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat) {

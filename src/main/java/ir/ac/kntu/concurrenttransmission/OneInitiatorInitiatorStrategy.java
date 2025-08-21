@@ -18,5 +18,4 @@ public class OneInitiatorInitiatorStrategy implements CtInitiatorStrategy {
         return this.initiatorNodeId;
     }
 
-
 }

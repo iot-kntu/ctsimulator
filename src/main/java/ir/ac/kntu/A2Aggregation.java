@@ -4,17 +4,13 @@ import ir.ac.kntu.concurrenttransmission.CtSimulator;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.RoundRobinInitiatorStrategy;
 import ir.ac.kntu.concurrenttransmission.chaos.*;
-import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.ListeningState;
 import ir.ac.kntu.distributedsystems.a2.aggregation.Aggregation;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.LogManager;
-
 
 public class A2Aggregation {
 
@@ -28,7 +24,6 @@ public class A2Aggregation {
             System.out.println("graphDiameter = " + graphDiameter);
             System.out.println("================================");
 
-            //noinspection
             if (netGraph.isEmpty())
                 throw new IllegalArgumentException("Invalid graph file format, it is not loaded");
 
@@ -39,21 +34,17 @@ public class A2Aggregation {
 
             ChaosSettings settings = new ChaosSettings(
                     lossProbability,
-                    executionRounds
-            );
+                    executionRounds);
 
-            ChaosTransmissionPolicy transmissionPolicy = new ChaosDefaultTransmissionPolicy(floodRepeatSlots, finalFloodRepeatSlots, netGraph);
+            ChaosTransmissionPolicy transmissionPolicy = new ChaosDefaultTransmissionPolicy(floodRepeatSlots,
+                    finalFloodRepeatSlots, netGraph);
 
             ChaosStrategies strategies = new ChaosStrategies(
                     new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),
-                    transmissionPolicy
-            );
+                    transmissionPolicy);
 
-
-            ChaosApplication chaosApplication = new ChaosApplication(settings, strategies, netGraph, transmissionPolicy.getInitialState());
-
-
-            AtomicInteger counter = new AtomicInteger(0);
+            ChaosApplication chaosApplication = new ChaosApplication(settings, strategies, netGraph,
+                    transmissionPolicy.getInitialState());
 
             netGraph.getNodes().forEach(node -> {
                 Queue<Integer> contents = new LinkedList<>();
@@ -65,10 +56,8 @@ public class A2Aggregation {
 
             });
 
-
             CtSimulator simulator = CtSimulator.createInstance(netGraph, chaosApplication);
             simulator.start();
-
 
             System.out.println(chaosApplication.getStateLogger().printTimeline());
         } catch (Exception e) {
@@ -93,4 +82,3 @@ public class A2Aggregation {
     }
 
 }
-

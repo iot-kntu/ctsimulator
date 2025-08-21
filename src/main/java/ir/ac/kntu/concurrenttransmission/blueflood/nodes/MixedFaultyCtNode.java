@@ -45,5 +45,4 @@ public class MixedFaultyCtNode extends FaultyCtNode {
         // else remain silent
     }
 
-
 }

@@ -7,10 +7,6 @@ import ir.ac.kntu.concurrenttransmission.events.Event;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
 
-/**
- * Behavior of a node when it decides to flood.
- * It sends its knowledge once and then transitions back to Listening.
- */
 public class CommitFloodingState implements NodeState {
 
     @Override
@@ -21,13 +17,15 @@ public class CommitFloodingState implements NodeState {
     @Override
     public void onEnter(StatefulNode node, ContextView context) {
         node.floodMessage(context, node, node.getKnowledge());
-        long endOfFloodTime = context.getTime() + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
+        long endOfFloodTime = context.getTime()
+                + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
 
-        context.getSimulator().scheduleEvent(Event.create("FinishedFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
-            if (node.getCurrentState() instanceof CommitFloodingState) {
-                node.setState(new CommitListeningState(), context);
-            }
-        }));
+        context.getSimulator().scheduleEvent(
+                Event.create("FinishedFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
+                    if (node.getCurrentState() instanceof CommitFloodingState) {
+                        node.setState(new CommitListeningState(), context);
+                    }
+                }));
     }
 
     @Override

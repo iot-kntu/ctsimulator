@@ -14,30 +14,33 @@ public interface NodeState {
     /**
      * Handles the event of receiving a packet. The implementation will vary
      * depending on the current state.
-     * @param node The node that is currently in this state.
-     * @param context The simulation context.
+     * 
+     * @param node           The node that is currently in this state.
+     * @param context        The simulation context.
      * @param capturedPacket The packet that was successfully received.
      */
     void onPacketReceived(StatefulNode node, ContextView context, FloodPacket<?> capturedPacket);
 
     /**
      * An action to be taken when the node enters this state.
-     * @param node The node entering this state.
+     * 
+     * @param node    The node entering this state.
      * @param context The simulation context.
      */
     void onEnter(StatefulNode node, ContextView context);
 
-
     /**
      * An action to be taken at the beginning of every time slot
      * while the node remains in this state.
-     * @param node The node currently in this state.
+     * 
+     * @param node    The node currently in this state.
      * @param context The simulation context.
      */
     void onSlotStart(StatefulNode node, ContextView context);
 
     /**
      * Returns the symbolic representation of this state.
+     * 
      * @return A NodeState enum.
      */
     String toString();

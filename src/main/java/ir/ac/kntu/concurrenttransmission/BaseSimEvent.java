@@ -35,7 +35,8 @@ public abstract class BaseSimEvent implements SimEvent, Comparable<BaseSimEvent>
     }
 
     /**
-     * Handles the event. Implementation in this class does nothing, thus, should be overriden in
+     * Handles the event. Implementation in this class does nothing, thus, should be
+     * overriden in
      * subclasses to do meaningful operation.
      *
      * @param context gives the read only state of simulation instance
@@ -46,7 +47,7 @@ public abstract class BaseSimEvent implements SimEvent, Comparable<BaseSimEvent>
     public int compareTo(BaseSimEvent o) {
         if (this.time == o.time)
             // as high priorities has higher value
-            //  the reverse of comparison result should be considered
+            // the reverse of comparison result should be considered
             return o.priority.compareTo(this.priority);
         else
             return (int) (this.time - o.time);
@@ -59,4 +60,3 @@ public abstract class BaseSimEvent implements SimEvent, Comparable<BaseSimEvent>
                 .toString();
     }
 }
-

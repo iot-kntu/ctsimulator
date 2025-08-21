@@ -3,9 +3,6 @@ package ir.ac.kntu.concurrenttransmission.chaos;
 import ir.ac.kntu.concurrenttransmission.ConcurrentTransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
 import ir.ac.kntu.concurrenttransmission.CtNode;
-import ir.ac.kntu.concurrenttransmission.NodeState;
-import ir.ac.kntu.concurrenttransmission.chaos.state.ChaosNodeState;
-
 import java.util.*;
 
 /**
@@ -79,7 +76,7 @@ public class ChaosStateLogger {
 
                     if (history.containsKey(currentTime) && history.get(currentTime).containsKey(node)) {
                         lastKnownStates.put(node, history.get(currentTime).get(node));
-                        lastKnownState =  history.get(currentTime).get(node);
+                        lastKnownState = history.get(currentTime).get(node);
                     } else {
                         lastKnownStates.put(node, lastKnownState);
                     }

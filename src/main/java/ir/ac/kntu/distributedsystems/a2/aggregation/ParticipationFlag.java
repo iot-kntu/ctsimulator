@@ -3,7 +3,8 @@ package ir.ac.kntu.distributedsystems.a2.aggregation;
 import ir.ac.kntu.concurrenttransmission.chaos.Flag;
 
 /**
- * A simple boolean flag representing whether a node has participated in the round.
+ * A simple boolean flag representing whether a node has participated in the
+ * round.
  */
 public enum ParticipationFlag implements Flag {
     PARTICIPATED,

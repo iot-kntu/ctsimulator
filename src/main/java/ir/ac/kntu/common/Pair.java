@@ -28,7 +28,8 @@ public class Pair<A, B> implements Serializable {
     }
 
     /**
-     * Creates new pair of elements pulling of the necessity to provide corresponding types of the
+     * Creates new pair of elements pulling of the necessity to provide
+     * corresponding types of the
      * elements supplied.
      *
      * @param a   first element
@@ -69,8 +70,7 @@ public class Pair<A, B> implements Serializable {
     public <E> boolean hasElement(E e) {
         if (e == null) {
             return key == null || value == null;
-        }
-        else {
+        } else {
             return e.equals(key) || e.equals(value);
         }
     }

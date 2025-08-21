@@ -2,12 +2,12 @@ package ir.ac.kntu.concurrenttransmission.chaos.state.primitive;
 
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
-import ir.ac.kntu.concurrenttransmission.chaos.state.ChaosNodeState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 /**
- * Behavior of a node when it has completed its work for the round and is asleep.
+ * Behavior of a node when it has completed its work for the round and is
+ * asleep.
  */
 public class SleepingState implements NodeState {
 

@@ -49,8 +49,7 @@ public class CtSimulator {
                 }
 
                 event.handle(context);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error in simulation start method", e);
             }
         }
@@ -68,8 +67,7 @@ public class CtSimulator {
         if (existingCtEvents.isEmpty()) {
             CtPacketsEvent packetsEvent = new CtPacketsEvent(packet.time(), packet);
             eventQueue.add(packetsEvent);
-        }
-        else {
+        } else {
             if (existingCtEvents.size() > 1)
                 throw new IllegalStateException("Several CtEvents exists:\n" + existingCtEvents);
 

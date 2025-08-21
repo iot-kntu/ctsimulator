@@ -11,7 +11,6 @@ import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.a2.twopc.TwoPhaseCommitPayload;
 import ir.ac.kntu.distributedsystems.a2.twopc.TwoPhaseCommitPhase;
 
-
 public class WaitingState implements NodeState {
 
     @Override

@@ -8,9 +8,12 @@ import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FloodingState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.ListeningState;
 
 /**
- * Based on Chaos design, every node in DefaultTransmissionPolicy listens in all slots
- * by default to receive a valid packet. The initiator node state is changed to Flood and starts flooding.
- * Then, receiver nodes receive a valid packet and merge it and flood N consecutive slots.
+ * Based on Chaos design, every node in DefaultTransmissionPolicy listens in all
+ * slots
+ * by default to receive a valid packet. The initiator node state is changed to
+ * Flood and starts flooding.
+ * Then, receiver nodes receive a valid packet and merge it and flood N
+ * consecutive slots.
  */
 public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
 
@@ -53,7 +56,6 @@ public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
         return new CtNetworkTime(round, slot);
     }
 
-
     @Override
     public NodeState getNodeState(CtNode node, int slot) {
         return NodeState.Listen;
@@ -62,7 +64,8 @@ public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
 
     @Override
     public int getTotalSlotsOfRound() {
-        return (netGraph.getNodeCount() + 2 * netGraph.getDiameter() + floodRepeatCount + finalFloodRepeatCount + 1) * 3; // TODO: fix it
+        return (netGraph.getNodeCount() + 2 * netGraph.getDiameter() + floodRepeatCount + finalFloodRepeatCount + 1)
+                * 3; // TODO: fix it
     }
 
 }

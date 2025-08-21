@@ -2,14 +2,14 @@ package ir.ac.kntu.concurrenttransmission.chaos.state.primitive;
 
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
-import ir.ac.kntu.concurrenttransmission.chaos.state.ChaosNodeState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.Event;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
 
 /**
- * Behavior of a node when it has reached completion and enters the final flood phase.
+ * Behavior of a node when it has reached completion and enters the final flood
+ * phase.
  */
 public class FinalFloodingState implements NodeState {
 
@@ -26,11 +26,12 @@ public class FinalFloodingState implements NodeState {
 
         long endOfFloodTime = context.getTime() + node.getFinalFloodCounter();
 
-        context.getSimulator().scheduleEvent(Event.create("FinishedFinalFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
-            if (node.getCurrentState() instanceof FinalFloodingState) {
-                node.setState(new SleepingState(), ctx);
-            }
-        }));
+        context.getSimulator().scheduleEvent(
+                Event.create("FinishedFinalFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
+                    if (node.getCurrentState() instanceof FinalFloodingState) {
+                        node.setState(new SleepingState(), ctx);
+                    }
+                }));
     }
 
     @Override

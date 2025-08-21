@@ -32,8 +32,8 @@ public class CtPacketsEvent extends BaseSimEvent implements CtEvent {
 
         CtMessage<?> first = packets.get(0).ctMessage();
         areTheSame = IntStream.range(1, packets.size())
-                              .mapToObj(i -> packets.get(i).ctMessage())
-                              .allMatch(ciMessage -> ciMessage.equals(first));
+                .mapToObj(i -> packets.get(i).ctMessage())
+                .allMatch(ciMessage -> ciMessage.equals(first));
 
         return areTheSame;
     }

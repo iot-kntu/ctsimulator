@@ -8,10 +8,7 @@ import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
 import ir.ac.kntu.concurrenttransmission.chaos.FlagField;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
-
-import java.util.BitSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Logger;
 
@@ -26,8 +23,6 @@ public class Vote implements ChaosNodeListener {
     private final Queue<Integer> proposals;
 
     private ChaosMessage roundMessage;
-    private VoteValue roundVote;
-
 
     private final int nodeId;
 

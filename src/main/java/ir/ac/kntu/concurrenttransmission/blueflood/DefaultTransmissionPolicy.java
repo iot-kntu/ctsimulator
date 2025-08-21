@@ -9,9 +9,12 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 /**
- * Based on BlueFlood design, every node in DefaultTransmissionPolicy listens in all slots
- * by default to receive a valid packet. The initiator node state is changed to Flood and starts flooding.
- * Then, receiver nodes receive a valid packet and flood N consecutive slots, and then
+ * Based on BlueFlood design, every node in DefaultTransmissionPolicy listens in
+ * all slots
+ * by default to receive a valid packet. The initiator node state is changed to
+ * Flood and starts flooding.
+ * Then, receiver nodes receive a valid packet and flood N consecutive slots,
+ * and then
  * go to deep sleep state until the next round.
  */
 public class DefaultTransmissionPolicy implements TransmissionPolicy {
@@ -50,18 +53,16 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
             stateHistory.put(networkTime, nodeStateMap);
 
         this.nodeStateMap = new TreeMap<>();
-        netGraph.getNodes().forEach(node ->
-                                    {
-                                        List<NodeState> states = new ArrayList<>(getTotalSlotsOfRound());
-                                        for (int i = 0; i < getTotalSlotsOfRound(); i++)
-                                            states.add(NodeState.Listen);
-                                        this.nodeStateMap.put(node, states);
-                                    }
-        );
+        netGraph.getNodes().forEach(node -> {
+            List<NodeState> states = new ArrayList<>(getTotalSlotsOfRound());
+            for (int i = 0; i < getTotalSlotsOfRound(); i++)
+                states.add(NodeState.Listen);
+            this.nodeStateMap.put(node, states);
+        });
 
         IntStream.range(0, floodRepeatCount).forEach(i -> nodeStateMap.get(initiator).set(i, NodeState.Flood));
         IntStream.range(floodRepeatCount, getTotalSlotsOfRound())
-                 .forEach(i -> nodeStateMap.get(initiator).set(i, NodeState.Sleep));
+                .forEach(i -> nodeStateMap.get(initiator).set(i, NodeState.Sleep));
 
     }
 
@@ -72,7 +73,7 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
     @Override
     public void newPacketReceived(CtNode node, int slot) {
         // when a new packet is received by a node, it floods
-        //  it for floodRepeatCount times and then goes to sleep
+        // it for floodRepeatCount times and then goes to sleep
         for (int i = slot + 1; i <= slot + floodRepeatCount; i++)
             nodeStateMap.get(node).set(i, NodeState.Flood);
 
@@ -149,8 +150,8 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
         for (CtNode node : netGraph.getNodes()) {
             StringBuilder row = new StringBuilder(String.format("%1$5s", "N[" + node.getId() + "]"));
             nodeStateMap.get(node).stream()
-                        .map(state -> String.format("%1$5c", state.getSymbol()))
-                        .forEach(row::append);
+                    .map(state -> String.format("%1$5c", state.getSymbol()))
+                    .forEach(row::append);
             builder.append(row).append('\n');
         }
 

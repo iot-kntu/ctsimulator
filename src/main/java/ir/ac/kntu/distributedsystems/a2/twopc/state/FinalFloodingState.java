@@ -20,11 +20,12 @@ public class FinalFloodingState implements NodeState {
 
         long endOfFloodTime = context.getTime() + node.getFinalFloodCounter();
 
-        context.getSimulator().scheduleEvent(Event.create("FinishedFinalFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
-            if (node.getCurrentState() instanceof FinalFloodingState) {
-                node.setState(new SleepingState(), context);
-            }
-        }));
+        context.getSimulator().scheduleEvent(
+                Event.create("FinishedFinalFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
+                    if (node.getCurrentState() instanceof FinalFloodingState) {
+                        node.setState(new SleepingState(), context);
+                    }
+                }));
     }
 
     @Override

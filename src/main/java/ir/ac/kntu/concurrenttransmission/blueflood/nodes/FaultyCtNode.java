@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Represents a complete faulty node. The faulty node may generate faulty messages
+ * Represents a complete faulty node. The faulty node may generate faulty
+ * messages
  * in round initiation, or in flooding slots.
  */
 public class FaultyCtNode extends LoyalCtNode {

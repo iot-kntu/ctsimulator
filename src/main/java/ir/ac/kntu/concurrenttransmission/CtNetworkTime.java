@@ -2,8 +2,9 @@ package ir.ac.kntu.concurrenttransmission;
 
 /**
  * Concurrent Transmission network time which encapsulates round and slot
+ * 
  * @param round rounds the simulation executed
- * @param slot the slot number in a round
+ * @param slot  the slot number in a round
  */
 public record CtNetworkTime(int round, int slot) implements Comparable<CtNetworkTime> {
 

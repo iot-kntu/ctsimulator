@@ -29,7 +29,7 @@ public class SimInitiateFloodEvent extends BaseSimEvent {
     @Override
     public String toString() {
         return new StringJoiner(", ", SimInitiateFloodEvent.class.getSimpleName() + "[", "]")
-                .add("t="+getTime())
+                .add("t=" + getTime())
                 .toString();
     }
 }

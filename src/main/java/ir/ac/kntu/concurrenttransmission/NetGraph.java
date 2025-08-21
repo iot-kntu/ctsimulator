@@ -29,13 +29,14 @@ public class NetGraph {
             while ((line = reader.readLine()) != null) {
                 lineCounter++;
 
-                if (line.startsWith("#") || line.isBlank()) continue;
-
+                if (line.startsWith("#") || line.isBlank())
+                    continue;
 
                 final String[] splitWithSemicolon = line.split(";");
                 if (splitWithSemicolon.length < 5) {
                     throw new IllegalStateException(
-                            "Line " + lineCounter + ": each row must have format of <node_id>;<neighbors>;<class>;<x>;<y>");
+                            "Line " + lineCounter
+                                    + ": each row must have format of <node_id>;<neighbors>;<class>;<x>;<y>");
                 }
 
                 final int nodeId = Integer.parseInt(splitWithSemicolon[0].trim());
@@ -58,7 +59,8 @@ public class NetGraph {
                 nodeNeighborsId.put(instance, neighbors);
 
                 for (String s : neighborsStr) {
-                    if (s.isBlank()) continue;
+                    if (s.isBlank())
+                        continue;
                     neighbors.add(Integer.parseInt(s.trim()));
                 }
             }
@@ -83,8 +85,7 @@ public class NetGraph {
                                 "Node " + keyNode + " has edge to " + neighbor + " but the reverse is not true");
                 }
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new Exception("Error parsing graph file at line " + lineCounter, ex);
         }
 

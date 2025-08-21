@@ -3,7 +3,8 @@ package ir.ac.kntu.concurrenttransmission;
 import java.util.Random;
 
 /**
- * A class to model and calculate received signal strength based on physical models.
+ * A class to model and calculate received signal strength based on physical
+ * models.
  * This class implements the log-distance path loss model.
  */
 public class SignalModel {
@@ -19,14 +20,16 @@ public class SignalModel {
 
     /**
      * The standard deviation (in dB) of the log-normal shadowing (fading).
-     * This adds randomness to the signal strength. A value of 2.0 is a reasonable start.
+     * This adds randomness to the signal strength. A value of 2.0 is a reasonable
+     * start.
      */
     private static final double FADING_STANDARD_DEVIATION_DB = 2.0;
 
     private final Random random = new Random();
 
     /**
-     * Calculates the received signal strength in dBm, including a random fading component.
+     * Calculates the received signal strength in dBm, including a random fading
+     * component.
      *
      * @param distance The distance between the transmitter and receiver.
      * @return The received signal strength in dBm.
@@ -49,6 +52,7 @@ public class SignalModel {
 
     /**
      * Converts power from dBm to milliwatts (mW).
+     * 
      * @param dbm The power in dBm.
      * @return The power in mW.
      */
@@ -58,6 +62,7 @@ public class SignalModel {
 
     /**
      * Converts power from milliwatts (mW) to dBm.
+     * 
      * @param milliwatts The power in mW.
      * @return The power in dBm.
      */

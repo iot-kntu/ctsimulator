@@ -10,11 +10,9 @@ import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.a2.aggregation.ParticipationFlag;
 
-
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -82,7 +80,8 @@ public class Collect implements ChaosNodeListener {
         CollectPayload receivedPayload = (CollectPayload) receivedContent.payload();
         CollectPayload mergedPayload = currentPayload.merge(receivedPayload);
 
-        logger.fine(String.format("Node[%d] merged data. New map size: %d, flags: %s ,peyload: %s", receiver.getId(), mergedPayload.dataMap().size(), mergedFlags.flags(), mergedPayload.dataMap()));
+        logger.fine(String.format("Node[%d] merged data. New map size: %d, flags: %s ,peyload: %s", receiver.getId(),
+                mergedPayload.dataMap().size(), mergedFlags.flags(), mergedPayload.dataMap()));
 
         ChaosMessage mergedContent = new ChaosMessage(mergedFlags, mergedPayload);
         return new CtMessage<>(currentMessage.initiator(), mergedContent);
@@ -94,7 +93,8 @@ public class Collect implements ChaosNodeListener {
     }
 
     @Override
-    public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket, boolean areSimilar) {
+    public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket,
+            boolean areSimilar) {
         return true;
     }
 

@@ -6,13 +6,13 @@ import ir.ac.kntu.concurrenttransmission.chaos.ChaosApplication;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosMessage;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
-import ir.ac.kntu.concurrenttransmission.chaos.state.ChaosNodeState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 /**
  * Behavior of a node when it is in the Listening state.
- * In this state, the node processes incoming packets and decides whether to transition
+ * In this state, the node processes incoming packets and decides whether to
+ * transition
  * to a flooding state.
  */
 public class ListeningState implements NodeState {

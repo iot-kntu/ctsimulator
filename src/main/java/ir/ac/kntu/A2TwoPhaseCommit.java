@@ -5,10 +5,8 @@ import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.OneInitiatorInitiatorStrategy;
 import ir.ac.kntu.concurrenttransmission.chaos.*;
 import ir.ac.kntu.distributedsystems.a2.twopc.TwoPcTransmissionPolicy;
-import ir.ac.kntu.distributedsystems.a2.twopc.state.VoteListeningState;
 import ir.ac.kntu.distributedsystems.a2.twopc.TwoPhaseCommit;
 import ir.ac.kntu.distributedsystems.a2.vote.VoteValue;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,36 +28,33 @@ public class A2TwoPhaseCommit {
 
             final int executionRounds = 1;
             final int floodRepeatSlots = 1;
-            final int finalFloodRepeatSlots = 3; // Needs more repeats to ensure decision is spread
+            final int finalFloodRepeatSlots = 3;
 
             ChaosSettings settings = new ChaosSettings(0.0, executionRounds);
 
-            // --- For 2PC, we need a single, fixed coordinator for the round ---
-            ChaosTransmissionPolicy transmissionPolicy = new TwoPcTransmissionPolicy(floodRepeatSlots, finalFloodRepeatSlots, netGraph);
+            ChaosTransmissionPolicy transmissionPolicy = new TwoPcTransmissionPolicy(floodRepeatSlots,
+                    finalFloodRepeatSlots, netGraph);
 
             final int coordinatorId = 0;
             ChaosStrategies strategies = new ChaosStrategies(
-                    new OneInitiatorInitiatorStrategy(coordinatorId), // Fixed initiator
-                    transmissionPolicy
-            );
+                    new OneInitiatorInitiatorStrategy(coordinatorId),
+                    transmissionPolicy);
 
-            ChaosApplication chaosApplication = new ChaosApplication(settings, strategies, netGraph, transmissionPolicy.getInitialState());
+            ChaosApplication chaosApplication = new ChaosApplication(settings, strategies, netGraph,
+                    transmissionPolicy.getInitialState());
 
-            // --- Setup Listeners for the 2PC Scenario ---
             final String proposal = "UPDATE_FIRMWARE_V2.1";
 
             netGraph.getNodes().forEach(node -> {
                 Queue<Object> proposals = new LinkedList<>();
-                proposals.add(proposal); // Only the coordinator will use this
+                proposals.add(proposal);
 
                 Queue<VoteValue> votes = new LinkedList<>();
-                // Let's assume nodes 1 and 2 are ready and vote YES, but node 3 is not and votes NO.
                 if (node.getId() == 1 || node.getId() == 2) {
                     votes.add(VoteValue.YES);
                 } else if (node.getId() == 3) {
                     votes.add(VoteValue.NO);
                 }
-                // Coordinator's vote queue can be empty as it defaults to YES.
 
                 chaosApplication.setListener(node, new TwoPhaseCommit(proposals, votes));
             });
@@ -74,7 +69,6 @@ public class A2TwoPhaseCommit {
             e.printStackTrace();
         }
     }
-
 
     private static void startLogger() throws IOException {
         InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("logging.properties");

@@ -25,4 +25,3 @@ public record FloodPacket<T>(long time, CtMessage<T> ctMessage, CtNode sender, C
         return new FloodPacket<>(time() + delay, ctMessage(), sender(), receiver());
     }
 }
-

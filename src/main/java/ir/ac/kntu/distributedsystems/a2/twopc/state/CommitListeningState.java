@@ -9,7 +9,6 @@ import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
-
 public class CommitListeningState implements NodeState {
 
     @Override

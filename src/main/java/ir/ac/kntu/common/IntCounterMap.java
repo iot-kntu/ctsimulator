@@ -44,7 +44,8 @@ public class IntCounterMap<K> extends HashMap<K, Integer> {
     }
 
     /**
-     * Subtracts decrValue to the previous value of this key and returns the new value
+     * Subtracts decrValue to the previous value of this key and returns the new
+     * value
      *
      * @param key
      * @param decrValue
@@ -110,8 +111,9 @@ public class IntCounterMap<K> extends HashMap<K, Integer> {
      * Finds whether this map have several keys that
      * have the same value, thus all of them can be
      * the MaxKey
+     * 
      * @return 1 if only one unique max key is available, otherwise
-     *  returns the number of similar keys
+     *         returns the number of similar keys
      */
     public int hasSeveralMaxKeys() {
         int maxKeysCount = 0;

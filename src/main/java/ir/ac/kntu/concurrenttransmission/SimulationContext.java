@@ -6,8 +6,8 @@ public class SimulationContext implements ContextView {
     NetGraph netGraph;
     ConcurrentTransmissionApplication application;
     long time;
-    //int round;
-    //int slot;
+    // int round;
+    // int slot;
 
     public SimulationContext() {
 
@@ -28,15 +28,15 @@ public class SimulationContext implements ContextView {
         return time;
     }
 
-    //@Override
-    //public int getRound() {
-    //    return round;
-    //}
+    // @Override
+    // public int getRound() {
+    // return round;
+    // }
     //
-    //@Override
-    //public int getSlot() {
-    //    return slot;
-    //}
+    // @Override
+    // public int getSlot() {
+    // return slot;
+    // }
 
     @Override
     public NetGraph getNetGraph() {

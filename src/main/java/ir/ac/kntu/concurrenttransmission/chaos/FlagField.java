@@ -6,7 +6,8 @@ import java.util.stream.Collectors;
 
 /**
  * A field that holds the flags for all nodes in the network.
- * This class replaces the simple BitSet to support different types of NodeFlags.
+ * This class replaces the simple BitSet to support different types of
+ * NodeFlags.
  * This class is immutable.
  */
 public record FlagField(Map<Integer, Flag> flags) {

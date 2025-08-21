@@ -18,4 +18,3 @@ public class SimulationStartEvent extends BaseSimEvent {
         context.getApplication().simulationStarting(context);
     }
 }
-

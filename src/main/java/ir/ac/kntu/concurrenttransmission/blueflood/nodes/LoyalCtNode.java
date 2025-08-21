@@ -91,4 +91,3 @@ public class LoyalCtNode implements CtNode {
         return "N[" + getId() + "]";
     }
 }
-

@@ -1,7 +1,7 @@
 package ir.ac.kntu.concurrenttransmission;
 
 /**
- *  Message initiation
+ * Message initiation
  * strategy
  */
 public interface CtInitiatorStrategy {
@@ -10,4 +10,3 @@ public interface CtInitiatorStrategy {
 
     int getNextInitiatorId();
 }
-

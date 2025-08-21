@@ -98,7 +98,7 @@ public class BlueFloodApplication implements CtBlueFloodApplication {
             return;
 
         // in case of receiving different packets, there is a chance one packet
-        //  to be received.
+        // to be received.
         FloodPacket<?> thePacket = packets.size() == 1
                 ? packets.get(0)
                 : packets.get(random.nextInt(packets.size()));
@@ -125,7 +125,8 @@ public class BlueFloodApplication implements CtBlueFloodApplication {
                             networkTime.slot(),
                             receiver.getId(), thePacket.ctMessage().messageNo()));
 
-                    boolean shouldFlood = getBlueFloodListener(receiver).ctPacketsReceived(context, packets, thePacket, ctEvent.areMessagesSimilar());
+                    boolean shouldFlood = getBlueFloodListener(receiver).ctPacketsReceived(context, packets, thePacket,
+                            ctEvent.areMessagesSimilar());
                     if (shouldFlood)
                         receiver.floodMessage(context, receiver, thePacket.ctMessage());
                 } else {
@@ -133,7 +134,8 @@ public class BlueFloodApplication implements CtBlueFloodApplication {
                 }
             }
             case Flood -> {
-                //getLogger().log(Level.WARNING, "Received packet while in the flooding state");
+                // getLogger().log(Level.WARNING, "Received packet while in the flooding
+                // state");
             }
         }
 
@@ -189,4 +191,3 @@ public class BlueFloodApplication implements CtBlueFloodApplication {
         return listener;
     }
 }
-

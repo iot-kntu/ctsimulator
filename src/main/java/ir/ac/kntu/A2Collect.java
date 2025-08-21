@@ -4,9 +4,7 @@ import ir.ac.kntu.concurrenttransmission.CtSimulator;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.RoundRobinInitiatorStrategy;
 import ir.ac.kntu.concurrenttransmission.chaos.*;
-import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.ListeningState;
 import ir.ac.kntu.distributedsystems.a2.collect.Collect;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,29 +24,25 @@ public class A2Collect {
             if (netGraph.isEmpty())
                 throw new IllegalArgumentException("Invalid graph file format.");
 
-            // --- Simulation Parameters ---
             final int executionRounds = 2;
             final int floodRepeatSlots = 1;
             final int finalFloodRepeatSlots = 3;
 
             ChaosSettings settings = new ChaosSettings(0.0, executionRounds);
 
-            ChaosTransmissionPolicy transmissionPolicy = new ChaosDefaultTransmissionPolicy(floodRepeatSlots, finalFloodRepeatSlots, netGraph);
-
+            ChaosTransmissionPolicy transmissionPolicy = new ChaosDefaultTransmissionPolicy(floodRepeatSlots,
+                    finalFloodRepeatSlots, netGraph);
 
             ChaosStrategies strategies = new ChaosStrategies(
                     new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),
-                    transmissionPolicy
-            );
+                    transmissionPolicy);
 
-            ChaosApplication chaosApplication = new ChaosApplication(settings, strategies, netGraph, transmissionPolicy.getInitialState());
+            ChaosApplication chaosApplication = new ChaosApplication(settings, strategies, netGraph,
+                    transmissionPolicy.getInitialState());
 
-            // --- Setup Listeners for each node ---
             netGraph.getNodes().forEach(node -> {
                 Queue<Object> dataQueue = new LinkedList<>();
-                // Each node will contribute its ID squared as its data for the first round.
                 dataQueue.add(node.getId() * node.getId());
-                // Add more data for subsequent rounds if needed...
                 dataQueue.add(node.getId() * 10);
 
                 chaosApplication.setListener(node, new Collect(dataQueue));
