@@ -51,10 +51,6 @@ public class NullApplication implements ConcurrentTransmissionApplication {
         return CtNode.NULL_NODE;
     }
 
-    @Override
-    public NodeState getNodeState(CtNode node) {
-        return NodeState.Sleep;
-    }
 
     @Override
     public TransmissionPolicy getTransmissionPolicy() {
@@ -63,11 +59,6 @@ public class NullApplication implements ConcurrentTransmissionApplication {
 
     @Override
     public CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat) {
-        return CtMessage.NULL_MESSAGE;
-    }
-
-    @Override
-    public CtMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
         return CtMessage.NULL_MESSAGE;
     }
 }

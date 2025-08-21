@@ -1,8 +1,9 @@
-package ir.ac.kntu.concurrenttransmission.chaos.state;
+package ir.ac.kntu.concurrenttransmission.chaos.state.primitive;
 
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.chaos.NodeStateBehavior;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
+import ir.ac.kntu.concurrenttransmission.chaos.state.ChaosNodeState;
+import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.Event;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
@@ -11,7 +12,7 @@ import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
  * Behavior of a node when it decides to flood.
  * It sends its knowledge once and then transitions back to Listening.
  */
-public class FloodingState implements NodeStateBehavior {
+public class FloodingState implements NodeState {
 
     @Override
     public void onPacketReceived(StatefulNode node, ContextView context, FloodPacket<?> capturedPacket) {
@@ -27,14 +28,19 @@ public class FloodingState implements NodeStateBehavior {
         long endOfFloodTime = context.getTime() + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
 
         context.getSimulator().scheduleEvent(Event.create("FinishedFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
-            if (node.getCurrentState().getStateAsEnum() == ChaosNodeState.Flood) {
-                node.setState(new ListeningState(), context);
+            if (node.getCurrentState() instanceof FloodingState) {
+                node.setState(new ListeningState(), ctx);
             }
         }));
     }
 
     @Override
-    public ChaosNodeState getStateAsEnum() {
-        return ChaosNodeState.Flood;
+    public void onSlotStart(StatefulNode node, ContextView context) {
+
+    }
+
+    @Override
+    public String toString() {
+        return "T";
     }
 }

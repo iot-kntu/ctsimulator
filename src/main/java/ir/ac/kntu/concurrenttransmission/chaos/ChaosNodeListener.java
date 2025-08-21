@@ -4,6 +4,7 @@ import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
+import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 import java.util.List;
@@ -40,8 +41,9 @@ public interface ChaosNodeListener {
     /**
      * Called at the beginning of a new round for each node to create its initial message.
      * The implementation should check if the node is the initiator and act accordingly.
-     * @param context The simulation context.
-     * @param self The node for which the message is being created.
+     *
+     * @param context   The simulation context.
+     * @param self      The node for which the message is being created.
      * @param initiator The designated initiator for this round.
      * @return The initial CtMessage containing a ChaosMessage for the node.
      */
@@ -62,8 +64,8 @@ public interface ChaosNodeListener {
     /**
      * Merges the given packet into the node message.
      *
-     * @param context the simulation context
-     * @param receivedPacket  the packet to be merged
+     * @param context        the simulation context
+     * @param receivedPacket the packet to be merged
      * @return the merged message
      */
     CtMessage<?> merge(ContextView context, FloodPacket<?> receivedPacket);

@@ -3,10 +3,8 @@ package ir.ac.kntu;
 import ir.ac.kntu.concurrenttransmission.CtSimulator;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.RoundRobinInitiatorStrategy;
-import ir.ac.kntu.concurrenttransmission.chaos.ChaosApplication;
-import ir.ac.kntu.concurrenttransmission.chaos.ChaosDefaultTransmissionPolicy;
-import ir.ac.kntu.concurrenttransmission.chaos.ChaosSettings;
-import ir.ac.kntu.concurrenttransmission.chaos.ChaosStrategies;
+import ir.ac.kntu.concurrenttransmission.chaos.*;
+import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.ListeningState;
 import ir.ac.kntu.distributedsystems.a2.aggregation.Aggregation;
 import ir.ac.kntu.distributedsystems.a2.vote.Vote;
 import ir.ac.kntu.distributedsystems.a2.vote.VoteValue;
@@ -46,13 +44,15 @@ public class A2Vote {
                     executionRounds
             );
 
+            ChaosTransmissionPolicy transmissionPolicy = new ChaosDefaultTransmissionPolicy(floodRepeatSlots, finalFloodRepeatSlots, netGraph);
+
             ChaosStrategies strategies = new ChaosStrategies(
                     new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),
-                    new ChaosDefaultTransmissionPolicy(floodRepeatSlots, finalFloodRepeatSlots, netGraph)
+                    transmissionPolicy
             );
 
 
-            ChaosApplication chaosApplication = new ChaosApplication(settings, strategies, netGraph);
+            ChaosApplication chaosApplication = new ChaosApplication(settings, strategies, netGraph, transmissionPolicy.getInitialState());
 
 
             netGraph.getNodes().forEach(node -> {

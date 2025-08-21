@@ -2,16 +2,16 @@ package ir.ac.kntu.concurrenttransmission.chaos;
 
 import ir.ac.kntu.concurrenttransmission.*;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
+import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
-import ir.ac.kntu.concurrenttransmission.CtNode;
 
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ChaosApplication implements ConcurrentTransmissionApplication {
+public class ChaosApplication implements CtChaosApplication {
 
     private final Logger logger = Logger.getLogger("ChaosApplication");
     /**
@@ -26,13 +26,15 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
     private final SortedMap<CtNode, ChaosNodeListener> listeners;
     private final ChaosStateLogger stateLogger;
     private final SignalModel signalModel;
+    private NodeState startingPoint;
 
-    public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph) {
+    public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph, NodeState startingPoint) {
         this.settings = settings;
         this.strategies = strategies;
         this.listeners = new TreeMap<>();
         this.stateLogger = new ChaosStateLogger(new ArrayList<>(netGraph.getNodes()), strategies.transmissionPolicy());
         this.signalModel = new SignalModel();
+        this.startingPoint = startingPoint;
     }
 
     public void setListener(CtNode node, ChaosNodeListener listener) {
@@ -68,6 +70,14 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
 
         final ChaosTransmissionPolicy transmissionPolicy = strategies.transmissionPolicy();
         this.networkTime = transmissionPolicy.getNetworkTime(context.getTime());
+
+        for (CtNode node : context.getNetGraph().getNodes()) {
+            if (node instanceof StatefulNode statefulNode) {
+                if (statefulNode.getCurrentState() != null) {
+                    statefulNode.getCurrentState().onSlotStart(statefulNode, context);
+                }
+            }
+        }
     }
 
     @Override
@@ -77,11 +87,11 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
 
 
         if (getRound() < settings.roundLimit()) {
-            final int nextInitiatorId = strategies.initiatorStrategy().getNextInitiatorId() + 1; // TODO: fix it
+            final int nextInitiatorId = strategies.initiatorStrategy().getNextInitiatorId(); // TODO: fix it
             context.getNetGraph().getNodes().forEach(node -> {
                 if (node instanceof StatefulNode) {
                     CtMessage<ChaosMessage> initialMessage = (CtMessage<ChaosMessage>) getChaosNodeListener(node).initiateMessage(context, node, context.getNetGraph().getNodeById(nextInitiatorId));
-                    ((StatefulNode) node).initializeForNewRound(context, initialMessage, this.stateLogger);
+                    ((StatefulNode) node).initializeForNewRound(context, initialMessage, this.stateLogger, startingPoint);
                 }
             });
 
@@ -162,11 +172,6 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
         return context.getNetGraph().getNodeById(strategies.initiatorStrategy().getCurrentInitiatorId());
     }
 
-    @Override
-    public NodeState getNodeState(CtNode node) {
-        return strategies.transmissionPolicy().getNodeState(node, getSlot());
-    }
-
 
     @Override
     public ChaosTransmissionPolicy getTransmissionPolicy() {
@@ -179,11 +184,6 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
         return getChaosNodeListener(sender).getMessage(context, sender, receivedMessage, whichRepeat);
     }
 
-    @Override
-    public CtMessage<?> getRoundInitiationMessage(ContextView context, CtNode initiator, int whichRepeat) {
-        return getChaosNodeListener(initiator).getRoundMessage(context, initiator, whichRepeat);
-    }
-
     /**
      * Retrieves the specific listener for a given node.
      * The listener contains the application-specific logic (e.g., how to merge messages).
@@ -192,6 +192,7 @@ public class ChaosApplication implements ConcurrentTransmissionApplication {
      * @return The ChaosNodeListener associated with the node.
      * @throws IllegalStateException if no listener is defined for the node.
      */
+    @Override
     public ChaosNodeListener getChaosNodeListener(CtNode node) {
         final ChaosNodeListener listener = listeners.get(node);
         if (listener == null) {

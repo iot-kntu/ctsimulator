@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class ChaosStateLogger {
 
-    private final SortedMap<CtNetworkTime, Map<CtNode, ChaosNodeState>> history = new TreeMap<>();
+    private final SortedMap<CtNetworkTime, Map<CtNode, String>> history = new TreeMap<>();
     private final List<CtNode> nodes;
     private final ConcurrentTransmissionPolicy transmissionPolicy;
 
@@ -23,8 +23,8 @@ public class ChaosStateLogger {
         this.transmissionPolicy = transmissionPolicy;
     }
 
-    public void setState(CtNetworkTime time, CtNode node, ChaosNodeState nodeState) {
-        final Map<CtNode, ChaosNodeState> stateMap = history.computeIfAbsent(time, k -> new TreeMap<>());
+    public void setState(CtNetworkTime time, CtNode node, String nodeState) {
+        final Map<CtNode, String> stateMap = history.computeIfAbsent(time, k -> new TreeMap<>());
         stateMap.put(node, nodeState);
     }
 
@@ -68,8 +68,8 @@ public class ChaosStateLogger {
         builder.append('\n');
 
         // --- Print Nodes Status ---
-        Map<CtNode, ChaosNodeState> lastKnownStates = new HashMap<>();
-        ChaosNodeState lastKnownState = null;
+        Map<CtNode, String> lastKnownStates = new HashMap<>();
+        String lastKnownState = null;
 
         for (CtNode node : this.nodes) {
             builder.append(String.format("N[%-3d]|", node.getId()));
@@ -84,9 +84,9 @@ public class ChaosStateLogger {
                         lastKnownStates.put(node, lastKnownState);
                     }
 
-                    ChaosNodeState stateToPrint = lastKnownStates.get(node);
-                    char symbol = (stateToPrint != null) ? stateToPrint.getSymbol() : '.';
-                    builder.append(String.format("%-5c", symbol));
+                    String stateToPrint = lastKnownStates.get(node);
+                    String symbol = (stateToPrint != null) ? stateToPrint : ".";
+                    builder.append(String.format("%-5s", symbol));
                 }
                 builder.append(String.format("%-5s", "|"));
             }

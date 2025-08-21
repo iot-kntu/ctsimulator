@@ -2,10 +2,12 @@ package ir.ac.kntu;
 
 import ir.ac.kntu.concurrenttransmission.CtSimulator;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
-import ir.ac.kntu.concurrenttransmission.RoundRobinInitiatorStrategy;
+import ir.ac.kntu.concurrenttransmission.OneInitiatorInitiatorStrategy;
 import ir.ac.kntu.concurrenttransmission.chaos.*;
-import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.ListeningState;
-import ir.ac.kntu.distributedsystems.a2.collect.Collect;
+import ir.ac.kntu.distributedsystems.a2.twopc.TwoPcTransmissionPolicy;
+import ir.ac.kntu.distributedsystems.a2.twopc.state.VoteListeningState;
+import ir.ac.kntu.distributedsystems.a2.twopc.TwoPhaseCommit;
+import ir.ac.kntu.distributedsystems.a2.vote.VoteValue;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,10 +16,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.LogManager;
 
-public class A2Collect {
+public class A2TwoPhaseCommit {
     public static void main(String[] args) {
         try {
-            startLogger();
+            startLogger(); // Assuming you have a utility class for this
 
             final NetGraph netGraph = NetGraph.loadFrom("sample.graph");
             System.out.println("Graph diameter = " + netGraph.getDiameter());
@@ -26,32 +28,40 @@ public class A2Collect {
             if (netGraph.isEmpty())
                 throw new IllegalArgumentException("Invalid graph file format.");
 
-            // --- Simulation Parameters ---
-            final int executionRounds = 2;
+            final int executionRounds = 1;
             final int floodRepeatSlots = 1;
-            final int finalFloodRepeatSlots = 3;
+            final int finalFloodRepeatSlots = 3; // Needs more repeats to ensure decision is spread
 
             ChaosSettings settings = new ChaosSettings(0.0, executionRounds);
 
-            ChaosTransmissionPolicy transmissionPolicy = new ChaosDefaultTransmissionPolicy(floodRepeatSlots, finalFloodRepeatSlots, netGraph);
+            // --- For 2PC, we need a single, fixed coordinator for the round ---
+            ChaosTransmissionPolicy transmissionPolicy = new TwoPcTransmissionPolicy(floodRepeatSlots, finalFloodRepeatSlots, netGraph);
 
-
+            final int coordinatorId = 0;
             ChaosStrategies strategies = new ChaosStrategies(
-                    new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),
+                    new OneInitiatorInitiatorStrategy(coordinatorId), // Fixed initiator
                     transmissionPolicy
             );
 
             ChaosApplication chaosApplication = new ChaosApplication(settings, strategies, netGraph, transmissionPolicy.getInitialState());
 
-            // --- Setup Listeners for each node ---
-            netGraph.getNodes().forEach(node -> {
-                Queue<Object> dataQueue = new LinkedList<>();
-                // Each node will contribute its ID squared as its data for the first round.
-                dataQueue.add(node.getId() * node.getId());
-                // Add more data for subsequent rounds if needed...
-                dataQueue.add(node.getId() * 10);
+            // --- Setup Listeners for the 2PC Scenario ---
+            final String proposal = "UPDATE_FIRMWARE_V2.1";
 
-                chaosApplication.setListener(node, new Collect(dataQueue));
+            netGraph.getNodes().forEach(node -> {
+                Queue<Object> proposals = new LinkedList<>();
+                proposals.add(proposal); // Only the coordinator will use this
+
+                Queue<VoteValue> votes = new LinkedList<>();
+                // Let's assume nodes 1 and 2 are ready and vote YES, but node 3 is not and votes NO.
+                if (node.getId() == 1 || node.getId() == 2) {
+                    votes.add(VoteValue.YES);
+                } else if (node.getId() == 3) {
+                    votes.add(VoteValue.NO);
+                }
+                // Coordinator's vote queue can be empty as it defaults to YES.
+
+                chaosApplication.setListener(node, new TwoPhaseCommit(proposals, votes));
             });
 
             CtSimulator simulator = CtSimulator.createInstance(netGraph, chaosApplication);
@@ -64,6 +74,7 @@ public class A2Collect {
             e.printStackTrace();
         }
     }
+
 
     private static void startLogger() throws IOException {
         InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("logging.properties");

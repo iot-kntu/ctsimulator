@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BlueFloodApplication implements ConcurrentTransmissionApplication {
+public class BlueFloodApplication implements CtBlueFloodApplication {
 
     public static double DEFAULT_INTERFERENCE_PROB = 0.9;
     protected final BlueFloodStrategies strategies;
@@ -120,16 +120,15 @@ public class BlueFloodApplication implements ConcurrentTransmissionApplication {
                 if (random.nextDouble() >= receiveProbability) { // no loss
 
                     getLogger().log(Level.INFO, String.format("[t:%d-r:%d-s:%d] node[%d] received Pkt[%d]",
-                                                              context.getTime(),
-                                                              networkTime.round(),
-                                                              networkTime.slot(),
-                                                              receiver.getId(), thePacket.ctMessage().messageNo()));
+                            context.getTime(),
+                            networkTime.round(),
+                            networkTime.slot(),
+                            receiver.getId(), thePacket.ctMessage().messageNo()));
 
                     boolean shouldFlood = getBlueFloodListener(receiver).ctPacketsReceived(context, packets, thePacket, ctEvent.areMessagesSimilar());
-                    if(shouldFlood)
+                    if (shouldFlood)
                         receiver.floodMessage(context, receiver, thePacket.ctMessage());
-                }
-                else {
+                } else {
                     getBlueFloodListener(receiver).ctPacketsLost(context, packets, ctEvent.areMessagesSimilar());
                 }
             }

@@ -4,6 +4,8 @@ import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.NodeState;
+import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FloodingState;
+import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.ListeningState;
 
 /**
  * Based on Chaos design, every node in DefaultTransmissionPolicy listens in all slots
@@ -33,6 +35,16 @@ public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
     }
 
     @Override
+    public ir.ac.kntu.concurrenttransmission.chaos.state.NodeState getInitialState() {
+        return new ListeningState();
+    }
+
+    @Override
+    public ir.ac.kntu.concurrenttransmission.chaos.state.NodeState getInitialFloodState() {
+        return new FloodingState();
+    }
+
+    @Override
     public CtNetworkTime getNetworkTime(long time) {
         final int totalSlotsOfRound = getTotalSlotsOfRound();
         int round = (int) (1.0 * time / totalSlotsOfRound);
@@ -40,7 +52,6 @@ public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
 
         return new CtNetworkTime(round, slot);
     }
-
 
 
     @Override
@@ -51,7 +62,7 @@ public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
 
     @Override
     public int getTotalSlotsOfRound() {
-        return netGraph.getNodeCount() + 2 * netGraph.getDiameter() + floodRepeatCount + finalFloodRepeatCount + 1; // TODO: fix it
+        return (netGraph.getNodeCount() + 2 * netGraph.getDiameter() + floodRepeatCount + finalFloodRepeatCount + 1) * 3; // TODO: fix it
     }
 
 }

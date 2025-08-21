@@ -1,8 +1,7 @@
-package ir.ac.kntu.concurrenttransmission.chaos;
+package ir.ac.kntu.concurrenttransmission.chaos.state;
 
 import ir.ac.kntu.concurrenttransmission.ContextView;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
-import ir.ac.kntu.concurrenttransmission.chaos.state.ChaosNodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 /**
@@ -10,7 +9,7 @@ import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
  * This is the core of the State Design Pattern. Each state implementation
  * will define how a node reacts to events.
  */
-public interface NodeStateBehavior {
+public interface NodeState {
 
     /**
      * Handles the event of receiving a packet. The implementation will vary
@@ -28,9 +27,18 @@ public interface NodeStateBehavior {
      */
     void onEnter(StatefulNode node, ContextView context);
 
+
+    /**
+     * An action to be taken at the beginning of every time slot
+     * while the node remains in this state.
+     * @param node The node currently in this state.
+     * @param context The simulation context.
+     */
+    void onSlotStart(StatefulNode node, ContextView context);
+
     /**
      * Returns the symbolic representation of this state.
      * @return A NodeState enum.
      */
-    ChaosNodeState getStateAsEnum();
+    String toString();
 }
