@@ -93,7 +93,8 @@ public class ChaosApplication implements CtChaosApplication {
 
     @Override
     public void simulationFinishing(ContextView context) {
-        strategies.transmissionPolicy().endRound(context.getTime() + 1);
+        if (!roundCompleted)
+            strategies.transmissionPolicy().endRound(context.getTime() + 1);
     }
 
     @Override
