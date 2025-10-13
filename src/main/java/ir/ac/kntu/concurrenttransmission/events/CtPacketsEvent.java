@@ -1,8 +1,8 @@
 package ir.ac.kntu.concurrenttransmission.events;
 
 import ir.ac.kntu.concurrenttransmission.BaseSimEvent;
-import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 
 import java.util.ArrayList;

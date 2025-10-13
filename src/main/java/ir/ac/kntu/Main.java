@@ -56,8 +56,7 @@ public class Main {
             simulator.start();
 
             System.out.println(blueFloodApplication.printTimeline());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("High level error occurred: ");
             e.printStackTrace();
         }

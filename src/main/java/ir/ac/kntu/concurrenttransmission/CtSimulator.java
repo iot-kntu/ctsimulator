@@ -53,6 +53,7 @@ public class CtSimulator {
                 logger.log(Level.SEVERE, "Error in simulation start method", e);
             }
         }
+        context.getApplication().simulationFinishing(context);
     }
 
     public void schedulePacket(FloodPacket<?> packet) {

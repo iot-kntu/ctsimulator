@@ -1,6 +1,7 @@
 package ir.ac.kntu.concurrenttransmission.chaos.state.primitive;
 
 import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.chaos.ChaosApplication;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
@@ -19,6 +20,7 @@ public class SleepingState implements NodeState {
     @Override
     public void onEnter(StatefulNode node, ContextView context) {
         // Nothing to do when entering sleep state.
+        ((ChaosApplication) context.getApplication()).checkRoundCompletion(context);
     }
 
     @Override

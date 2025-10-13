@@ -1,10 +1,10 @@
 package ir.ac.kntu.concurrenttransmission.chaos.nodes;
 
-import ir.ac.kntu.concurrenttransmission.*;
+import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
+import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
+import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.chaos.*;
-import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FinalFloodingState;
-import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FloodingState;
-import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.ListeningState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
@@ -58,12 +58,18 @@ public class LoyalCtNode implements StatefulNode {
     @Override
     public void setState(NodeState newState, ContextView context) {
         if (this.currentState == null || this.currentState.getClass() != newState.getClass()) {
+            NodeState oldState = this.currentState;
             this.currentState = newState;
             CtNetworkTime netTime = context.getApplication().getNetworkTime();
 
             stateLogger.setState(netTime, this, newState.toString());
             logger.fine(String.format("Node[%d] at t=%s transitioned to state %s",
-                    this.id, netTime, newState.toString()));
+                    this.id, netTime, newState));
+
+            // Notify the application about state change for tracking
+            if (context.getApplication() instanceof ChaosApplication chaosApp) {
+                chaosApp.onNodeStateChanged(this, oldState, newState);
+            }
 
             // Trigger the onEnter action for the new state
             newState.onEnter(this, context);

@@ -1,7 +1,7 @@
 package ir.ac.kntu.concurrenttransmission.blueflood;
 
-import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
@@ -26,7 +26,7 @@ public interface BlueFloodNodeListener {
      * @return tells the application if the received packet should be flooded
      */
     boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket,
-            boolean areSimilar);
+                              boolean areSimilar);
 
     /**
      * Called when some simultaneous packets are lost and not delivered to an

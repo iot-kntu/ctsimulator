@@ -1,7 +1,7 @@
 package ir.ac.kntu.distributedsystems.a2.collect;
 
-import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosMessage;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
@@ -94,7 +94,7 @@ public class Collect implements ChaosNodeListener {
 
     @Override
     public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket,
-            boolean areSimilar) {
+                                     boolean areSimilar) {
         return true;
     }
 

@@ -108,7 +108,7 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
         builder.append('\n');
 
         builder.append(String.format("%1$5s", "S"));
-        final int rounds = stateHistory.keySet().size();
+        final int rounds = stateHistory.size();
         for (int i = 0; i < rounds; i++) {
             for (int j = 0; j < getTotalSlotsOfRound(); j++) {
                 builder.append(String.format("%1$5s", j));

@@ -12,7 +12,7 @@ public interface Flag {
      * Merges this flag with another flag. The logic depends on the flag type.
      * For example, a participation flag would use OR, while a vote flag might
      * keep the first non-undecided value.
-     * 
+     *
      * @param other The other flag to merge with.
      * @return A new, merged NodeFlag instance.
      */

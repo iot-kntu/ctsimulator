@@ -17,9 +17,8 @@ public class RoundRobinInitiatorStrategy implements CtInitiatorStrategy {
     @Override
     public int getNextInitiatorId() {
         int nextId = (this.currentId + 1) % nodesCount;
-        int turn = this.currentId;
         this.currentId = nextId;
 
-        return turn;
+        return nextId;
     }
 }

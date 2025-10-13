@@ -1,7 +1,7 @@
 package ir.ac.kntu.distributedsystems.fault.om;
 
-import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 public class ReplicatedWriteOralMessage extends ParentOralMessageSystem implements BlueFloodNodeListener {
 
-    private final int initiatorId ;
+    private final int initiatorId;
     private final OmAction action;
     private final HashMap<CtNode, OmNodeStatus> nodeStatusMap = new HashMap<>();
 

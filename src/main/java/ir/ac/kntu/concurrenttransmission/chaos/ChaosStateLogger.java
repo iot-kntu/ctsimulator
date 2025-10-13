@@ -1,20 +1,20 @@
 package ir.ac.kntu.concurrenttransmission.chaos;
 
-import ir.ac.kntu.concurrenttransmission.ConcurrentTransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
 import ir.ac.kntu.concurrenttransmission.CtNode;
+
 import java.util.*;
 
 /**
- * This class intended for logging the state of the simulation and printing
+ * Logs and prints simulation state dynamically based on ChaosDefaultTransmissionPolicy rounds.
  */
 public class ChaosStateLogger {
 
     private final SortedMap<CtNetworkTime, Map<CtNode, String>> history = new TreeMap<>();
     private final List<CtNode> nodes;
-    private final ConcurrentTransmissionPolicy transmissionPolicy;
+    private final ChaosTransmissionPolicy transmissionPolicy;
 
-    public ChaosStateLogger(List<CtNode> nodes, ConcurrentTransmissionPolicy transmissionPolicy) {
+    public ChaosStateLogger(List<CtNode> nodes, ChaosTransmissionPolicy transmissionPolicy) {
         this.nodes = new ArrayList<>(nodes);
         this.nodes.sort(Comparator.comparingInt(CtNode::getId));
         this.transmissionPolicy = transmissionPolicy;
@@ -30,65 +30,71 @@ public class ChaosStateLogger {
             return "StateHistory is empty.";
         }
 
+//        List<Long> endRounds = transmissionPolicy.();
+        int roundCount = transmissionPolicy.getTotalRounds();
         StringBuilder builder = new StringBuilder();
-        int totalSlotsOfRound = transmissionPolicy.getTotalSlotsOfRound();
-        int maxRound = history.lastKey().round();
 
         // --- Print Rounds Header ---
         builder.append(String.format("%-6s|", "R"));
-        for (int r = 0; r <= maxRound; r++) {
-            for (int s = 0; s < totalSlotsOfRound; s++) {
+        for (int r = 0; r <= roundCount; r++) {
+            long roundLength = transmissionPolicy.getRoundDuration(r);
+            for (int s = 0; s < roundLength; s++) {
                 builder.append(String.format("%-5s", r));
             }
-            builder.append(String.format("%-5s", "|"));
+            builder.append("|");
         }
         builder.append('\n');
 
         // --- Print Slots Header ---
         builder.append(String.format("%-6s|", "S"));
-        for (int r = 0; r <= maxRound; r++) {
-            for (int s = 0; s < totalSlotsOfRound; s++) {
+        for (int r = 0; r <= roundCount; r++) {
+            long roundLength = transmissionPolicy.getRoundDuration(r);
+            for (int s = 0; s < roundLength; s++) {
                 builder.append(String.format("%-5s", s));
             }
-            builder.append(String.format("%-5s", "|"));
+            builder.append("|");
         }
         builder.append('\n');
 
         // --- Print Separator ---
         builder.append(String.format("%-6s|", "------"));
-        for (int r = 0; r <= maxRound; r++) {
-            for (int s = 0; s < totalSlotsOfRound; s++) {
-                builder.append(String.format("%-5s", "-----"));
+        for (int r = 0; r <= roundCount; r++) {
+            long roundLength = transmissionPolicy.getRoundDuration(r);
+            for (int s = 0; s < roundLength; s++) {
+                builder.append("-----");
             }
-            builder.append(String.format("%-5s", "|"));
+            builder.append("|");
         }
         builder.append('\n');
 
         // --- Print Nodes Status ---
         Map<CtNode, String> lastKnownStates = new HashMap<>();
-        String lastKnownState = null;
 
         for (CtNode node : this.nodes) {
             builder.append(String.format("N[%-3d]|", node.getId()));
-            for (int r = 0; r <= maxRound; r++) {
-                for (int s = 0; s < totalSlotsOfRound; s++) {
+
+            for (int r = 0; r <= roundCount; r++) {
+                long roundLength = transmissionPolicy.getRoundDuration(r);
+
+                for (int s = 0; s < roundLength; s++) {
                     CtNetworkTime currentTime = new CtNetworkTime(r, s);
 
+                    String nodeState = null;
                     if (history.containsKey(currentTime) && history.get(currentTime).containsKey(node)) {
-                        lastKnownStates.put(node, history.get(currentTime).get(node));
-                        lastKnownState = history.get(currentTime).get(node);
+                        nodeState = history.get(currentTime).get(node);
+                        lastKnownStates.put(node, nodeState);
                     } else {
-                        lastKnownStates.put(node, lastKnownState);
+                        nodeState = lastKnownStates.get(node);
                     }
 
-                    String stateToPrint = lastKnownStates.get(node);
-                    String symbol = (stateToPrint != null) ? stateToPrint : ".";
+                    String symbol = (nodeState != null) ? nodeState : ".";
                     builder.append(String.format("%-5s", symbol));
                 }
-                builder.append(String.format("%-5s", "|"));
+                builder.append("|");
             }
             builder.append('\n');
         }
+
         return builder.toString();
     }
 }

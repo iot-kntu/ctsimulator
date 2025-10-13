@@ -6,6 +6,7 @@ import ir.ac.kntu.concurrenttransmission.RoundRobinInitiatorStrategy;
 import ir.ac.kntu.concurrenttransmission.chaos.*;
 import ir.ac.kntu.distributedsystems.a2.vote.Vote;
 import ir.ac.kntu.distributedsystems.a2.vote.VoteValue;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +16,7 @@ import java.util.logging.LogManager;
 
 public class A2Vote {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         try {
             startLogger();

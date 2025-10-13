@@ -38,7 +38,7 @@ public interface ConcurrentTransmissionApplication {
     /**
      * Receives message for flooding. It is expected the application relay this call
      * to listeners.
-     * 
+     *
      * @param context         the simulation context
      * @param sender          which neighbor has sent the message
      * @param receivedMessage the full received message, if this argument is

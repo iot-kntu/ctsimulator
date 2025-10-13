@@ -7,6 +7,9 @@ import ir.ac.kntu.concurrenttransmission.NodeState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FloodingState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.ListeningState;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Based on Chaos design, every node in DefaultTransmissionPolicy listens in all
  * slots
@@ -20,11 +23,13 @@ public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
     private final int floodRepeatCount;
     private final int finalFloodRepeatCount;
     private final NetGraph netGraph;
+    private final List<Long> endRounds;
 
     public ChaosDefaultTransmissionPolicy(int floodRepeatCount, int finalFloodRepeatCount, NetGraph netGraph) {
         this.floodRepeatCount = floodRepeatCount;
         this.finalFloodRepeatCount = finalFloodRepeatCount;
         this.netGraph = netGraph;
+        this.endRounds = new ArrayList<>();
     }
 
     @Override
@@ -49,23 +54,62 @@ public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
 
     @Override
     public CtNetworkTime getNetworkTime(long time) {
-        final int totalSlotsOfRound = getTotalSlotsOfRound();
-        int round = (int) (1.0 * time / totalSlotsOfRound);
-        int slot = (int) (time % totalSlotsOfRound);
+        if (endRounds.isEmpty()) {
+            return new CtNetworkTime(0, (int) time);
+        }
 
-        return new CtNetworkTime(round, slot);
+        long prevEnd = 0;
+        int index = 0;
+
+        for (long endTime : endRounds) {
+            if (time < endTime) {
+                long slot = time - prevEnd;
+                return new CtNetworkTime(index, (int) slot);
+            }
+            prevEnd = endTime;
+            index++;
+        }
+
+        long slot = time - endRounds.get(endRounds.size() - 1);
+        return new CtNetworkTime(index, (int) slot);
     }
+
+    @Override
+    public void endRound(long time) {
+        this.endRounds.add(time);
+    }
+
+    @Override
+    public int getTotalRounds() {
+        return this.endRounds.size();
+    }
+
+    @Override
+    public long getRoundDuration(int round) {
+        if (endRounds.isEmpty()) {
+            return -1;
+        }
+        if (round == 0) {
+            return endRounds.get(0);
+        }
+        if (round > 0 && round < endRounds.size()) {
+            return endRounds.get(round) - endRounds.get(round - 1);
+        }
+        return -1;
+    }
+
 
     @Override
     public NodeState getNodeState(CtNode node, int slot) {
         return NodeState.Listen;
-
     }
+
 
     @Override
     public int getTotalSlotsOfRound() {
-        return (netGraph.getNodeCount() + 2 * netGraph.getDiameter() + floodRepeatCount + finalFloodRepeatCount + 1)
-                * 3; // TODO: fix it
+        // With dynamic completion detection, this is now just a maximum bound
+        // The actual round will complete when all nodes reach SleepingState or timeout occurs
+        return 256; // Maximum slots before timeout
     }
 
 }

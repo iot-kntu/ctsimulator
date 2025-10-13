@@ -12,6 +12,7 @@ import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.a2.aggregation.ParticipationFlag;
 import ir.ac.kntu.distributedsystems.a2.vote.VoteFlag;
 import ir.ac.kntu.distributedsystems.a2.vote.VoteValue;
+
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
@@ -29,7 +30,7 @@ public class TwoPhaseCommit implements ChaosNodeListener {
 
     @Override
     public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket,
-            boolean areSimilar) {
+                                     boolean areSimilar) {
         return true;
     }
 
@@ -95,8 +96,8 @@ public class TwoPhaseCommit implements ChaosNodeListener {
     }
 
     private CtMessage<ChaosMessage> handleFinalizingPhase(StatefulNode receiver,
-            CtMessage<ChaosMessage> currentKnowledge,
-            CtMessage<ChaosMessage> receivedKnowledge) {
+                                                          CtMessage<ChaosMessage> currentKnowledge,
+                                                          CtMessage<ChaosMessage> receivedKnowledge) {
 
         TwoPhaseCommitPayload currentPayload = (TwoPhaseCommitPayload) currentKnowledge.content().payload();
         TwoPhaseCommitPayload receivedPayload = (TwoPhaseCommitPayload) receivedKnowledge.content().payload();
@@ -119,8 +120,8 @@ public class TwoPhaseCommit implements ChaosNodeListener {
     }
 
     private CtMessage<ChaosMessage> handleVotingPhase(ContextView context, StatefulNode receiver,
-            CtMessage<ChaosMessage> currentKnowledge,
-            CtMessage<ChaosMessage> receivedKnowledge) {
+                                                      CtMessage<ChaosMessage> currentKnowledge,
+                                                      CtMessage<ChaosMessage> receivedKnowledge) {
 
         TwoPhaseCommitPayload currentPayload = (TwoPhaseCommitPayload) currentKnowledge.content().payload();
         TwoPhaseCommitPayload receivedPayload = (TwoPhaseCommitPayload) receivedKnowledge.content().payload();

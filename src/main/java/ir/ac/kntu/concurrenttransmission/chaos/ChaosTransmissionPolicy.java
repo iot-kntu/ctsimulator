@@ -9,4 +9,11 @@ public interface ChaosTransmissionPolicy extends ConcurrentTransmissionPolicy {
     NodeState getInitialState();
 
     NodeState getInitialFloodState();
+
+    void endRound(long time);
+
+    int getTotalRounds();
+
+    long getRoundDuration(int round);
+
 }

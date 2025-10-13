@@ -37,13 +37,13 @@ public final class OmNodeStatus {
     /**
      * Returns the action is associated to the node with nodeId or returns the
      * defaultAction
-     * @param nodeId the ID of the node searching for its recorded action
-     * @param defaultAction the action is returned if no record found for the given nodeId
      *
+     * @param nodeId        the ID of the node searching for its recorded action
+     * @param defaultAction the action is returned if no record found for the given nodeId
      */
     public OmAction findActionOfNode(int nodeId, OmAction defaultAction) {
         for (CtNode ctNode : receivedNodeActions.keySet()) {
-            if(ctNode.getId() == nodeId)
+            if (ctNode.getId() == nodeId)
                 return receivedNodeActions.get(ctNode);
         }
 
@@ -52,7 +52,7 @@ public final class OmNodeStatus {
 
     public OmAction findActionOfNode(CtNode node, OmAction defaultAction) {
         for (CtNode ctNode : receivedNodeActions.keySet()) {
-            if(ctNode.equals(node))
+            if (ctNode.equals(node))
                 return receivedNodeActions.get(ctNode);
         }
 

@@ -3,16 +3,25 @@ package ir.ac.kntu.concurrenttransmission.chaos;
 import ir.ac.kntu.concurrenttransmission.*;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
+import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FinalFloodingState;
+import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.SleepingState;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
+
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Chaos application that implements dynamic round completion detection.
+ * Rounds complete when all nodes reach SleepingState or when timeout (256
+ * slots) is reached.
+ */
 public class ChaosApplication implements CtChaosApplication {
 
-    private final Logger logger = Logger.getLogger("ChaosApplication");
+    private static final Logger logger = Logger.getLogger(ChaosApplication.class.getSimpleName());
+
     /**
      * The minimum signal difference (in dB) required for the strongest signal
      * to be successfully captured over the interference from other signals.
@@ -25,10 +34,14 @@ public class ChaosApplication implements CtChaosApplication {
     private final SortedMap<CtNode, ChaosNodeListener> listeners;
     private final ChaosStateLogger stateLogger;
     private final SignalModel signalModel;
-    private NodeState startingPoint;
+    private final NodeState startingPoint;
+    private long roundStartTime;
+    private boolean roundCompleted = false;
+    private int nodesInFinalFlooding = 0;
+    private int nodesInSleeping = 0;
 
     public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph,
-            NodeState startingPoint) {
+                            NodeState startingPoint) {
         this.settings = settings;
         this.strategies = strategies;
         this.listeners = new TreeMap<>();
@@ -44,6 +57,24 @@ public class ChaosApplication implements CtChaosApplication {
         this.listeners.put(node, listener);
     }
 
+    /**
+     * Called when a node's state changes to track completion conditions
+     */
+    public void onNodeStateChanged(StatefulNode node, NodeState oldState, NodeState newState) {
+        if (oldState instanceof FinalFloodingState) {
+            nodesInFinalFlooding--;
+        } else if (oldState instanceof SleepingState) {
+            nodesInSleeping--;
+        }
+
+        if (newState instanceof FinalFloodingState) {
+            nodesInFinalFlooding++;
+        } else if (newState instanceof SleepingState) {
+            nodesInSleeping++;
+        }
+    }
+
+
     public ChaosStateLogger getStateLogger() {
         return this.stateLogger;
     }
@@ -55,12 +86,14 @@ public class ChaosApplication implements CtChaosApplication {
 
     @Override
     public void simulationStarting(ContextView context) {
+        roundStartTime = context.getTime();
+        roundCompleted = false;
         newRound(context);
     }
 
     @Override
     public void simulationFinishing(ContextView context) {
-
+        strategies.transmissionPolicy().endRound(context.getTime() + 1);
     }
 
     @Override
@@ -77,6 +110,12 @@ public class ChaosApplication implements CtChaosApplication {
                 }
             }
         }
+
+        // Check for timeout
+        if (!roundCompleted && (context.getTime() - roundStartTime) >= transmissionPolicy.getTotalSlotsOfRound()) {
+            logger.log(Level.INFO, "Round timeout reached at slot " + (context.getTime() - roundStartTime));
+            completeRound(context);
+        }
     }
 
     @Override
@@ -85,21 +124,72 @@ public class ChaosApplication implements CtChaosApplication {
             logger.log(Level.INFO, "======== round " + getRound() + " completed ===========");
 
         if (getRound() < settings.roundLimit()) {
-            final int nextInitiatorId = strategies.initiatorStrategy().getNextInitiatorId(); // TODO: fix it
+            roundStartTime = context.getTime();
+            roundCompleted = false;
+
+            // Reset state counters
+            nodesInFinalFlooding = 0;
+            nodesInSleeping = 0;
+
+            logger.log(Level.INFO, "Starting new round " + (getRound() + 1) + " at time " + context.getTime());
+
+            final int nextInitiatorId = strategies.initiatorStrategy().getNextInitiatorId();
             context.getNetGraph().getNodes().forEach(node -> {
                 if (node instanceof StatefulNode) {
-                    CtMessage<ChaosMessage> initialMessage = (CtMessage<ChaosMessage>) getChaosNodeListener(node)
+                    CtMessage<ChaosMessage> initialMessage = getChaosNodeListener(node)
                             .initiateMessage(context, node, context.getNetGraph().getNodeById(nextInitiatorId));
                     ((StatefulNode) node).initializeForNewRound(context, initialMessage, this.stateLogger,
                             startingPoint);
+
+                    // Update state counters based on initial state
+                    if (startingPoint instanceof FinalFloodingState) {
+                        nodesInFinalFlooding++;
+                    } else if (startingPoint instanceof SleepingState) {
+                        nodesInSleeping++;
+                    }
                 }
             });
 
             SimInitiateFloodEvent initiateFloodEvent = new SimInitiateFloodEvent(context.getTime(), nextInitiatorId);
             context.getSimulator().scheduleEvent(initiateFloodEvent);
-            context.getSimulator().scheduleEvent(
-                    new SimNewRoundEvent(context.getTime() + strategies.transmissionPolicy().getTotalSlotsOfRound()));
+        } else {
+            logger.log(Level.INFO, "All rounds completed. Simulation finished.");
         }
+    }
+
+    public void checkRoundCompletion(ContextView context) {
+        if (roundCompleted)
+            return;
+
+        // Log current states of all nodes for debugging
+        StringBuilder stateLog = new StringBuilder("Node states: ");
+        context.getNetGraph().getNodes().stream()
+                .filter(node -> node instanceof StatefulNode)
+                .forEach(node -> {
+                    StatefulNode statefulNode = (StatefulNode) node;
+                    stateLog.append(String.format("Node[%d]=%s ", node.getId(), statefulNode.getCurrentState()));
+                });
+        logger.log(Level.FINE, stateLog.toString());
+
+        int totalNodes = listeners.size();
+        boolean allSleeping = nodesInSleeping == totalNodes;
+
+        if (allSleeping) {
+            completeRound(context);
+        }
+    }
+
+    private void completeRound(ContextView context) {
+        if (roundCompleted)
+            return;
+
+        roundCompleted = true;
+        long actualSlotsUsed = context.getTime() - roundStartTime;
+        logger.log(Level.INFO, "Round completed in " + actualSlotsUsed + " slots");
+        strategies.transmissionPolicy().endRound(context.getTime() + 1);
+
+        // Schedule next round
+        context.getSimulator().scheduleEvent(new SimNewRoundEvent(context.getTime() + 1));
     }
 
     @Override
@@ -133,7 +223,7 @@ public class ChaosApplication implements CtChaosApplication {
     }
 
     private FloodPacket<?> selectPacketBySignal(List<FloodPacket<?>> packets, StatefulNode receiver,
-            ContextView context) {
+                                                ContextView context) {
         if (packets.size() == 1) {
             return packets.get(0);
         }
@@ -210,11 +300,11 @@ public class ChaosApplication implements CtChaosApplication {
     }
 
     public int getRound() {
-        return networkTime.round();
+        return this.networkTime != null ? this.networkTime.round() : 0;
     }
 
     public int getSlot() {
-        return networkTime.slot();
+        return this.networkTime != null ? this.networkTime.slot() : 0;
     }
 
 }

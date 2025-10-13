@@ -8,6 +8,7 @@ import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
 import ir.ac.kntu.concurrenttransmission.chaos.FlagField;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+
 import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
@@ -92,10 +93,10 @@ public class Vote implements ChaosNodeListener {
         }
 
 
-
         ChaosMessage mergedContent = new ChaosMessage(mergedFlags, authoritativeProposal);
         return new CtMessage<>(receivedKnowledgeMsg.initiator(), mergedContent);
     }
+
     @Override
     public CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat) {
         return null;

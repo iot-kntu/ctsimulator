@@ -11,6 +11,7 @@ public record CollectPayload(Map<Integer, Object> dataMap) {
 
     /**
      * Creates a new payload by merging the current data map with a received one.
+     *
      * @param other The payload from the received packet.
      * @return A new, merged CollectPayload.
      */

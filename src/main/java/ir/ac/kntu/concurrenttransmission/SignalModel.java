@@ -52,7 +52,7 @@ public class SignalModel {
 
     /**
      * Converts power from dBm to milliwatts (mW).
-     * 
+     *
      * @param dbm The power in dBm.
      * @return The power in mW.
      */
@@ -62,7 +62,7 @@ public class SignalModel {
 
     /**
      * Converts power from milliwatts (mW) to dBm.
-     * 
+     *
      * @param milliwatts The power in mW.
      * @return The power in dBm.
      */
