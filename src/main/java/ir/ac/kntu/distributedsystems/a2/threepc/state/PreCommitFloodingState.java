@@ -1,0 +1,50 @@
+package ir.ac.kntu.distributedsystems.a2.threepc.state;
+
+import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.CtMessage;
+import ir.ac.kntu.concurrenttransmission.chaos.ChaosMessage;
+import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
+import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
+import ir.ac.kntu.concurrenttransmission.events.Event;
+import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
+
+public class PreCommitFloodingState implements NodeState {
+
+    @Override
+    public void onPacketReceived(StatefulNode node, ContextView context, FloodPacket<?> capturedPacket) {
+
+    }
+
+    @Override
+    public void onEnter(StatefulNode node, ContextView context) {
+        CtMessage<ChaosMessage> message = node.getKnowledge();
+        int totalNodes = context.getNetGraph().getNodeCount();
+        boolean allNodesParticipated = message.content().flags().getParticipationCount() == totalNodes;
+
+        node.floodMessage(context, node, node.getKnowledge());
+        long endOfFloodTime = context.getTime()
+                + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
+
+        context.getSimulator().scheduleEvent(
+                Event.create("FinishedFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
+                    if (node.getCurrentState() instanceof PreCommitFloodingState) {
+                        if (allNodesParticipated) {
+                            node.setState(new CommitWaitingState(), context);
+                        } else {
+                            node.setState(new PreCommitListeningState(), context);
+                        }
+                    }
+                }));
+    }
+
+    @Override
+    public void onSlotStart(StatefulNode node, ContextView context) {
+
+    }
+
+    @Override
+    public String toString() {
+        return "pT";
+    }
+}
