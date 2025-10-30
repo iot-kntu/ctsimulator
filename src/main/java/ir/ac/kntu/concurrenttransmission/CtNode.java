@@ -1,12 +1,10 @@
 package ir.ac.kntu.concurrenttransmission;
 
-import ir.ac.kntu.concurrenttransmission.blueflood.nodes.LoyalCtNode;
-
 import java.util.Objects;
 
 public interface CtNode extends Comparable<CtNode> {
 
-    CtNode NULL_NODE = new LoyalCtNode(-1);
+    CtNode NULL_NODE = NullCtNode.INSTANCE;
 
     void initiateFlood(ContextView context, CtNode initiatorNode);
 

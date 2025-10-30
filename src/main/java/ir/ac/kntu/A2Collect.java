@@ -1,77 +1,67 @@
 package ir.ac.kntu;
 
-import ir.ac.kntu.concurrenttransmission.CtSimulator;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.RoundRobinInitiatorStrategy;
 import ir.ac.kntu.concurrenttransmission.chaos.*;
+import ir.ac.kntu.concurrenttransmission.graph.CtNodeFactory;
+import ir.ac.kntu.concurrenttransmission.graph.ReflectionCtNodeFactory;
 import ir.ac.kntu.distributedsystems.a2.collect.Collect;
+import ir.ac.kntu.simulation.ScenarioRunner;
+import ir.ac.kntu.simulation.SimulationScenario;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.logging.LogManager;
 
-public class A2Collect {
+public class A2Collect implements SimulationScenario<ChaosApplication> {
+
+    private static final int EXECUTION_ROUNDS = 2;
+    private static final int FLOOD_REPEAT_SLOTS = 1;
+    private static final int FINAL_FLOOD_REPEAT_SLOTS = 3;
+
     public static void main(String[] args) {
-        try {
-            startLogger();
-
-            final NetGraph netGraph = NetGraph.loadFrom("sample.graph");
-            System.out.println("Graph diameter = " + netGraph.getDiameter());
-            System.out.println("================================");
-
-            if (netGraph.isEmpty())
-                throw new IllegalArgumentException("Invalid graph file format.");
-
-            final int executionRounds = 2;
-            final int floodRepeatSlots = 1;
-            final int finalFloodRepeatSlots = 3;
-
-            ChaosSettings settings = new ChaosSettings(0.0, executionRounds);
-
-            ChaosTransmissionPolicy transmissionPolicy = new ChaosDefaultTransmissionPolicy(floodRepeatSlots,
-                    finalFloodRepeatSlots, netGraph);
-
-            ChaosStrategies strategies = new ChaosStrategies(
-                    new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),
-                    transmissionPolicy);
-
-            ChaosApplication chaosApplication = new ChaosApplication(settings, strategies, netGraph,
-                    transmissionPolicy.getInitialState());
-
-            netGraph.getNodes().forEach(node -> {
-                Queue<Object> dataQueue = new LinkedList<>();
-                dataQueue.add(node.getId() * node.getId());
-                dataQueue.add(node.getId() * 10);
-
-                chaosApplication.setListener(node, new Collect(dataQueue));
-            });
-
-            CtSimulator simulator = CtSimulator.createInstance(netGraph, chaosApplication);
-            simulator.start();
-
-            System.out.println(chaosApplication.getStateLogger().printTimeline());
-
-        } catch (Exception e) {
-            System.err.println("High level error occurred: ");
-            e.printStackTrace();
-        }
+        ScenarioRunner.run(new A2Collect());
     }
 
-    private static void startLogger() throws IOException {
-        InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("logging.properties");
+    @Override
+    public Path graphPath() {
+        return Path.of("sample.graph");
+    }
 
-        if (inputStream == null) {
-            System.err.println("Cannot find logging config file, is package corrupted??");
-            System.exit(2);
-        }
+    @Override
+    public CtNodeFactory nodeFactory() {
+        return new ReflectionCtNodeFactory("ir.ac.kntu.concurrenttransmission.chaos.nodes");
+    }
 
-        File logDir = new File("logs").getAbsoluteFile();
-        if (!logDir.exists())
-            logDir.mkdir();
+    @Override
+    public ChaosApplication createApplication(NetGraph netGraph) {
+        ChaosSettings settings = new ChaosSettings(0.0, EXECUTION_ROUNDS);
 
-        LogManager.getLogManager().readConfiguration(inputStream);
+        ChaosTransmissionPolicy transmissionPolicy = new ChaosDefaultTransmissionPolicy(
+                FLOOD_REPEAT_SLOTS,
+                FINAL_FLOOD_REPEAT_SLOTS,
+                netGraph);
+
+        ChaosStrategies strategies = new ChaosStrategies(
+                new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),
+                transmissionPolicy);
+
+        return new ChaosApplication(settings, strategies, netGraph, transmissionPolicy.getInitialState());
+    }
+
+    @Override
+    public void configure(NetGraph netGraph, ChaosApplication application) {
+        netGraph.getNodes().forEach(node -> {
+            Queue<Object> dataQueue = new LinkedList<>();
+            dataQueue.add(node.getId() * node.getId());
+            dataQueue.add(node.getId() * 10);
+
+            application.setListener(node, new Collect(dataQueue));
+        });
+    }
+
+    @Override
+    public void onSimulationFinished(ChaosApplication application) {
+        System.out.println(application.getStateLogger().printTimeline());
     }
 }

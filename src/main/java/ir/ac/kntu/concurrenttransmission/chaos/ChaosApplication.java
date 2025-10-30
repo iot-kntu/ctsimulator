@@ -1,10 +1,9 @@
 package ir.ac.kntu.concurrenttransmission.chaos;
 
+import ir.ac.kntu.concurrenttransmission.AbstractConcurrentTransmissionApplication;
 import ir.ac.kntu.concurrenttransmission.*;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
-import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FinalFloodingState;
-import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.SleepingState;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
@@ -18,7 +17,8 @@ import java.util.logging.Logger;
  * Rounds complete when all nodes reach SleepingState or when timeout (256
  * slots) is reached.
  */
-public class ChaosApplication implements CtChaosApplication {
+public class ChaosApplication extends AbstractConcurrentTransmissionApplication<ChaosNodeListener>
+        implements CtChaosApplication {
 
     private static final Logger logger = Logger.getLogger(ChaosApplication.class.getSimpleName());
 
@@ -30,48 +30,31 @@ public class ChaosApplication implements CtChaosApplication {
     private static final double CAPTURE_THRESHOLD_DB = 0;
     protected final ChaosStrategies strategies;
     private final ChaosSettings settings;
-    private CtNetworkTime networkTime;
-    private final SortedMap<CtNode, ChaosNodeListener> listeners;
     private final ChaosStateLogger stateLogger;
     private final SignalModel signalModel;
     private final NodeState startingPoint;
-    private long roundStartTime;
-    private boolean roundCompleted = false;
-    private int nodesInFinalFlooding = 0;
-    private int nodesInSleeping = 0;
+    private final ChaosRoundLifecycle roundLifecycle;
 
     public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph,
                             NodeState startingPoint) {
         this.settings = settings;
         this.strategies = strategies;
-        this.listeners = new TreeMap<>();
         this.stateLogger = new ChaosStateLogger(new ArrayList<>(netGraph.getNodes()), strategies.transmissionPolicy());
         this.signalModel = new SignalModel();
         this.startingPoint = startingPoint;
+        this.roundLifecycle = new ChaosRoundLifecycle(strategies.transmissionPolicy());
     }
 
+    @Override
     public void setListener(CtNode node, ChaosNodeListener listener) {
-        Objects.requireNonNull(node);
-        Objects.requireNonNull(listener);
-
-        this.listeners.put(node, listener);
+        super.setListener(node, listener);
     }
 
     /**
      * Called when a node's state changes to track completion conditions
      */
     public void onNodeStateChanged(StatefulNode node, NodeState oldState, NodeState newState) {
-        if (oldState instanceof FinalFloodingState) {
-            nodesInFinalFlooding--;
-        } else if (oldState instanceof SleepingState) {
-            nodesInSleeping--;
-        }
-
-        if (newState instanceof FinalFloodingState) {
-            nodesInFinalFlooding++;
-        } else if (newState instanceof SleepingState) {
-            nodesInSleeping++;
-        }
+        roundLifecycle.onNodeStateChanged(oldState, newState);
     }
 
 
@@ -80,20 +63,13 @@ public class ChaosApplication implements CtChaosApplication {
     }
 
     @Override
-    public CtNetworkTime getNetworkTime() {
-        return networkTime;
-    }
-
-    @Override
     public void simulationStarting(ContextView context) {
-        roundStartTime = context.getTime();
-        roundCompleted = false;
         newRound(context);
     }
 
     @Override
     public void simulationFinishing(ContextView context) {
-        if (!roundCompleted)
+        if (!roundLifecycle.isRoundCompleted())
             strategies.transmissionPolicy().endRound(context.getTime() + 1);
     }
 
@@ -102,7 +78,7 @@ public class ChaosApplication implements CtChaosApplication {
         Objects.requireNonNull(context);
 
         final ChaosTransmissionPolicy transmissionPolicy = strategies.transmissionPolicy();
-        this.networkTime = transmissionPolicy.getNetworkTime(context.getTime());
+        updateNetworkTime(transmissionPolicy.getNetworkTime(context.getTime()));
 
         for (CtNode node : context.getNetGraph().getNodes()) {
             if (node instanceof StatefulNode statefulNode) {
@@ -113,24 +89,20 @@ public class ChaosApplication implements CtChaosApplication {
         }
 
         // Check for timeout
-        if (!roundCompleted && (context.getTime() - roundStartTime) >= transmissionPolicy.getTotalSlotsOfRound()) {
-            logger.log(Level.INFO, "Round timeout reached at slot " + (context.getTime() - roundStartTime));
+        if (roundLifecycle.shouldTimeout(context.getTime())) {
+            logger.log(Level.INFO,
+                    "Round timeout reached at slot " + roundLifecycle.elapsedSlots(context.getTime()));
             completeRound(context);
         }
     }
 
     @Override
     public void newRound(ContextView context) {
-        if (this.networkTime != null && this.networkTime.round() > 0)
+        if (getNetworkTime() != null && getNetworkTime().round() > 0)
             logger.log(Level.INFO, "======== round " + getRound() + " completed ===========");
 
         if (getRound() < settings.roundLimit()) {
-            roundStartTime = context.getTime();
-            roundCompleted = false;
-
-            // Reset state counters
-            nodesInFinalFlooding = 0;
-            nodesInSleeping = 0;
+            roundLifecycle.reset(context.getTime());
 
             logger.log(Level.INFO, "Starting new round " + (getRound() + 1) + " at time " + context.getTime());
 
@@ -141,13 +113,6 @@ public class ChaosApplication implements CtChaosApplication {
                             .initiateMessage(context, node, context.getNetGraph().getNodeById(nextInitiatorId));
                     ((StatefulNode) node).initializeForNewRound(context, initialMessage, this.stateLogger,
                             startingPoint);
-
-                    // Update state counters based on initial state
-                    if (startingPoint instanceof FinalFloodingState) {
-                        nodesInFinalFlooding++;
-                    } else if (startingPoint instanceof SleepingState) {
-                        nodesInSleeping++;
-                    }
                 }
             });
 
@@ -159,7 +124,7 @@ public class ChaosApplication implements CtChaosApplication {
     }
 
     public void checkRoundCompletion(ContextView context) {
-        if (roundCompleted)
+        if (roundLifecycle.isRoundCompleted())
             return;
 
         // Log current states of all nodes for debugging
@@ -172,20 +137,19 @@ public class ChaosApplication implements CtChaosApplication {
                 });
         logger.log(Level.FINE, stateLog.toString());
 
-        int totalNodes = listeners.size();
-        boolean allSleeping = nodesInSleeping == totalNodes;
+        int totalNodes = listenersView().size();
 
-        if (allSleeping) {
+        if (roundLifecycle.shouldCompleteBySleeping(totalNodes)) {
             completeRound(context);
         }
     }
 
     private void completeRound(ContextView context) {
-        if (roundCompleted)
+        if (roundLifecycle.isRoundCompleted())
             return;
 
-        roundCompleted = true;
-        long actualSlotsUsed = context.getTime() - roundStartTime;
+        roundLifecycle.markCompleted();
+        long actualSlotsUsed = roundLifecycle.elapsedSlots(context.getTime());
         logger.log(Level.INFO, "Round completed in " + actualSlotsUsed + " slots");
         strategies.transmissionPolicy().endRound(context.getTime() + 1);
 
@@ -289,11 +253,7 @@ public class ChaosApplication implements CtChaosApplication {
      */
     @Override
     public ChaosNodeListener getChaosNodeListener(CtNode node) {
-        final ChaosNodeListener listener = listeners.get(node);
-        if (listener == null) {
-            throw new IllegalStateException("No listener defined for node " + node);
-        }
-        return listener;
+        return getListener(node);
     }
 
     public Logger getLogger() {
@@ -301,11 +261,13 @@ public class ChaosApplication implements CtChaosApplication {
     }
 
     public int getRound() {
-        return this.networkTime != null ? this.networkTime.round() : 0;
+        CtNetworkTime networkTime = getNetworkTime();
+        return networkTime != null ? networkTime.round() : 0;
     }
 
     public int getSlot() {
-        return this.networkTime != null ? this.networkTime.slot() : 0;
+        CtNetworkTime networkTime = getNetworkTime();
+        return networkTime != null ? networkTime.slot() : 0;
     }
 
 }

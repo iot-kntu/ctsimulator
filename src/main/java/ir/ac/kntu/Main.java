@@ -1,81 +1,62 @@
 package ir.ac.kntu;
 
-import ir.ac.kntu.concurrenttransmission.CtSimulator;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.RoundRobinInitiatorStrategy;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodApplication;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodSettings;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodStrategies;
 import ir.ac.kntu.concurrenttransmission.blueflood.DefaultTransmissionPolicy;
+import ir.ac.kntu.concurrenttransmission.graph.CtNodeFactory;
+import ir.ac.kntu.concurrenttransmission.graph.ReflectionCtNodeFactory;
 import ir.ac.kntu.distributedsystems.fault.om.OmAction;
 import ir.ac.kntu.distributedsystems.fault.om.ReplicatedWriteOralMessage;
+import ir.ac.kntu.simulation.ScenarioRunner;
+import ir.ac.kntu.simulation.SimulationScenario;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.logging.LogManager;
+import java.nio.file.Path;
 
+public class Main implements SimulationScenario<BlueFloodApplication> {
 
-public class Main {
+    private static final int BLUEFLOOD_REPEAT_SLOTS = 3;
+    private static final int EXECUTION_ROUNDS = 5;
+    private static final double LOSS_PROBABILITY = 0.0;
 
     public static void main(String[] args) {
-
-        try {
-            startLogger();
-
-            final NetGraph netGraph = NetGraph.loadFrom("sample.graph");
-            final int graphDiameter = netGraph.getDiameter();
-            System.out.println("graphDiameter = " + graphDiameter);
-            System.out.println("================================");
-
-            //noinspection
-            if (netGraph.isEmpty())
-                throw new IllegalArgumentException("Invalid graph file format, it is not loaded");
-
-            final double lossProbability = 0.0;
-            final int executionRounds = 5;
-            final int blueFloodRepeatSlots = 3;
-
-            BlueFloodSettings settings = new BlueFloodSettings(
-                    lossProbability,
-                    BlueFloodApplication.DEFAULT_INTERFERENCE_PROB,
-                    executionRounds
-            );
-
-            BlueFloodStrategies strategies = new BlueFloodStrategies(
-                    new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),
-                    new DefaultTransmissionPolicy(blueFloodRepeatSlots, netGraph)
-            );
-
-            BlueFloodApplication blueFloodApplication = new BlueFloodApplication(settings, strategies);
-            //netGraph.getNodes().forEach(node -> blueFloodApplication.setListener(node, new PrimaryBasedOralMessage()));
-            netGraph.getNodes().forEach(node -> blueFloodApplication
-                    .setListener(node, new ReplicatedWriteOralMessage(OmAction.Retreat, 1, OmAction.Attack)));
-
-            CtSimulator simulator = CtSimulator.createInstance(netGraph, blueFloodApplication);
-            simulator.start();
-
-            System.out.println(blueFloodApplication.printTimeline());
-        } catch (Exception e) {
-            System.err.println("High level error occurred: ");
-            e.printStackTrace();
-        }
+        ScenarioRunner.run(new Main());
     }
 
-    private static void startLogger() throws IOException {
-        InputStream inputStream = ClassLoader.getSystemClassLoader().getResourceAsStream("logging.properties");
-
-        if (inputStream == null) {
-            System.err.println("Cannot find logging config file, is package corrupted??");
-            System.exit(2);
-        }
-
-        File logDir = new File("logs").getAbsoluteFile();
-        if (!logDir.exists())
-            logDir.mkdir();
-
-        LogManager.getLogManager().readConfiguration(inputStream);
+    @Override
+    public Path graphPath() {
+        return Path.of("sample.graph");
     }
 
+    @Override
+    public CtNodeFactory nodeFactory() {
+        return new ReflectionCtNodeFactory("ir.ac.kntu.concurrenttransmission.blueflood.nodes");
+    }
+
+    @Override
+    public BlueFloodApplication createApplication(NetGraph netGraph) {
+        BlueFloodSettings settings = new BlueFloodSettings(
+                LOSS_PROBABILITY,
+                BlueFloodApplication.DEFAULT_INTERFERENCE_PROB,
+                EXECUTION_ROUNDS);
+
+        BlueFloodStrategies strategies = new BlueFloodStrategies(
+                new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),
+                new DefaultTransmissionPolicy(BLUEFLOOD_REPEAT_SLOTS, netGraph));
+
+        return new BlueFloodApplication(settings, strategies);
+    }
+
+    @Override
+    public void configure(NetGraph netGraph, BlueFloodApplication application) {
+        netGraph.getNodes().forEach(node -> application
+                .setListener(node, new ReplicatedWriteOralMessage(OmAction.Retreat, 1, OmAction.Attack)));
+    }
+
+    @Override
+    public void onSimulationFinished(BlueFloodApplication application) {
+        System.out.println(application.printTimeline());
+    }
 }
-

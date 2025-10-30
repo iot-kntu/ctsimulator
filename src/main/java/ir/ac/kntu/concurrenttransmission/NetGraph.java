@@ -1,5 +1,8 @@
 package ir.ac.kntu.concurrenttransmission;
 
+import ir.ac.kntu.concurrenttransmission.graph.CompositeCtNodeFactory;
+import ir.ac.kntu.concurrenttransmission.graph.CtNodeFactory;
+import ir.ac.kntu.concurrenttransmission.graph.ReflectionCtNodeFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.geom.Point2D;
@@ -20,6 +23,12 @@ public class NetGraph {
     }
 
     public static @NotNull NetGraph loadFrom(String path) throws Exception {
+        return loadFrom(path, new CompositeCtNodeFactory(
+                new ReflectionCtNodeFactory("ir.ac.kntu.concurrenttransmission.chaos.nodes"),
+                new ReflectionCtNodeFactory("ir.ac.kntu.concurrenttransmission.blueflood.nodes")));
+    }
+
+    public static @NotNull NetGraph loadFrom(String path, CtNodeFactory nodeFactory) throws Exception {
         NetGraph netGraph = new NetGraph();
         HashMap<CtNode, List<Integer>> nodeNeighborsId = new HashMap<>();
         int lineCounter = 0;
@@ -46,9 +55,7 @@ public class NetGraph {
                 final double x = Double.parseDouble(splitWithSemicolon[3].trim());
                 final double y = Double.parseDouble(splitWithSemicolon[4].trim());
 
-                final Class<?> nodeClass = Class.forName(
-                        "ir.ac.kntu.concurrenttransmission.chaos.nodes." + className);
-                final CtNode instance = (CtNode) nodeClass.getDeclaredConstructor(Integer.class).newInstance(nodeId);
+                final CtNode instance = nodeFactory.create(className, nodeId);
 
                 netGraph.nodes.add(instance);
                 netGraph.neighborsMap.put(instance, new ArrayList<>());

@@ -1,5 +1,6 @@
 package ir.ac.kntu.concurrenttransmission.blueflood;
 
+import ir.ac.kntu.concurrenttransmission.AbstractConcurrentTransmissionApplication;
 import ir.ac.kntu.concurrenttransmission.*;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
@@ -9,32 +10,23 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BlueFloodApplication implements CtBlueFloodApplication {
+public class BlueFloodApplication extends AbstractConcurrentTransmissionApplication<BlueFloodNodeListener>
+        implements CtBlueFloodApplication {
 
     public static double DEFAULT_INTERFERENCE_PROB = 0.9;
     protected final BlueFloodStrategies strategies;
     private final Logger logger = Logger.getLogger("BlueFloodApplication");
     private final BlueFloodSettings settings;
     private final Random random = new Random(new Date().getTime());
-    private CtNetworkTime networkTime;
-    private final SortedMap<CtNode, BlueFloodNodeListener> listeners;
 
     public BlueFloodApplication(BlueFloodSettings settings, BlueFloodStrategies strategies) {
         this.settings = settings;
         this.strategies = strategies;
-        this.listeners = new TreeMap<>();
-    }
-
-    public void setListener(CtNode node, BlueFloodNodeListener listener) {
-        Objects.requireNonNull(node);
-        Objects.requireNonNull(listener);
-
-        this.listeners.put(node, listener);
     }
 
     @Override
-    public CtNetworkTime getNetworkTime() {
-        return networkTime;
+    public void setListener(CtNode node, BlueFloodNodeListener listener) {
+        super.setListener(node, listener);
     }
 
     @Override
@@ -52,12 +44,12 @@ public class BlueFloodApplication implements CtBlueFloodApplication {
         Objects.requireNonNull(context);
 
         final TransmissionPolicy transmissionPolicy = strategies.transmissionPolicy();
-        this.networkTime = transmissionPolicy.getNetworkTime(context.getTime());
+        updateNetworkTime(transmissionPolicy.getNetworkTime(context.getTime()));
     }
 
     @Override
     public void newRound(ContextView context) {
-        if (this.networkTime != null && this.networkTime.round() > 0)
+        if (getNetworkTime() != null && getNetworkTime().round() > 0)
             logger.log(Level.INFO, "======== round " + getRound() + " completed ===========");
 
         if (getRound() < settings.roundLimit()) {
@@ -77,7 +69,7 @@ public class BlueFloodApplication implements CtBlueFloodApplication {
 
         final CtNode inode = getInitiatorNode(context);
 
-        strategies.transmissionPolicy().newRound(networkTime, inode);
+        strategies.transmissionPolicy().newRound(getNetworkTime(), inode);
 
         inode.initiateFlood(context, inode);
 
@@ -120,8 +112,8 @@ public class BlueFloodApplication implements CtBlueFloodApplication {
 
                     getLogger().log(Level.INFO, String.format("[t:%d-r:%d-s:%d] node[%d] received Pkt[%d]",
                             context.getTime(),
-                            networkTime.round(),
-                            networkTime.slot(),
+                            getRound(),
+                            getSlot(),
                             receiver.getId(), thePacket.ctMessage().messageNo()));
 
                     boolean shouldFlood = getBlueFloodListener(receiver).ctPacketsReceived(context, packets, thePacket,
@@ -175,18 +167,16 @@ public class BlueFloodApplication implements CtBlueFloodApplication {
     }
 
     public int getRound() {
-        return networkTime.round();
+        CtNetworkTime networkTime = getNetworkTime();
+        return networkTime != null ? networkTime.round() : 0;
     }
 
     public int getSlot() {
-        return networkTime.slot();
+        CtNetworkTime networkTime = getNetworkTime();
+        return networkTime != null ? networkTime.slot() : 0;
     }
 
     private BlueFloodNodeListener getBlueFloodListener(CtNode node) {
-        final BlueFloodNodeListener listener = listeners.get(node);
-        if (listener == null)
-            throw new IllegalStateException("No listener defined for node " + node);
-
-        return listener;
+        return getListener(node);
     }
 }
