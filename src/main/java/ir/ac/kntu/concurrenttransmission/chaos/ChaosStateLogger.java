@@ -25,12 +25,20 @@ public class ChaosStateLogger {
         stateMap.put(node, nodeState);
     }
 
+    /**
+     * Returns a defensive copy of the collected node states keyed by network time.
+     */
+    public SortedMap<CtNetworkTime, Map<CtNode, String>> snapshotHistory() {
+        SortedMap<CtNetworkTime, Map<CtNode, String>> copy = new TreeMap<>();
+        history.forEach((time, stateMap) -> copy.put(time, Collections.unmodifiableMap(new HashMap<>(stateMap))));
+        return Collections.unmodifiableSortedMap(copy);
+    }
+
     public String printTimeline() {
         if (history.isEmpty()) {
             return "StateHistory is empty.";
         }
 
-//        List<Long> endRounds = transmissionPolicy.();
         int roundCount = transmissionPolicy.getTotalRounds();
         StringBuilder builder = new StringBuilder();
 
