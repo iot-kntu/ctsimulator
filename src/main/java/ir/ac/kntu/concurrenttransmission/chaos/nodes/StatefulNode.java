@@ -15,7 +15,14 @@ public interface StatefulNode extends CtNode {
 
     void handlePacket(ContextView context, FloodPacket<?> packet);
 
-    void setState(NodeState newState, ContextView context);
+    default void beginSlot(ContextView context) {
+    }
+
+    default void setState(NodeState newState, ContextView context) {
+        setState(newState, context, false);
+    }
+
+    void setState(NodeState newState, ContextView context, boolean immediate);
 
     NodeState getCurrentState();
 

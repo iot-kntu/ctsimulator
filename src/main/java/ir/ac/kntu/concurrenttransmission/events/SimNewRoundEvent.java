@@ -1,6 +1,7 @@
-package ir.ac.kntu.concurrenttransmission;
+package ir.ac.kntu.concurrenttransmission.events;
 
-import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
+import ir.ac.kntu.concurrenttransmission.BaseSimEvent;
+import ir.ac.kntu.concurrenttransmission.ContextView;
 
 public class SimNewRoundEvent extends BaseSimEvent {
     public SimNewRoundEvent(long time) {

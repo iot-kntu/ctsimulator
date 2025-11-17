@@ -1,12 +1,13 @@
 package ir.ac.kntu.concurrenttransmission.chaos;
 
-import ir.ac.kntu.concurrenttransmission.AbstractConcurrentTransmissionApplication;
 import ir.ac.kntu.concurrenttransmission.*;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
+import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.SleepingState;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
+import ir.ac.kntu.concurrenttransmission.events.SimNewRoundEvent;
 
 import java.awt.geom.Point2D;
 import java.io.BufferedWriter;
@@ -41,16 +42,21 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
     private final NodeState startingPoint;
     private final ChaosRoundLifecycle roundLifecycle;
     private final ChaosScenarioRecorder scenarioRecorder;
+    private boolean roundActive;
+    private int roundsCompleted;
 
     public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph,
                             NodeState startingPoint) {
-        this.settings = settings;
+        this.settings = Objects.requireNonNull(settings, "settings");
         this.strategies = strategies;
         this.stateLogger = new ChaosStateLogger(new ArrayList<>(netGraph.getNodes()), strategies.transmissionPolicy());
         this.signalModel = new SignalModel();
-        this.startingPoint = startingPoint;
+        this.startingPoint = Objects.requireNonNullElseGet(startingPoint,
+                () -> strategies.transmissionPolicy().getInitialState());
         this.roundLifecycle = new ChaosRoundLifecycle(strategies.transmissionPolicy());
         this.scenarioRecorder = new ChaosScenarioRecorder();
+        this.roundActive = false;
+        this.roundsCompleted = 0;
     }
 
     @Override
@@ -64,7 +70,6 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
     public void onNodeStateChanged(StatefulNode node, NodeState oldState, NodeState newState) {
         roundLifecycle.onNodeStateChanged(oldState, newState);
     }
-
 
     public ChaosStateLogger getStateLogger() {
         return this.stateLogger;
@@ -88,10 +93,16 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         final ChaosTransmissionPolicy transmissionPolicy = strategies.transmissionPolicy();
         updateNetworkTime(transmissionPolicy.getNetworkTime(context.getTime()));
 
+        if (!roundActive) {
+            return;
+        }
+
         for (CtNode node : context.getNetGraph().getNodes()) {
             if (node instanceof StatefulNode statefulNode) {
-                if (statefulNode.getCurrentState() != null) {
-                    statefulNode.getCurrentState().onSlotStart(statefulNode, context);
+                statefulNode.beginSlot(context);
+                NodeState state = statefulNode.getCurrentState();
+                if (state != null) {
+                    state.onSlotStart(statefulNode, context);
                 }
             }
         }
@@ -106,33 +117,47 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
 
     @Override
     public void newRound(ContextView context) {
-        if (getNetworkTime() != null && getNetworkTime().round() > 0)
-            logger.log(Level.INFO, "======== round " + getRound() + " completed ===========");
-
-        if (getRound() < settings.roundLimit()) {
-            roundLifecycle.reset(context.getTime());
-
-            logger.log(Level.INFO, "Starting new round " + (getRound() + 1) + " at time " + context.getTime());
-
-            final int nextInitiatorId = strategies.initiatorStrategy().getNextInitiatorId();
-            context.getNetGraph().getNodes().forEach(node -> {
-                if (node instanceof StatefulNode) {
-                    CtMessage<ChaosMessage> initialMessage = getChaosNodeListener(node)
-                            .initiateMessage(context, node, context.getNetGraph().getNodeById(nextInitiatorId));
-                    ((StatefulNode) node).initializeForNewRound(context, initialMessage, this.stateLogger,
-                            startingPoint);
-                }
-            });
-
-            SimInitiateFloodEvent initiateFloodEvent = new SimInitiateFloodEvent(context.getTime(), nextInitiatorId);
-            context.getSimulator().scheduleEvent(initiateFloodEvent);
-        } else {
-            logger.log(Level.INFO, "All rounds completed. Simulation finished.");
+        Objects.requireNonNull(context);
+        if (roundActive) {
+            logger.log(Level.FINE, "Round already active; ignoring additional newRound call.");
+            return;
         }
+
+        if (roundsCompleted >= settings.roundLimit()) {
+            logger.log(Level.INFO, "All rounds completed. Simulation finished.");
+            return;
+        }
+        roundActive = true;
+
+        int sleepingNodes = (int) context.getNetGraph().getNodes().stream()
+                .filter(node -> node instanceof StatefulNode statefulNode
+                        && statefulNode.getCurrentState() instanceof SleepingState)
+                .count();
+        roundLifecycle.reset(context.getTime(), sleepingNodes);
+
+        int roundIndex = roundsCompleted + 1;
+        logger.log(Level.INFO, "Starting round " + roundIndex + " at time " + context.getTime());
+
+        final int nextInitiatorId = strategies.initiatorStrategy().getNextInitiatorId();
+        context.getNetGraph().getNodes().forEach(node -> {
+            if (node instanceof StatefulNode statefulNode) {
+                CtMessage<ChaosMessage> initialMessage = getChaosNodeListener(node)
+                        .initiateMessage(context, node, context.getNetGraph().getNodeById(nextInitiatorId));
+                if (initialMessage == null) {
+                    throw new IllegalStateException(
+                            "No initial knowledge available for node " + node.getId());
+                }
+                statefulNode.initializeForNewRound(context, initialMessage, this.stateLogger,
+                        startingPoint);
+            }
+        });
+
+        SimInitiateFloodEvent initiateFloodEvent = new SimInitiateFloodEvent(context.getTime(), nextInitiatorId);
+        context.getSimulator().scheduleEvent(initiateFloodEvent);
     }
 
     public void checkRoundCompletion(ContextView context) {
-        if (roundLifecycle.isRoundCompleted())
+        if (!roundActive || roundLifecycle.isRoundCompleted())
             return;
 
         // Log current states of all nodes for debugging
@@ -153,16 +178,21 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
     }
 
     private void completeRound(ContextView context) {
-        if (roundLifecycle.isRoundCompleted())
+        if (!roundActive || roundLifecycle.isRoundCompleted())
             return;
 
         roundLifecycle.markCompleted();
         long actualSlotsUsed = roundLifecycle.elapsedSlots(context.getTime());
         logger.log(Level.INFO, "Round completed in " + actualSlotsUsed + " slots");
         strategies.transmissionPolicy().endRound(context.getTime() + 1);
+        roundActive = false;
+        roundsCompleted++;
 
-        // Schedule next round
-        context.getSimulator().scheduleEvent(new SimNewRoundEvent(context.getTime() + 1));
+        if (roundsCompleted < settings.roundLimit()) {
+            context.getSimulator().scheduleEvent(new SimNewRoundEvent(context.getTime() + 1));
+        } else {
+            logger.log(Level.INFO, "All rounds completed. Simulation finished.");
+        }
     }
 
     @Override
@@ -191,7 +221,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
 
         if (capturedPacket != null) {
             if (currentTime != null) {
-                CtNetworkTime successTime = determineEventTime(capturedPacket, currentTime) ;
+                CtNetworkTime successTime = determineEventTime(capturedPacket, currentTime);
                 scenarioRecorder.recordEvent(successTime,
                         ChaosScenarioRecorder.TransmissionEvent.success("flood", capturedPacket));
                 packets.stream()
@@ -203,6 +233,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
                         });
             }
             ((StatefulNode) receiver).handlePacket(context, capturedPacket);
+            checkRoundCompletion(context);
         } else {
             if (currentTime != null) {
                 packets.forEach(packet -> {
@@ -298,6 +329,10 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         return networkTime != null ? networkTime.slot() : 0;
     }
 
+    public boolean isRoundOpen() {
+        return roundActive && !roundLifecycle.isRoundCompleted();
+    }
+
     public ChaosScenarioRecorder getScenarioRecorder() {
         return scenarioRecorder;
     }
@@ -385,7 +420,8 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
             history.put(time, byId);
         });
 
-        SortedMap<CtNetworkTime, List<ChaosScenarioRecorder.TransmissionEvent>> events = scenarioRecorder.snapshotEvents();
+        SortedMap<CtNetworkTime, List<ChaosScenarioRecorder.TransmissionEvent>> events = scenarioRecorder
+                .snapshotEvents();
 
         SortedSet<Integer> roundsPresent = new TreeSet<>();
         history.keySet().forEach(time -> roundsPresent.add(time.round()));
@@ -533,7 +569,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         if (packet == null) {
             return fallback;
         }
-        long sendTime = Math.max(0, packet.time() - 1);
+        long sendTime = Math.max(0, packet.time());
         return strategies.transmissionPolicy().getNetworkTime(sendTime);
     }
 

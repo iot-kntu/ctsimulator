@@ -1,8 +1,7 @@
 package ir.ac.kntu.distributedsystems.a2.threepc.state;
 
 import ir.ac.kntu.concurrenttransmission.ContextView;
-import ir.ac.kntu.concurrenttransmission.CtMessage;
-import ir.ac.kntu.concurrenttransmission.chaos.ChaosMessage;
+import ir.ac.kntu.concurrenttransmission.chaos.ChaosApplication;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.Event;
@@ -18,22 +17,17 @@ public class PreCommitFloodingState implements NodeState {
 
     @Override
     public void onEnter(StatefulNode node, ContextView context) {
-        CtMessage<ChaosMessage> message = node.getKnowledge();
-        int totalNodes = context.getNetGraph().getNodeCount();
-        boolean allNodesParticipated = message.content().flags().getParticipationCount() == totalNodes;
-
         node.floodMessage(context, node, node.getKnowledge());
         long endOfFloodTime = context.getTime()
                 + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
 
         context.getSimulator().scheduleEvent(
-                Event.create("FinishedFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
+                Event.create("FinishedFloodEvent", endOfFloodTime, SimEventPriority.High, (ctx) -> {
+                    if (ctx.getApplication() instanceof ChaosApplication chaosApp && !chaosApp.isRoundOpen()) {
+                        return;
+                    }
                     if (node.getCurrentState() instanceof PreCommitFloodingState) {
-                        if (allNodesParticipated) {
-                            node.setState(new CommitWaitingState(), context);
-                        } else {
-                            node.setState(new PreCommitListeningState(), context);
-                        }
+                        node.setState(new PreCommitListeningState(), ctx, true);
                     }
                 }));
     }

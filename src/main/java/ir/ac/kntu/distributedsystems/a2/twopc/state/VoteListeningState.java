@@ -23,7 +23,11 @@ public class VoteListeningState implements NodeState {
 
         TwoPhaseCommitPayload payload = (TwoPhaseCommitPayload) mergedMessage.content().payload();
         if (payload.phase() == TwoPhaseCommitPhase.FINALIZING) {
-            node.setState(new CommitFloodingState(), context);
+            if (node.shouldFlood(currentKnowledge, (CtMessage<ChaosMessage>) capturedPacket.ctMessage())) {
+                node.setState(new CommitFloodingState(), context);
+            } else {
+                node.setState(new CommitListeningState(), context);
+            }
             return;
         }
 

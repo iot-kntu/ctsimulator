@@ -23,10 +23,20 @@ public class VoteListeningState implements NodeState {
 
         ThreePhaseCommitPayload payload = (ThreePhaseCommitPayload) mergedMessage.content().payload();
         if (payload.phase() == ThreePhaseCommitPhase.PRE_COMMIT) {
-            node.setState(new PreCommitFloodingState(), context);
+            if (node.shouldFlood(currentKnowledge, (CtMessage<ChaosMessage>) capturedPacket.ctMessage())) {
+                node.setState(new PreCommitFloodingState(), context);
+            } else {
+                node.setState(new PreCommitListeningState(), context);
+            }
             return;
-        } else if (payload.phase() == ThreePhaseCommitPhase.FINALIZING) {
-            node.setState(new CommitFloodingState(), context);
+        }
+
+        if (payload.phase() == ThreePhaseCommitPhase.FINALIZING) {
+            if (node.shouldFlood(currentKnowledge, (CtMessage<ChaosMessage>) capturedPacket.ctMessage())) {
+                node.setState(new CommitFloodingState(), context);
+            } else {
+                node.setState(new CommitListeningState(), context);
+            }
             return;
         }
 

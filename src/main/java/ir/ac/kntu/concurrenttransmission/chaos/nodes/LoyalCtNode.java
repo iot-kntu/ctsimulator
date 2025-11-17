@@ -23,6 +23,8 @@ public class LoyalCtNode implements StatefulNode {
     private static final Logger logger = Logger.getLogger(LoyalCtNode.class.getSimpleName());
 
     private NodeState currentState;
+    private NodeState pendingState;
+    private long pendingActivationTime = Long.MIN_VALUE;
     private CtMessage<ChaosMessage> knowledge;
     private ChaosStateLogger stateLogger;
     private ChaosTransmissionPolicy policy;
@@ -39,7 +41,9 @@ public class LoyalCtNode implements StatefulNode {
         this.knowledge = initialKnowledge;
         this.stateLogger = logger;
         this.policy = (ChaosTransmissionPolicy) context.getApplication().getTransmissionPolicy();
-        setState(startingPoint, context);
+        if (startingPoint != null) {
+            setState(startingPoint, context, true);
+        }
     }
 
     /**
@@ -56,24 +60,48 @@ public class LoyalCtNode implements StatefulNode {
      * This method AUTOMATICALLY logs the state change.
      */
     @Override
-    public void setState(NodeState newState, ContextView context) {
-        if (this.currentState == null || this.currentState.getClass() != newState.getClass()) {
-            NodeState oldState = this.currentState;
-            this.currentState = newState;
-            CtNetworkTime netTime = context.getApplication().getNetworkTime();
-
-            stateLogger.setState(netTime, this, newState.toString());
-            logger.fine(String.format("Node[%d] at t=%s transitioned to state %s",
-                    this.id, netTime, newState));
-
-            // Notify the application about state change for tracking
-            if (context.getApplication() instanceof ChaosApplication chaosApp) {
-                chaosApp.onNodeStateChanged(this, oldState, newState);
-            }
-
-            // Trigger the onEnter action for the new state
-            newState.onEnter(this, context);
+    public void beginSlot(ContextView context) {
+        if (pendingState != null && context.getTime() >= pendingActivationTime) {
+            NodeState next = pendingState;
+            pendingState = null;
+            pendingActivationTime = Long.MIN_VALUE;
+            applyState(next, context);
         }
+    }
+
+    @Override
+    public void setState(NodeState newState, ContextView context, boolean immediate) {
+        Objects.requireNonNull(newState, "newState");
+        if (immediate || this.currentState == null) {
+            pendingState = null;
+            pendingActivationTime = Long.MIN_VALUE;
+            applyState(newState, context);
+            return;
+        }
+
+        if ((this.currentState != null && this.currentState.getClass() == newState.getClass())
+                || (this.pendingState != null && this.pendingState.getClass() == newState.getClass())) {
+            return;
+        }
+        this.pendingState = newState;
+        this.pendingActivationTime = context.getTime() + 1;
+    }
+
+    private void applyState(NodeState newState, ContextView context) {
+        NodeState oldState = this.currentState;
+        this.currentState = newState;
+        CtNetworkTime netTime = context.getApplication().getNetworkTime();
+
+        stateLogger.setState(netTime, this, newState.toString());
+        logger.fine(String.format("Node[%d] at t=%s transitioned to state %s",
+                this.id, netTime, newState));
+
+        if (context.getApplication() instanceof ChaosApplication chaosApp) {
+            chaosApp.onNodeStateChanged(this, oldState, newState);
+            chaosApp.checkRoundCompletion(context);
+        }
+
+        newState.onEnter(this, context);
     }
 
 
@@ -119,7 +147,7 @@ public class LoyalCtNode implements StatefulNode {
     @Override
     public void initiateFlood(ContextView context, CtNode initiatorNode) {
         ChaosTransmissionPolicy policy = (ChaosTransmissionPolicy) context.getApplication().getTransmissionPolicy();
-        setState(policy.getInitialFloodState(), context);
+        setState(policy.getInitialFloodState(), context, true);
     }
 
     @Override
@@ -135,7 +163,7 @@ public class LoyalCtNode implements StatefulNode {
 
 
         for (int repeat = 0; repeat < repeatCount; repeat++) {
-            this.sendMessage(context, 1 + repeat, sender, message);
+            this.sendMessage(context, repeat, sender, message);
         }
     }
 
@@ -173,4 +201,3 @@ public class LoyalCtNode implements StatefulNode {
         return "N[" + getId() + "]";
     }
 }
-

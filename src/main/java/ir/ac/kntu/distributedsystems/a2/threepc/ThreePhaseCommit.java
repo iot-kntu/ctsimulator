@@ -55,7 +55,8 @@ public class ThreePhaseCommit implements ChaosNodeListener {
         } else {
             // I AM A PARTICIPANT
             // I start with no knowledge and an undecided vote.
-            payload = new ThreePhaseCommitPayload(ThreePhaseCommitPhase.VOTING, null, ThreePhaseCommitDecision.IN_PROGRESS);
+            payload = new ThreePhaseCommitPayload(ThreePhaseCommitPhase.VOTING, null,
+                    ThreePhaseCommitDecision.IN_PROGRESS);
             initialFlags = FlagField.initial(self.getId(), VoteFlag.UNDECIDED);
         }
 
@@ -138,20 +139,40 @@ public class ThreePhaseCommit implements ChaosNodeListener {
         ThreePhaseCommitPayload receivedPayload = (ThreePhaseCommitPayload) receivedKnowledge.content().payload();
 
         FlagField ackFlags = receivedKnowledge.content().flags();
+        ThreePhaseCommitPayload payloadToSend = receivedPayload;
 
         if (currentPayload.phase() == ThreePhaseCommitPhase.PRE_COMMIT
                 && receivedPayload.phase() == ThreePhaseCommitPhase.VOTING) {
             ackFlags = currentKnowledge.content().flags();
-            return new CtMessage<>(receivedKnowledge.initiator(), new ChaosMessage(ackFlags, currentPayload));
+            payloadToSend = currentPayload;
         } else if (currentPayload.phase() == ThreePhaseCommitPhase.VOTING
                 && receivedPayload.phase() == ThreePhaseCommitPhase.PRE_COMMIT) {
             ackFlags = ackFlags.merge(FlagField.initial(receiver.getId(), ParticipationFlag.PARTICIPATED));
-            return new CtMessage<>(receivedKnowledge.initiator(), new ChaosMessage(ackFlags, receivedPayload));
+            payloadToSend = receivedPayload;
         } else {
             ackFlags = ackFlags.merge(currentKnowledge.content().flags());
             ackFlags = ackFlags.merge(FlagField.initial(receiver.getId(), ParticipationFlag.PARTICIPATED));
-            return new CtMessage<>(receivedKnowledge.initiator(), new ChaosMessage(ackFlags, receivedPayload));
+            payloadToSend = receivedPayload;
         }
+
+        if (receiver.equals(receivedKnowledge.initiator())) {
+            int totalNodes = context.getNetGraph().getNodeCount();
+            if (ackFlags.getParticipationCount() == totalNodes && ackFlags.flags().values().stream()
+                    .noneMatch(flag -> flag.equals(ParticipationFlag.NOT_PARTICIPATED))) {
+                ThreePhaseCommitDecision decision = payloadToSend.decision();
+                if (decision == ThreePhaseCommitDecision.PRE_COMMIT) {
+                    decision = ThreePhaseCommitDecision.COMMIT;
+                }
+                ThreePhaseCommitPayload finalPayload = new ThreePhaseCommitPayload(
+                        ThreePhaseCommitPhase.FINALIZING,
+                        payloadToSend.proposal(),
+                        decision);
+                FlagField finalFlags = FlagField.initial(receiver.getId(), ParticipationFlag.PARTICIPATED);
+                return new CtMessage<>(receivedKnowledge.initiator(), new ChaosMessage(finalFlags, finalPayload));
+            }
+        }
+
+        return new CtMessage<>(receivedKnowledge.initiator(), new ChaosMessage(ackFlags, payloadToSend));
     }
 
     private CtMessage<ChaosMessage> handleVotingPhase(ContextView context, StatefulNode receiver,
@@ -182,31 +203,52 @@ public class ThreePhaseCommit implements ChaosNodeListener {
         if (receiver.equals(receivedKnowledge.initiator())) {
             int totalNodes = context.getNetGraph().getNodeCount();
 
+            // All nodes have voted. Time to make a decision.
+            boolean allVotedYes = mergedFlags.flags().values().stream()
+                    .allMatch(flag -> ((VoteFlag) flag).value() == VoteValue.YES);
+
             // Check if voting is complete.
             if (mergedFlags.getParticipationCount() == totalNodes) {
-                // All nodes have voted. Time to make a decision.
-                boolean allVotedYes = mergedFlags.flags().values().stream()
-                        .allMatch(flag -> ((VoteFlag) flag).value() == VoteValue.YES);
 
                 ThreePhaseCommitDecision decision = allVotedYes ? ThreePhaseCommitDecision.PRE_COMMIT
                         : ThreePhaseCommitDecision.ABORT;
 
                 // Transition to PRE_COMMIT phase with new, reset flags.
                 FlagField preCommitFlags = FlagField.initial(receiver.getId(), ParticipationFlag.PARTICIPATED);
-                ThreePhaseCommitPayload preCommitPayload = new ThreePhaseCommitPayload(ThreePhaseCommitPhase.PRE_COMMIT, proposal,
+                ThreePhaseCommitPayload preCommitPayload = new ThreePhaseCommitPayload(ThreePhaseCommitPhase.PRE_COMMIT,
+                        proposal,
                         decision);
 
-                logger.info(String.format("Coordinator Node[%d] sent PRE_COMMIT. Decision: %s. Entering PRE_COMMIT phase.",
-                        receiver.getId(), decision));
+                logger.info(
+                        String.format("Coordinator Node[%d] sent PRE_COMMIT. Decision: %s. Entering PRE_COMMIT phase.",
+                                receiver.getId(), decision));
 
                 return new CtMessage<>(receivedKnowledge.initiator(),
                         new ChaosMessage(preCommitFlags, preCommitPayload));
+            } else {
+                if (!allVotedYes) {
+                    FlagField preCommitFlags = FlagField.initial(receiver.getId(), ParticipationFlag.PARTICIPATED);
+                    ThreePhaseCommitPayload preCommitPayload = new ThreePhaseCommitPayload(
+                            ThreePhaseCommitPhase.FINALIZING,
+                            proposal,
+                            ThreePhaseCommitDecision.ABORT);
+                    logger.info(
+                            String.format(
+                                    "Coordinator Node[%d] sent PRE_COMMIT. Decision: %s. Entering PRE_COMMIT phase.",
+                                    receiver.getId(), ThreePhaseCommitDecision.ABORT));
+
+                    return new CtMessage<>(receivedKnowledge.initiator(),
+                            new ChaosMessage(preCommitFlags, preCommitPayload));
+
+                }
+
             }
         }
 
         // If I am a participant OR the coordinator but voting is not over,
         // just create a new message with the updated votes in the VOTING phase.
-        ThreePhaseCommitPayload updatedVotingPayload = new ThreePhaseCommitPayload(ThreePhaseCommitPhase.VOTING, proposal,
+        ThreePhaseCommitPayload updatedVotingPayload = new ThreePhaseCommitPayload(ThreePhaseCommitPhase.VOTING,
+                proposal,
                 ThreePhaseCommitDecision.IN_PROGRESS);
         ChaosMessage mergedContent = new ChaosMessage(mergedFlags, updatedVotingPayload);
         return new CtMessage<>(receivedKnowledge.initiator(), mergedContent);

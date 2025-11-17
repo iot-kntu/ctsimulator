@@ -1,6 +1,7 @@
 package ir.ac.kntu.distributedsystems.a2.threepc.state;
 
 import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.chaos.ChaosApplication;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.SleepingState;
@@ -22,9 +23,12 @@ public class FinalFloodingState implements NodeState {
         long endOfFloodTime = context.getTime() + node.getFinalFloodCounter();
 
         context.getSimulator().scheduleEvent(
-                Event.create("FinishedFinalFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
+                Event.create("FinishedFinalFloodEvent", endOfFloodTime, SimEventPriority.High, (ctx) -> {
+                    if (ctx.getApplication() instanceof ChaosApplication chaosApp && !chaosApp.isRoundOpen()) {
+                        return;
+                    }
                     if (node.getCurrentState() instanceof FinalFloodingState) {
-                        node.setState(new SleepingState(), context);
+                        node.setState(new SleepingState(), ctx, true);
                     }
                 }));
     }

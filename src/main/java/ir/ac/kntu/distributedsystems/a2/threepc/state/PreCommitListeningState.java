@@ -23,13 +23,11 @@ public class PreCommitListeningState implements NodeState {
 
         ThreePhaseCommitPayload payload = (ThreePhaseCommitPayload) mergedMessage.content().payload();
         if (payload.phase() == ThreePhaseCommitPhase.FINALIZING) {
-            node.setState(new CommitFloodingState(), context);
-            return;
-        }
-
-        int totalNodes = context.getNetGraph().getNodeCount();
-        if (mergedMessage.content().flags().getParticipationCount() == totalNodes) {
-            node.setState(new CommitFloodingState(), context);
+            if (node.shouldFlood(currentKnowledge, (CtMessage<ChaosMessage>) capturedPacket.ctMessage())) {
+                node.setState(new CommitFloodingState(), context);
+            } else {
+                node.setState(new CommitListeningState(), context);
+            }
             return;
         }
 

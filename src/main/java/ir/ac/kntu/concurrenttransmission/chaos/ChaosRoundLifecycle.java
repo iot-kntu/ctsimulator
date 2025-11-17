@@ -1,7 +1,6 @@
 package ir.ac.kntu.concurrenttransmission.chaos;
 
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
-import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FinalFloodingState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.SleepingState;
 
 class ChaosRoundLifecycle {
@@ -9,31 +8,25 @@ class ChaosRoundLifecycle {
     private final ChaosTransmissionPolicy transmissionPolicy;
     private long roundStartTime;
     private boolean roundCompleted;
-    private int nodesInFinalFlooding;
     private int nodesInSleeping;
 
     ChaosRoundLifecycle(ChaosTransmissionPolicy transmissionPolicy) {
         this.transmissionPolicy = transmissionPolicy;
-        reset(0);
+        reset(0, 0);
     }
 
-    void reset(long startTime) {
+    void reset(long startTime, int initialSleepingNodes) {
         this.roundStartTime = startTime;
         this.roundCompleted = false;
-        this.nodesInFinalFlooding = 0;
-        this.nodesInSleeping = 0;
+        this.nodesInSleeping = Math.max(0, initialSleepingNodes);
     }
 
     void onNodeStateChanged(NodeState oldState, NodeState newState) {
-        if (oldState instanceof FinalFloodingState) {
-            nodesInFinalFlooding--;
-        } else if (oldState instanceof SleepingState) {
+        if (oldState instanceof SleepingState) {
             nodesInSleeping--;
         }
 
-        if (newState instanceof FinalFloodingState) {
-            nodesInFinalFlooding++;
-        } else if (newState instanceof SleepingState) {
+        if (newState instanceof SleepingState) {
             nodesInSleeping++;
         }
     }

@@ -46,6 +46,7 @@ public class SignalModel {
         // 2. Add a random component for fading (log-normal shadowing)
         // This simulates the unpredictable variations in a real environment.
         double fading = random.nextGaussian() * FADING_STANDARD_DEVIATION_DB;
+        fading = 0; // TODO: Delete it later
 
         return deterministicSignalStrength + fading;
     }

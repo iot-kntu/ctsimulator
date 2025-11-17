@@ -147,22 +147,31 @@ public class TwoPhaseCommit implements ChaosNodeListener {
         if (receiver.equals(receivedKnowledge.initiator())) {
             int totalNodes = context.getNetGraph().getNodeCount();
 
-            // Check if voting is complete.
-            if (mergedFlags.getParticipationCount() == totalNodes) {
-                // All nodes have voted. Time to make a decision.
-                boolean allVotedYes = mergedFlags.flags().values().stream()
-                        .allMatch(flag -> ((VoteFlag) flag).value() == VoteValue.YES);
+            boolean allVotesKnown = mergedFlags.flags().values().stream()
+                    .filter(flag -> flag instanceof VoteFlag)
+                    .allMatch(flag -> ((VoteFlag) flag).value() != VoteValue.UNDECIDED);
 
-                TwoPhaseCommitDecision decision = allVotedYes ? TwoPhaseCommitDecision.COMMIT
-                        : TwoPhaseCommitDecision.ABORT;
+            boolean anyNoVote = mergedFlags.flags().values().stream()
+                    .filter(flag -> flag instanceof VoteFlag)
+                    .anyMatch(flag -> ((VoteFlag) flag).value() == VoteValue.NO);
 
-                // Transition to FINALIZING phase with new, reset flags.
+            boolean everyoneResponded = mergedFlags.getParticipationCount() == totalNodes;
+
+            boolean shouldAbort = anyNoVote;
+            boolean shouldCommit = everyoneResponded && allVotesKnown && mergedFlags.flags().values().stream()
+                    .allMatch(flag -> ((VoteFlag) flag).value() == VoteValue.YES);
+
+            if (shouldAbort || shouldCommit) {
+                TwoPhaseCommitDecision decision = shouldAbort ? TwoPhaseCommitDecision.ABORT
+                        : TwoPhaseCommitDecision.COMMIT;
+
                 FlagField finalizationFlags = FlagField.initial(receiver.getId(), ParticipationFlag.PARTICIPATED);
                 TwoPhaseCommitPayload finalPayload = new TwoPhaseCommitPayload(TwoPhaseCommitPhase.FINALIZING, proposal,
                         decision);
 
-                logger.info(String.format("Coordinator Node[%d] made decision: %s. Entering FINALIZING phase.",
-                        receiver.getId(), decision));
+                logger.info(String.format(
+                        "Coordinator Node[%d] made decision: %s. Entering FINALIZING phase (votesKnown=%s, earlyAbort=%s).",
+                        receiver.getId(), decision, allVotesKnown, shouldAbort));
 
                 return new CtMessage<>(receivedKnowledge.initiator(),
                         new ChaosMessage(finalizationFlags, finalPayload));

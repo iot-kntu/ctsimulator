@@ -1,6 +1,7 @@
 package ir.ac.kntu.concurrenttransmission.chaos.state.primitive;
 
 import ir.ac.kntu.concurrenttransmission.ContextView;
+import ir.ac.kntu.concurrenttransmission.chaos.ChaosApplication;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.Event;
@@ -28,8 +29,11 @@ public class FinalFloodingState implements NodeState {
 
         context.getSimulator().scheduleEvent(
                 Event.create("FinishedFinalFloodEvent", endOfFloodTime, SimEventPriority.BelowNormal, (ctx) -> {
+                    if (ctx.getApplication() instanceof ChaosApplication chaosApp && !chaosApp.isRoundOpen()) {
+                        return;
+                    }
                     if (node.getCurrentState() instanceof FinalFloodingState) {
-                        node.setState(new SleepingState(), ctx);
+                        node.setState(new SleepingState(), ctx, true);
                     }
                 }));
     }
