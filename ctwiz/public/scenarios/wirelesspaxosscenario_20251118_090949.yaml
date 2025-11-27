@@ -1,0 +1,733 @@
+id: 3e250227-6532-4f0d-a358-8bd6313c7567
+name: WirelessPaxosScenario 2
+metadata:
+  author: amir
+  description: Auto-generated report for WirelessPaxosScenario
+nodes:
+  - id: 0
+    label: A
+    position:
+      x: 3.5
+      y: 8.8
+  - id: 1
+    label: B
+    position:
+      x: 0
+      y: 3.2
+  - id: 2
+    label: C
+    position:
+      x: 4
+      y: 2.5
+  - id: 3
+    label: D
+    position:
+      x: 2
+      y: 0
+links:
+  - source: 0
+    target: 1
+  - source: 0
+    target: 2
+  - source: 1
+    target: 3
+  - source: 2
+    target: 3
+rounds:
+  - id: 1
+    label: Round 1
+    description: Auto generated description for round 1
+    slots:
+      - id: 1
+        nodeStates:
+          "0": pT
+          "1": pR
+          "2": pR
+          "3": pR
+        events:
+          - type: flood
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 0
+              initiatorId: 0
+              messageNo: 1
+              content: ChaosMessage[flags={0:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+          - type: flood
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 0
+              initiatorId: 0
+              messageNo: 1
+              content: ChaosMessage[flags={0:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+      - id: 2
+        nodeStates:
+          "0": pR
+          "1": pT
+          "2": pT
+          "3": pR
+        events:
+          - type: flood
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 6
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+          - type: flood
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 5
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+          - type: flood
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 6
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+          - type: flood
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 5
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+      - id: 3
+        nodeStates:
+          "0": pT
+          "1": pR
+          "2": pR
+          "3": pT
+        events:
+          - type: flood
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 8
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+          - type: flood
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 7
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+          - type: flood
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 8
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+          - type: flood
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 7
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+      - id: 4
+        nodeStates:
+          "0": pR
+          "1": pT
+          "2": pT
+          "3": pR
+        events:
+          - type: flood
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 10
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+          - type: flood
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 9
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=PREPARE,
+                proposalNumber=1024, value=null, phaseNumber=-1]]
+          - type: flood
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 10
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=PREPARE, proposalNumber=1024,
+                value=null, phaseNumber=-1]]
+          - type: flood
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 9
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=PREPARE,
+                proposalNumber=1024, value=null, phaseNumber=-1]]
+      - id: 5
+        nodeStates:
+          "0": aT
+          "1": pR
+          "2": pR
+          "3": pR
+        events:
+          - type: flood
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 4
+              initiatorId: 0
+              messageNo: 11
+              content: ChaosMessage[flags={0:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 4
+              initiatorId: 0
+              messageNo: 11
+              content: ChaosMessage[flags={0:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+      - id: 6
+        nodeStates:
+          "0": aR
+          "1": aT
+          "2": aT
+          "3": pR
+        events:
+          - type: flood
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 14
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+          - type: flood
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 13
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+          - type: flood
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 14
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+          - type: flood
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 13
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+      - id: 7
+        nodeStates:
+          "0": aT
+          "1": aR
+          "2": aR
+          "3": aT
+        events:
+          - type: flood
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 16
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 15
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+          - type: flood
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 16
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 15
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+      - id: 8
+        nodeStates:
+          "0": aR
+          "1": F
+          "2": aT
+          "3": aR
+        events:
+          - type: flood
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 18
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+          - type: flood
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 17
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 18
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+          - type: flood
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 17
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+      - id: 9
+        nodeStates:
+          "0": aT
+          "1": F
+          "2": aR
+          "3": aR
+        events:
+          - type: flood
+            from: 1
+            to: 0
+            success: true
+            packet:
+              time: 8
+              initiatorId: 0
+              messageNo: 17
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 1
+            to: 3
+            success: true
+            packet:
+              time: 8
+              initiatorId: 0
+              messageNo: 17
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 8
+              initiatorId: 0
+              messageNo: 19
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 8
+              initiatorId: 0
+              messageNo: 19
+              content: ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED},
+                payload=WirelessPaxosPayload[phase=ACCEPT, proposalNumber=1024,
+                value=UPDATE_FROM_NODE_0, phaseNumber=1024]]
+      - id: 10
+        nodeStates:
+          "0": aR
+          "1": F
+          "2": aR
+          "3": F
+        events:
+          - type: flood
+            from: 1
+            to: 3
+            success: true
+            packet:
+              time: 9
+              initiatorId: 0
+              messageNo: 17
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 9
+              initiatorId: 0
+              messageNo: 21
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 9
+              initiatorId: 0
+              messageNo: 21
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 1
+            to: 0
+            success: true
+            packet:
+              time: 9
+              initiatorId: 0
+              messageNo: 17
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+      - id: 11
+        nodeStates:
+          "0": F
+          "1": S
+          "2": F
+          "3": F
+        events:
+          - type: flood
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 21
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 21
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 24
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 23
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 23
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 24
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+      - id: 12
+        nodeStates:
+          "0": F
+          "1": S
+          "2": F
+          "3": F
+        events:
+          - type: flood
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 23
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 21
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 24
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 21
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 24
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 23
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+      - id: 13
+        nodeStates:
+          "0": F
+          "1": S
+          "2": F
+          "3": S
+        events:
+          - type: flood
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 23
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 24
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 23
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+          - type: flood
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 24
+              content: ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED,
+                3:PARTICIPATED}, payload=WirelessPaxosPayload[phase=ACCEPT,
+                proposalNumber=1024, value=UPDATE_FROM_NODE_0,
+                phaseNumber=1024]]
+      - id: 14
+        nodeStates:
+          "0": S
+          "1": S
+          "2": S
+          "3": S

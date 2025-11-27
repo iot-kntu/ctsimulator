@@ -1,0 +1,772 @@
+id: "fb390d4f-3f0a-41fb-b02c-95318da4fd1c"
+name: "A2Collect"
+metadata:
+  author: "amir"
+  description: "Auto-generated report for A2Collect"
+nodes:
+  - id: 0
+    label: "A"
+    position: { x: 3.5, y: 8.8 }
+  - id: 1
+    label: "B"
+    position: { x: 0, y: 3.2 }
+  - id: 2
+    label: "C"
+    position: { x: 4, y: 2.5 }
+  - id: 3
+    label: "D"
+    position: { x: 2, y: 0 }
+links:
+  - source: 0
+    target: 1
+  - source: 0
+    target: 2
+  - source: 1
+    target: 3
+  - source: 2
+    target: 3
+rounds:
+  - id: 1
+    label: "Round 1"
+    description: "Auto generated description for round 1"
+    slots:
+      - id: 1
+        nodeStates:
+          0: "T"
+          1: "R"
+          2: "R"
+          3: "R"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 0
+              initiatorId: 0
+              messageNo: 1
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload={0=0}]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 0
+              initiatorId: 0
+              messageNo: 1
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload={0=0}]"
+      - id: 2
+        nodeStates:
+          0: "R"
+          1: "T"
+          2: "T"
+          3: "R"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 6
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload={0=0, 2=4}]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 5
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload={0=0, 1=1}]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 6
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload={0=0, 2=4}]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 5
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload={0=0, 1=1}]"
+      - id: 3
+        nodeStates:
+          0: "T"
+          1: "R"
+          2: "R"
+          3: "T"
+        events:
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 8
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 2=4, 3=9}]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 7
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload={0=0, 2=4}]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 8
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 2=4, 3=9}]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 7
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload={0=0, 2=4}]"
+      - id: 4
+        nodeStates:
+          0: "R"
+          1: "F"
+          2: "R"
+          3: "R"
+        events:
+          - type: "flood"
+            from: 1
+            to: 0
+            success: true
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 9
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: true
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 9
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+      - id: 5
+        nodeStates:
+          0: "R"
+          1: "F"
+          2: "R"
+          3: "F"
+        events:
+          - type: "flood"
+            from: 1
+            to: 0
+            success: true
+            packet:
+              time: 4
+              initiatorId: 0
+              messageNo: 9
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: true
+            packet:
+              time: 4
+              initiatorId: 0
+              messageNo: 9
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 4
+              initiatorId: 0
+              messageNo: 10
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 4
+              initiatorId: 0
+              messageNo: 10
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+      - id: 6
+        nodeStates:
+          0: "F"
+          1: "F"
+          2: "F"
+          3: "F"
+        events:
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 10
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 12
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 9
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 11
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 12
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 9
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 10
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 11
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+      - id: 7
+        nodeStates:
+          0: "F"
+          1: "S"
+          2: "F"
+          3: "F"
+        events:
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 12
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 10
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 11
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 10
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 11
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 12
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+      - id: 8
+        nodeStates:
+          0: "F"
+          1: "S"
+          2: "F"
+          3: "S"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 11
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 12
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 11
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 12
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=1, 2=4, 3=9}]"
+      - id: 9
+        nodeStates:
+          0: "S"
+          1: "S"
+          2: "S"
+          3: "S"
+  - id: 2
+    label: "Round 2"
+    description: "Auto generated description for round 2"
+    slots:
+      - id: 1
+        nodeStates:
+          0: "R"
+          1: "T"
+          2: "R"
+          3: "R"
+        events:
+          - type: "flood"
+            from: 1
+            to: 0
+            success: true
+            packet:
+              time: 9
+              initiatorId: 1
+              messageNo: 14
+              content: "ChaosMessage[flags={1:PARTICIPATED}, payload={1=10}]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: true
+            packet:
+              time: 9
+              initiatorId: 1
+              messageNo: 14
+              content: "ChaosMessage[flags={1:PARTICIPATED}, payload={1=10}]"
+      - id: 2
+        nodeStates:
+          0: "T"
+          1: "R"
+          2: "R"
+          3: "T"
+        events:
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 10
+              initiatorId: 1
+              messageNo: 18
+              content: "ChaosMessage[flags={1:PARTICIPATED, 3:PARTICIPATED}, payload={1=10, 3=30}]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 10
+              initiatorId: 1
+              messageNo: 17
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload={0=0, 1=10}]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 10
+              initiatorId: 1
+              messageNo: 18
+              content: "ChaosMessage[flags={1:PARTICIPATED, 3:PARTICIPATED}, payload={1=10, 3=30}]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 10
+              initiatorId: 1
+              messageNo: 17
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload={0=0, 1=10}]"
+      - id: 3
+        nodeStates:
+          0: "R"
+          1: "T"
+          2: "T"
+          3: "R"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 11
+              initiatorId: 1
+              messageNo: 20
+              content: "ChaosMessage[flags={1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 11
+              initiatorId: 1
+              messageNo: 19
+              content: "ChaosMessage[flags={1:PARTICIPATED, 3:PARTICIPATED}, payload={1=10, 3=30}]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 11
+              initiatorId: 1
+              messageNo: 20
+              content: "ChaosMessage[flags={1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 11
+              initiatorId: 1
+              messageNo: 19
+              content: "ChaosMessage[flags={1:PARTICIPATED, 3:PARTICIPATED}, payload={1=10, 3=30}]"
+      - id: 4
+        nodeStates:
+          0: "F"
+          1: "R"
+          2: "R"
+          3: "R"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 12
+              initiatorId: 1
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 12
+              initiatorId: 1
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+      - id: 5
+        nodeStates:
+          0: "F"
+          1: "R"
+          2: "F"
+          3: "R"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 13
+              initiatorId: 1
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 13
+              initiatorId: 1
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 13
+              initiatorId: 1
+              messageNo: 22
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 13
+              initiatorId: 1
+              messageNo: 22
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+      - id: 6
+        nodeStates:
+          0: "F"
+          1: "F"
+          2: "F"
+          3: "F"
+        events:
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 14
+              initiatorId: 1
+              messageNo: 22
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 14
+              initiatorId: 1
+              messageNo: 24
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 14
+              initiatorId: 1
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: true
+            packet:
+              time: 14
+              initiatorId: 1
+              messageNo: 23
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 14
+              initiatorId: 1
+              messageNo: 24
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 14
+              initiatorId: 1
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 14
+              initiatorId: 1
+              messageNo: 22
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 14
+              initiatorId: 1
+              messageNo: 23
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+      - id: 7
+        nodeStates:
+          0: "S"
+          1: "F"
+          2: "F"
+          3: "F"
+        events:
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 15
+              initiatorId: 1
+              messageNo: 24
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 15
+              initiatorId: 1
+              messageNo: 22
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 15
+              initiatorId: 1
+              messageNo: 23
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 15
+              initiatorId: 1
+              messageNo: 22
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 15
+              initiatorId: 1
+              messageNo: 23
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 15
+              initiatorId: 1
+              messageNo: 24
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+      - id: 8
+        nodeStates:
+          0: "S"
+          1: "F"
+          2: "S"
+          3: "F"
+        events:
+          - type: "flood"
+            from: 1
+            to: 0
+            success: true
+            packet:
+              time: 16
+              initiatorId: 1
+              messageNo: 23
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 16
+              initiatorId: 1
+              messageNo: 24
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: true
+            packet:
+              time: 16
+              initiatorId: 1
+              messageNo: 23
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 16
+              initiatorId: 1
+              messageNo: 24
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload={0=0, 1=10, 2=20, 3=30}]"
+      - id: 9
+        nodeStates:
+          0: "S"
+          1: "S"
+          2: "S"
+          3: "S"
