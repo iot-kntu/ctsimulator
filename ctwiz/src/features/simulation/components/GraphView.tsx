@@ -89,6 +89,7 @@ const MAX_ZOOM = 4;
 
 export const GraphView = memo(function GraphView({ scenario, snapshot, className }: GraphViewProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const patternId = useId();
   const [patternSize, setPatternSize] = useState({ width: PATTERN_BASE_SIZE, height: PATTERN_BASE_SIZE });
   const [viewportAspectRatio, setViewportAspectRatio] = useState<number | null>(null);
@@ -176,6 +177,12 @@ export const GraphView = memo(function GraphView({ scenario, snapshot, className
       updatePatternFromRect(svgSizeRef.current);
     }
   }, [updatePatternFromRect, viewBox.height, viewBox.width]);
+  const [hoveredTooltip, setHoveredTooltip] = useState<{
+    nodeId: number;
+    knowledge: string;
+    x: number;
+    y: number;
+  } | null>(null);
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) {
@@ -335,7 +342,7 @@ export const GraphView = memo(function GraphView({ scenario, snapshot, className
   }, []);
 
   return (
-    <div className={cn("h-full w-full", className)}>
+    <div ref={containerRef} className={cn("relative h-full w-full", className)}>
       <svg
         ref={svgRef}
         viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
@@ -384,10 +391,41 @@ export const GraphView = memo(function GraphView({ scenario, snapshot, className
               state={snapshot.nodeStates[node.id] ?? 'idle'}
               highlighted={highlightedNodes.has(node.id)}
               stateStyles={stateStyles}
+              onHoverChange={(isHovered, evt) => {
+                if (!containerRef.current) {
+                  return;
+                }
+                if (!isHovered) {
+                  setHoveredTooltip(null);
+                  return;
+                }
+                const rect = containerRef.current.getBoundingClientRect();
+                setHoveredTooltip({
+                  nodeId: node.id,
+                  knowledge: snapshot.nodeKnowledge[node.id] ?? '',
+                  x: evt.clientX - rect.left + 12,
+                  y: evt.clientY - rect.top - 10,
+                });
+              }}
             />
           ))}
         </g>
       </svg>
+      {hoveredTooltip && hoveredTooltip.knowledge && (
+        <div
+          className="pointer-events-none absolute z-10 max-w-xs rounded-md bg-slate-900/95 px-3 py-2 text-xs text-slate-50 shadow-xl ring-1 ring-white/25"
+          style={{
+            left: hoveredTooltip.x,
+            top: hoveredTooltip.y,
+            transform: 'translateY(-100%)',
+          }}
+        >
+          <div className="text-[10px] uppercase tracking-wide text-slate-300">Knowledge</div>
+          <div className="mt-1 font-mono leading-snug text-[11px] wrap-break-word whitespace-pre-wrap">
+            {hoveredTooltip.knowledge}
+          </div>
+        </div>
+      )}
     </div>
   );
 });
@@ -651,11 +689,13 @@ function resolveStateStyle(styles: Map<string, NodeVisualStyle>, state: string |
 type GraphNodeProps = {
   node: ScenarioNode;
   state: string;
+  knowledge?: string | null;
   highlighted: boolean;
   stateStyles: Map<string, NodeVisualStyle>;
+  onHoverChange?: (isHovered: boolean, evt: React.MouseEvent<SVGGElement, MouseEvent>) => void;
 };
 
-function GraphNode({ node, state, highlighted, stateStyles }: GraphNodeProps) {
+function GraphNode({ node, state, highlighted, stateStyles, onHoverChange }: GraphNodeProps) {
   const styles = resolveStateStyle(stateStyles, state);
   const transform = `translate(${node.position.x}, ${node.position.y})`;
   const normalizedState = state?.trim() ?? '';
@@ -664,8 +704,12 @@ function GraphNode({ node, state, highlighted, stateStyles }: GraphNodeProps) {
   const stateLabel = normalizedState.length > 0 ? normalizedState.toUpperCase() : 'IDLE';
 
   return (
-    <g transform={transform}>
-      <title>{`${node.label ?? node.id}${normalizedState ? ` • ${normalizedState}` : ''}`}</title>
+    <g
+      transform={transform}
+      onMouseEnter={(evt) => onHoverChange?.(true, evt)}
+      onMouseLeave={(evt) => onHoverChange?.(false, evt)}
+      onMouseMove={(evt) => onHoverChange?.(true, evt)}
+    >
       {shouldHighlight && (
         <motion.circle
           r={NODE_RADIUS * 1.8}

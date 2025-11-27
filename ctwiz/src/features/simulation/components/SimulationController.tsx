@@ -71,6 +71,9 @@ function SimulationControllerComponent({
     ? "Awaiting start"
     : `Slot ${snapshot.slotIndex + 1}`;
   const nodeChangeCount = Object.keys(snapshot.nodeStateChanges).length;
+  const knowledgeChangeCount = Object.keys(
+    snapshot.nodeKnowledgeChanges ?? {}
+  ).length;
 
   return (
     <div className="flex flex-col gap-4">
@@ -84,8 +87,9 @@ function SimulationControllerComponent({
           </span>
           <span className="text-xs text-muted-foreground">{slotLabel}</span>
           <span className="text-[11px] font-mono text-muted-foreground">
-            Step {snapshot.step}/{totalSteps} · nodes {nodeChangeCount} · events{" "}
-            {snapshot.events.length} · tx {snapshot.transmissions.length}
+            Step {snapshot.step}/{totalSteps} · nodes {nodeChangeCount} ·
+            knowledge {knowledgeChangeCount} · events {snapshot.events.length} ·
+            tx {snapshot.transmissions.length}
           </span>
         </div>
       </div>

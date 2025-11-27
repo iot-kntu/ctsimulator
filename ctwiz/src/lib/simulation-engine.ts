@@ -29,6 +29,8 @@ export type SimulationFrame = {
   slotDescription?: string;
   nodeStates: Record<number, NodeStatus>;
   nodeStateChanges: Record<number, NodeStatus>;
+  nodeKnowledge: Record<number, string | null>;
+  nodeKnowledgeChanges: Record<number, string | null>;
   highlightedNodes: number[];
   transmissions: TransmissionEvent[];
   events: ScenarioSlotEvent[];
@@ -117,8 +119,10 @@ export class SimulationEngine {
 function buildSimulationFrames(scenario: Scenario): SimulationFrame[] {
   const frames: SimulationFrame[] = [];
   const baseNodeStates: Record<number, NodeStatus> = {};
+  const baseNodeKnowledge: Record<number, string | null> = {};
   scenario.nodes.forEach((node) => {
     baseNodeStates[node.id] = "idle";
+    baseNodeKnowledge[node.id] = null;
   });
 
   const initialFrame: SimulationFrame = {
@@ -127,6 +131,8 @@ function buildSimulationFrames(scenario: Scenario): SimulationFrame[] {
     slotIndex: -1,
     nodeStates: { ...baseNodeStates },
     nodeStateChanges: {},
+    nodeKnowledge: { ...baseNodeKnowledge },
+    nodeKnowledgeChanges: {},
     highlightedNodes: [],
     transmissions: [],
     events: [],
@@ -142,19 +148,23 @@ function buildSimulationFrames(scenario: Scenario): SimulationFrame[] {
 
   let step = 1;
   let currentNodeStates = { ...baseNodeStates };
+  let currentNodeKnowledge = { ...baseNodeKnowledge };
 
   scenario.rounds.forEach((round, roundIndex) => {
     appendRoundFrames({
       frames,
       round,
       roundIndex,
-      stepState: { step, currentNodeStates },
+      stepState: { step, currentNodeStates, currentNodeKnowledge },
     });
     const lastFrame = frames[frames.length - 1];
     if (lastFrame) {
       step = lastFrame.step + 1;
       currentNodeStates = {
         ...lastFrame.nodeStates,
+      };
+      currentNodeKnowledge = {
+        ...lastFrame.nodeKnowledge,
       };
     }
   });
@@ -174,22 +184,29 @@ type AppendRoundFramesArgs = {
   stepState: {
     step: number;
     currentNodeStates: Record<number, NodeStatus>;
+    currentNodeKnowledge: Record<number, string | null>;
   };
 };
 
 function appendRoundFrames({ frames, round, roundIndex, stepState }: AppendRoundFramesArgs) {
-  let { currentNodeStates } = stepState;
+  let { currentNodeStates, currentNodeKnowledge } = stepState;
 
   round.slots.forEach((slot, slotIndex) => {
     const { updatedStates, changes: nodeStateChanges, highlightedNodes } = deriveSlotNodeStates(currentNodeStates, slot);
+    const { updatedKnowledge, changes: knowledgeChanges, highlightedNodes: knowledgeHighlights } = deriveSlotKnowledge(
+      currentNodeKnowledge,
+      slot,
+    );
 
     currentNodeStates = updatedStates;
+    currentNodeKnowledge = updatedKnowledge;
     const transmissions = deriveSlotTransmissions(slot);
 
     transmissions.forEach((tx) => {
       highlightedNodes.add(tx.source);
       highlightedNodes.add(tx.target);
     });
+    knowledgeHighlights.forEach((id) => highlightedNodes.add(id));
 
     const frame: SimulationFrame = {
       step: 0, // temporary, reassigned later
@@ -199,6 +216,8 @@ function appendRoundFrames({ frames, round, roundIndex, stepState }: AppendRound
       slotLabel: slot.label ?? `Slot ${slotIndex + 1}`,
       nodeStates: updatedStates,
       nodeStateChanges,
+      nodeKnowledge: updatedKnowledge,
+      nodeKnowledgeChanges: knowledgeChanges,
       highlightedNodes: Array.from(highlightedNodes),
       transmissions,
       events: slot.events,
@@ -246,6 +265,37 @@ function deriveSlotNodeStates(
 
   return {
     updatedStates,
+    changes,
+    highlightedNodes,
+  };
+}
+
+function deriveSlotKnowledge(
+  previousKnowledge: Record<number, string | null>,
+  slot: ScenarioSlot,
+): {
+  updatedKnowledge: Record<number, string | null>;
+  changes: Record<number, string | null>;
+  highlightedNodes: Set<number>;
+} {
+  const updatedKnowledge = { ...previousKnowledge };
+  const changes: Record<number, string | null> = {};
+  const highlightedNodes = new Set<number>();
+
+  if (slot.knowledge) {
+    Object.entries(slot.knowledge).forEach(([nodeId, knowledge]) => {
+      const numericId = Number(nodeId);
+      const nextValue = knowledge ?? null;
+      if (updatedKnowledge[numericId] !== nextValue) {
+        updatedKnowledge[numericId] = nextValue;
+        changes[numericId] = nextValue;
+        highlightedNodes.add(numericId);
+      }
+    });
+  }
+
+  return {
+    updatedKnowledge,
     changes,
     highlightedNodes,
   };

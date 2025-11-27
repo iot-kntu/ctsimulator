@@ -53,6 +53,10 @@ const scenarioSlotEventSchema = z.object({
 });
 
 const nodeStatesSchema = z.record(z.union([z.string(), z.number()]), z.string());
+const nodeKnowledgeSchema = z.record(
+  z.union([z.string(), z.number()]),
+  z.union([z.string(), z.null()]),
+);
 
 const scenarioSlotSchema = z.object({
   id: z.number(),
@@ -60,6 +64,7 @@ const scenarioSlotSchema = z.object({
   description: z.string().optional(),
   duration: z.number().optional(),
   nodeStates: nodeStatesSchema.optional(),
+  knowledge: nodeKnowledgeSchema.optional(),
   events: z.array(scenarioSlotEventSchema).optional(),
 });
 
@@ -143,6 +148,7 @@ export type ScenarioSlot = {
   description?: string;
   duration?: number;
   nodeStates?: Record<number, NodeStatus>;
+  knowledge?: Record<number, string | null>;
   events: ScenarioSlotEvent[];
 };
 
@@ -288,6 +294,7 @@ function normalizeRounds(
     const roundId = round.id ?? `round-${roundIndex + 1}`;
     const slots = round.slots.map((slot, slotIndex) => {
       const nodeStates = normalizeNodeStates(slot.nodeStates, slot.id, nodes, warnings);
+      const knowledge = normalizeNodeKnowledge(slot.knowledge, slot.id, nodes, warnings);
       const events = normalizeEvents(slot.events ?? [], slot.id, slotIndex, nodeStates, nodes, warnings);
 
       const normalizedSlot: ScenarioSlot = {
@@ -298,6 +305,9 @@ function normalizeRounds(
 
       if (nodeStates) {
         normalizedSlot.nodeStates = nodeStates;
+      }
+      if (knowledge) {
+        normalizedSlot.knowledge = knowledge;
       }
 
       if (slot.label) {
@@ -350,6 +360,38 @@ function normalizeNodeStates(
       return;
     }
     normalized[nodeId] = normalizeStatus(rawStatus);
+  });
+
+  return Object.keys(normalized).length ? normalized : undefined;
+}
+
+function normalizeNodeKnowledge(
+  input: Record<string, string | null> | undefined,
+  slotId: number,
+  nodes: Set<number>,
+  warnings: string[],
+): Record<number, string | null> | undefined {
+  if (!input) {
+    return undefined;
+  }
+
+  const normalized: Record<number, string | null> = {};
+  Object.entries(input).forEach(([rawId, rawKnowledge]) => {
+    const nodeId = Number(rawId);
+    if (!Number.isFinite(nodeId)) {
+      warnings.push(`Slot "${slotId}" has invalid node id "${rawId}" in knowledge.`);
+      return;
+    }
+    if (!nodes.has(nodeId)) {
+      warnings.push(`Slot "${slotId}" references unknown node "${rawId}" in knowledge.`);
+      return;
+    }
+
+    if (rawKnowledge === null || rawKnowledge === undefined) {
+      normalized[nodeId] = null;
+    } else {
+      normalized[nodeId] = String(rawKnowledge);
+    }
   });
 
   return Object.keys(normalized).length ? normalized : undefined;

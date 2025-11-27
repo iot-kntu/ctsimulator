@@ -1,5 +1,4 @@
 import * as React from "react";
-import { GripVertical } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -69,7 +68,7 @@ export function ResizableSidebar({
         <div
             ref={sidebarRef}
             className={cn(
-                "absolute top-0 bottom-0 z-10 flex bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-border shadow-lg transition-all duration-0",
+                "absolute top-0 bottom-0 z-10 flex bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-border shadow-lg transition-all duration-0",
                 side === "left" ? "left-0 border-r" : "right-0 border-l",
                 className
             )}
