@@ -97,6 +97,8 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
             return;
         }
 
+        recordKnowledgeSnapshot(context);
+
         for (CtNode node : context.getNetGraph().getNodes()) {
             if (node instanceof StatefulNode statefulNode) {
                 statefulNode.beginSlot(context);
@@ -123,6 +125,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
             return;
         }
 
+        updateNetworkTime(strategies.transmissionPolicy().getNetworkTime(context.getTime()));
         if (roundsCompleted >= settings.roundLimit()) {
             logger.log(Level.INFO, "All rounds completed. Simulation finished.");
             return;
@@ -151,6 +154,8 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
                         startingPoint);
             }
         });
+
+        recordKnowledgeSnapshot(context);
 
         SimInitiateFloodEvent initiateFloodEvent = new SimInitiateFloodEvent(context.getTime(), nextInitiatorId);
         context.getSimulator().scheduleEvent(initiateFloodEvent);
@@ -220,8 +225,9 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         FloodPacket<?> capturedPacket = selectPacketBySignal(packets, (StatefulNode) receiver, context);
 
         if (capturedPacket != null) {
+            CtNetworkTime successTime = null;
             if (currentTime != null) {
-                CtNetworkTime successTime = determineEventTime(capturedPacket, currentTime);
+                successTime = determineEventTime(capturedPacket, currentTime);
                 scenarioRecorder.recordEvent(successTime,
                         ChaosScenarioRecorder.TransmissionEvent.success("flood", capturedPacket));
                 packets.stream()
@@ -232,7 +238,14 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
                                     ChaosScenarioRecorder.TransmissionEvent.failure("flood", packet));
                         });
             }
-            ((StatefulNode) receiver).handlePacket(context, capturedPacket);
+            StatefulNode statefulReceiver = (StatefulNode) receiver;
+            statefulReceiver.handlePacket(context, capturedPacket);
+            if (successTime == null) {
+                successTime = getNetworkTime();
+            }
+            if (successTime != null) {
+                recordKnowledge(successTime, statefulReceiver);
+            }
             checkRoundCompletion(context);
         } else {
             if (currentTime != null) {
@@ -420,12 +433,21 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
             history.put(time, byId);
         });
 
+        SortedMap<CtNetworkTime, Map<CtNode, String>> rawKnowledgeHistory = stateLogger.snapshotKnowledgeHistory();
+        SortedMap<CtNetworkTime, Map<Integer, String>> knowledgeHistory = new TreeMap<>();
+        rawKnowledgeHistory.forEach((time, knowledgeMap) -> {
+            Map<Integer, String> byId = new HashMap<>();
+            knowledgeMap.forEach((node, knowledge) -> byId.put(node.getId(), knowledge));
+            knowledgeHistory.put(time, byId);
+        });
+
         SortedMap<CtNetworkTime, List<ChaosScenarioRecorder.TransmissionEvent>> events = scenarioRecorder
                 .snapshotEvents();
 
         SortedSet<Integer> roundsPresent = new TreeSet<>();
         history.keySet().forEach(time -> roundsPresent.add(time.round()));
         events.keySet().forEach(time -> roundsPresent.add(time.round()));
+        knowledgeHistory.keySet().forEach(time -> roundsPresent.add(time.round()));
 
         int policyRounds = strategies.transmissionPolicy().getTotalRounds();
         for (int r = 0; r < policyRounds; r++) {
@@ -435,7 +457,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         builder.appendLine("rounds:");
         builder.increaseIndent();
         for (Integer roundIndex : roundsPresent) {
-            int slotCount = determineSlotCount(roundIndex, history, events);
+            int slotCount = determineSlotCount(roundIndex, history, knowledgeHistory, events);
             if (slotCount <= 0) {
                 continue;
             }
@@ -448,6 +470,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
             builder.appendLine("slots:");
             builder.increaseIndent();
             Map<Integer, String> lastStates = new HashMap<>();
+            Map<Integer, String> lastKnowledge = new HashMap<>();
 
             for (int slot = 0; slot < slotCount; slot++) {
                 builder.startListItem("id: " + (slot + 1));
@@ -458,11 +481,24 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
                     updates.forEach(lastStates::put);
                 }
 
+                Map<Integer, String> knowledgeUpdates = knowledgeHistory.getOrDefault(timeKey, Collections.emptyMap());
+                if (!knowledgeUpdates.isEmpty()) {
+                    knowledgeUpdates.forEach(lastKnowledge::put);
+                }
+
                 builder.appendLine("nodeStates:");
                 builder.increaseIndent();
                 for (CtNode node : sortedNodes) {
                     builder.appendLine(node.getId() + ": "
                             + quote(lastStates.getOrDefault(node.getId(), "unknown")));
+                }
+                builder.decreaseIndent();
+
+                builder.appendLine("knowledge:");
+                builder.increaseIndent();
+                for (CtNode node : sortedNodes) {
+                    builder.appendLine(node.getId() + ": "
+                            + quoteNullable(lastKnowledge.get(node.getId())));
                 }
                 builder.decreaseIndent();
 
@@ -504,9 +540,15 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
 
     private int determineSlotCount(int roundIndex,
                                    SortedMap<CtNetworkTime, Map<Integer, String>> history,
+                                   SortedMap<CtNetworkTime, Map<Integer, String>> knowledgeHistory,
                                    SortedMap<CtNetworkTime, List<ChaosScenarioRecorder.TransmissionEvent>> events) {
         int maxSlot = -1;
         for (CtNetworkTime time : history.keySet()) {
+            if (time.round() == roundIndex) {
+                maxSlot = Math.max(maxSlot, time.slot());
+            }
+        }
+        for (CtNetworkTime time : knowledgeHistory.keySet()) {
             if (time.round() == roundIndex) {
                 maxSlot = Math.max(maxSlot, time.slot());
             }
@@ -571,6 +613,32 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         }
         long sendTime = Math.max(0, packet.time());
         return strategies.transmissionPolicy().getNetworkTime(sendTime);
+    }
+
+    private void recordKnowledgeSnapshot(ContextView context) {
+        CtNetworkTime netTime = getNetworkTime();
+        if (netTime == null) {
+            return;
+        }
+        for (CtNode node : context.getNetGraph().getNodes()) {
+            if (node instanceof StatefulNode statefulNode) {
+                recordKnowledge(netTime, statefulNode);
+            }
+        }
+    }
+
+    private void recordKnowledge(CtNetworkTime time, StatefulNode node) {
+        if (time == null || node == null) {
+            return;
+        }
+        stateLogger.setKnowledge(time, node, serializeKnowledge(node.getKnowledge()));
+    }
+
+    private static String serializeKnowledge(CtMessage<ChaosMessage> knowledge) {
+        if (knowledge == null || knowledge.isNull()) {
+            return null;
+        }
+        return knowledge.toString();
     }
 
     private static final class YamlBuilder {

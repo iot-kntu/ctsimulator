@@ -11,6 +11,7 @@ import java.util.*;
 public class ChaosStateLogger {
 
     private final SortedMap<CtNetworkTime, Map<CtNode, String>> history = new TreeMap<>();
+    private final SortedMap<CtNetworkTime, Map<CtNode, String>> knowledgeHistory = new TreeMap<>();
     private final List<CtNode> nodes;
     private final ChaosTransmissionPolicy transmissionPolicy;
 
@@ -25,12 +26,26 @@ public class ChaosStateLogger {
         stateMap.put(node, nodeState);
     }
 
+    public void setKnowledge(CtNetworkTime time, CtNode node, String knowledge) {
+        final Map<CtNode, String> knowledgeMap = knowledgeHistory.computeIfAbsent(time, k -> new TreeMap<>());
+        knowledgeMap.put(node, knowledge);
+    }
+
     /**
      * Returns a defensive copy of the collected node states keyed by network time.
      */
     public SortedMap<CtNetworkTime, Map<CtNode, String>> snapshotHistory() {
         SortedMap<CtNetworkTime, Map<CtNode, String>> copy = new TreeMap<>();
         history.forEach((time, stateMap) -> copy.put(time, Collections.unmodifiableMap(new HashMap<>(stateMap))));
+        return Collections.unmodifiableSortedMap(copy);
+    }
+
+    /**
+     * Returns a defensive copy of the collected node knowledge keyed by network time.
+     */
+    public SortedMap<CtNetworkTime, Map<CtNode, String>> snapshotKnowledgeHistory() {
+        SortedMap<CtNetworkTime, Map<CtNode, String>> copy = new TreeMap<>();
+        knowledgeHistory.forEach((time, knowledgeMap) -> copy.put(time, Collections.unmodifiableMap(new HashMap<>(knowledgeMap))));
         return Collections.unmodifiableSortedMap(copy);
     }
 
