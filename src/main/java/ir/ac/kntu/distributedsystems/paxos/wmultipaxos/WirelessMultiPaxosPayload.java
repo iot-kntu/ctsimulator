@@ -1,0 +1,141 @@
+package ir.ac.kntu.distributedsystems.paxos.wmultipaxos;
+
+import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxosPhase;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Payload for Wireless Multi-Paxos messages.
+ * Carries a window of log entries plus proposal/meta data so it can be merged
+ * in-flight by Chaos aggregation.
+ */
+public record WirelessMultiPaxosPayload(
+        WirelessPaxosPhase phase,
+        int proposalNumber,
+        int slotStart,
+        int slotCount,
+        List<LogEntry> entries,
+        int minProposal) {
+
+    public static WirelessMultiPaxosPayload empty(int slotCapacity) {
+        return new WirelessMultiPaxosPayload(WirelessPaxosPhase.PREPARE, -1, 0, Math.max(0, slotCapacity),
+                List.of(), 0);
+    }
+
+    public static WirelessMultiPaxosPayload prepare(int proposalNumber, int slotStart, List<LogEntry> entries,
+                                                    int minProposal) {
+        return build(WirelessPaxosPhase.PREPARE, proposalNumber, slotStart, entries, minProposal);
+    }
+
+    public static WirelessMultiPaxosPayload accept(int proposalNumber, int slotStart, List<LogEntry> entries,
+                                                   int minProposal) {
+        return build(WirelessPaxosPhase.ACCEPT, proposalNumber, slotStart, entries, minProposal);
+    }
+
+    private static WirelessMultiPaxosPayload build(WirelessPaxosPhase phase, int proposalNumber, int slotStart,
+                                                   List<LogEntry> entries, int minProposal) {
+        List<LogEntry> normalized = normalize(entries, slotStart, Integer.MAX_VALUE);
+        int slotCount = normalized.size();
+        return new WirelessMultiPaxosPayload(phase, proposalNumber, slotStart, slotCount, normalized, minProposal);
+    }
+
+    public WirelessMultiPaxosPayload withEntries(List<LogEntry> updatedEntries, int slotCapacity) {
+        int start = updatedEntries.isEmpty() ? slotStart : updatedEntries.get(0).slotIndex();
+        List<LogEntry> normalized = normalize(updatedEntries, start, slotCapacity);
+        return new WirelessMultiPaxosPayload(phase, proposalNumber, start, normalized.size(), normalized, minProposal);
+    }
+
+    public WirelessMultiPaxosPayload withMinProposal(int nextMinProposal) {
+        return new WirelessMultiPaxosPayload(phase, proposalNumber, slotStart, slotCount, entries, nextMinProposal);
+    }
+
+    public boolean isEmptyAttempt() {
+        return proposalNumber < 0;
+    }
+
+    public static WirelessMultiPaxosPayload mergePayloads(WirelessMultiPaxosPayload left,
+                                                          WirelessMultiPaxosPayload right, int slotCapacity) {
+        if (left == null) {
+            return right != null ? right : empty(slotCapacity);
+        }
+        if (right == null) {
+            return left;
+        }
+
+        WirelessMultiPaxosPayload dominant = pickDominant(left, right);
+
+        // Only merge entries for the slots covered by the dominant chunk.
+        Map<Integer, LogEntry> mergedEntries = new HashMap<>();
+        int chunkStart = dominant.slotStart();
+        int chunkEnd = chunkStart + Math.max(1, dominant.slotCount());
+
+        // Seed with dominant entries.
+        for (LogEntry entry : dominant.entries()) {
+            mergedEntries.put(entry.slotIndex(), entry);
+        }
+        // Bring in higher-accepted entries for the same slots from the other payload.
+        WirelessMultiPaxosPayload secondary = (dominant == left) ? right : left;
+        for (LogEntry entry : secondary.entries()) {
+            if (entry.slotIndex() < chunkStart || entry.slotIndex() >= chunkEnd) {
+                continue; // ignore other chunks
+            }
+            LogEntry current = mergedEntries.get(entry.slotIndex());
+            if (current == null
+                    || entry.acceptedProposal() > current.acceptedProposal()
+                    || (entry.acceptedProposal() == current.acceptedProposal()
+                            && current.acceptedValue() == null && entry.acceptedValue() != null)) {
+                mergedEntries.put(entry.slotIndex(), entry);
+            }
+        }
+
+        List<LogEntry> normalized = normalize(new ArrayList<>(mergedEntries.values()),
+                dominant.slotStart(), slotCapacity);
+        int slotCount = normalized.size();
+        int min = Math.max(left.minProposal(), right.minProposal());
+        return new WirelessMultiPaxosPayload(dominant.phase(), dominant.proposalNumber(),
+                normalized.isEmpty() ? dominant.slotStart() : normalized.get(0).slotIndex(),
+                slotCount,
+                normalized,
+                min);
+    }
+
+    private static WirelessMultiPaxosPayload pickDominant(WirelessMultiPaxosPayload left,
+                                                          WirelessMultiPaxosPayload right) {
+        if (left.proposalNumber() != right.proposalNumber()) {
+            return left.proposalNumber() > right.proposalNumber() ? left : right;
+        }
+        if (left.phase() != right.phase()) {
+            return left.phase() == WirelessPaxosPhase.ACCEPT ? left : right;
+        }
+        if (left.slotStart() != right.slotStart()) {
+            // Prefer the newer chunk (higher slotStart) when proposal/phase are the same.
+            return left.slotStart() > right.slotStart() ? left : right;
+        }
+        return left;
+    }
+
+    private static List<LogEntry> normalize(List<LogEntry> source, int start, int slotCapacity) {
+        List<LogEntry> copy = new ArrayList<>();
+        for (LogEntry entry : source) {
+            if (entry != null) {
+                copy.add(entry);
+            }
+        }
+        copy.sort(Comparator.comparingInt(LogEntry::slotIndex));
+        if (copy.size() > slotCapacity) {
+            copy = copy.subList(0, slotCapacity);
+        }
+        return List.copyOf(copy);
+    }
+
+    public record LogEntry(int slotIndex, int acceptedProposal, Object acceptedValue, Object proposedValue) {
+        public LogEntry {
+            Objects.requireNonNull(Integer.valueOf(slotIndex), "slotIndex");
+        }
+    }
+}
