@@ -37,7 +37,8 @@ public class LoyalCtNode implements StatefulNode {
      * Initializes the node at the start of a new round.
      */
     @Override
-    public void initializeForNewRound(ContextView context, CtMessage<ChaosMessage> initialKnowledge, ChaosStateLogger logger, NodeState startingPoint) {
+    public void initializeForNewRound(ContextView context, CtMessage<ChaosMessage> initialKnowledge,
+            ChaosStateLogger logger, NodeState startingPoint) {
         this.knowledge = initialKnowledge;
         this.stateLogger = logger;
         this.policy = (ChaosTransmissionPolicy) context.getApplication().getTransmissionPolicy();
@@ -104,7 +105,6 @@ public class LoyalCtNode implements StatefulNode {
         newState.onEnter(this, context);
     }
 
-
     @Override
     public NodeState getCurrentState() {
         return currentState;
@@ -133,7 +133,8 @@ public class LoyalCtNode implements StatefulNode {
         FlagField mergedFlags = currentContent.flags().merge(receivedContent.flags());
 
         boolean hasNewInfo = !mergedFlags.equals(currentContent.flags());
-        boolean receiverKnowsMore = currentContent.flags().getParticipationCount() > receivedContent.flags().getParticipationCount();
+        boolean receiverKnowsMore = currentContent.flags().getParticipationCount() > receivedContent.flags()
+                .getParticipationCount();
 
         return hasNewInfo || receiverKnowsMore;
     }
@@ -143,7 +144,6 @@ public class LoyalCtNode implements StatefulNode {
         return policy.getFinalFloodRepeatCount();
     }
 
-
     @Override
     public void initiateFlood(ContextView context, CtNode initiatorNode) {
         ChaosTransmissionPolicy policy = (ChaosTransmissionPolicy) context.getApplication().getTransmissionPolicy();
@@ -151,28 +151,24 @@ public class LoyalCtNode implements StatefulNode {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message) {
-        this.floodMessage(context, sender, message, false);
+    public <T> void floodMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message) {
+        this.floodMessage(context, delay, sender, message, false);
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message, boolean finalFlood) {
+    public <T> void floodMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message,
+            boolean finalFlood) {
         int repeatCount = finalFlood
-                ? policy.getFinalFloodRepeatCount() // In FinalFloodingState, we send one packet at a time and decrement counter
+                ? policy.getFinalFloodRepeatCount() // In FinalFloodingState, we send one packet at a time and decrement
+                                                    // counter
                 : policy.getFloodRepeatCount();
-
-
-        for (int repeat = 0; repeat < repeatCount; repeat++) {
-            this.sendMessage(context, repeat, sender, message);
-        }
-    }
-
-    @Override
-    public <T> void sendMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message) {
         final List<CtNode> neighbors = context.getNetGraph().getNodeNeighbors(sender);
-        for (CtNode node : neighbors) {
-            final FloodPacket<T> floodPacket = new FloodPacket<>(context.getTime() + delay, message, sender, node);
-            context.getSimulator().schedulePacket(floodPacket);
+
+        for (int repeat = 0 + (int) delay; repeat < repeatCount; repeat++) {
+            for (CtNode node : neighbors) {
+                final FloodPacket<T> floodPacket = new FloodPacket<>(context.getTime() + delay, message, sender, node);
+                context.getSimulator().schedulePacket(floodPacket);
+            }
         }
     }
 

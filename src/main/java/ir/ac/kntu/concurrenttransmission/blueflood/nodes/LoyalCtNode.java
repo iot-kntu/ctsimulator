@@ -40,7 +40,7 @@ public class LoyalCtNode implements CtNode {
         for (CtNode node : neighbors) {
             for (int repeat = 0; repeat < floodRepeatCount; repeat++) {
 
-                final FloodPacket<?> stFloodPacket = new FloodPacket<>(context.getTime() + 1 + repeat, ctMessage,
+                final FloodPacket<?> stFloodPacket = new FloodPacket<>(context.getTime() + repeat, ctMessage,
                         initiatorNode, node);
                 context.getSimulator().schedulePacket(stFloodPacket);
             }
@@ -48,7 +48,7 @@ public class LoyalCtNode implements CtNode {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message) {
+    public <T> void floodMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message) {
 
         Objects.requireNonNull(context);
         Objects.requireNonNull(sender);
@@ -58,8 +58,8 @@ public class LoyalCtNode implements CtNode {
         final List<CtNode> neighbors = context.getNetGraph().getNodeNeighbors(sender);
 
         for (CtNode node : neighbors) {
-            for (int repeat = 0; repeat < floodRepeatCount; repeat++) {
-                final FloodPacket<T> stFloodPacket = new FloodPacket<>(context.getTime() + 1 + repeat, message, sender,
+            for (int repeat = 0 + (int) delay; repeat < floodRepeatCount; repeat++) {
+                final FloodPacket<T> stFloodPacket = new FloodPacket<>(context.getTime() + repeat, message, sender,
                         node);
                 context.getSimulator().schedulePacket(stFloodPacket);
             }

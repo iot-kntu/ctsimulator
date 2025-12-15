@@ -23,7 +23,7 @@ public class FinalFloodingState implements NodeState {
     @Override
     public void onEnter(StatefulNode node, ContextView context) {
         // The action is to repeatedly flood the final message.
-        node.floodMessage(context, node, node.getKnowledge(), true);
+        node.floodMessage(context, 0, node, node.getKnowledge(), true);
 
         long endOfFloodTime = context.getTime() + node.getFinalFloodCounter();
 

@@ -18,7 +18,7 @@ final class NullCtNode implements CtNode {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message) {
+    public <T> void floodMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message) {
         // no-op
     }
 

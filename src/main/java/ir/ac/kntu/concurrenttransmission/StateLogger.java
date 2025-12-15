@@ -22,6 +22,15 @@ public class StateLogger {
         stateMap.put(node, nodeState);
     }
 
+    /**
+     * Returns a defensive copy of the collected node states keyed by network time.
+     */
+    public SortedMap<CtNetworkTime, Map<CtNode, NodeState>> snapshotHistory() {
+        SortedMap<CtNetworkTime, Map<CtNode, NodeState>> copy = new TreeMap<>();
+        history.forEach((time, stateMap) -> copy.put(time, Collections.unmodifiableMap(new HashMap<>(stateMap))));
+        return Collections.unmodifiableSortedMap(copy);
+    }
+
     public String printTimeline() {
         if (history.isEmpty()) {
             return "StateHistory is empty.";

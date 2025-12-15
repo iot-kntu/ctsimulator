@@ -47,7 +47,7 @@ public class FaultyCtNode extends LoyalCtNode {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message) {
+    public <T> void floodMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message) {
 
         final List<CtNode> neighbors = context.getNetGraph().getNodeNeighbors(sender);
         final int floodRepeatCount = context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
@@ -57,7 +57,7 @@ public class FaultyCtNode extends LoyalCtNode {
             CtMessage<?> newMessage = context.getApplication().getMessage(context, sender, message, i);
 
             for (CtNode neighbor : neighbors) {
-                final FloodPacket<?> packet = new FloodPacket<>(context.getTime() + 1 + i,
+                final FloodPacket<?> packet = new FloodPacket<>(context.getTime() + delay + i,
                         newMessage, sender, neighbor);
                 context.getSimulator().schedulePacket(packet);
             }

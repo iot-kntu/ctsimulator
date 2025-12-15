@@ -9,7 +9,7 @@ public interface CtNode extends Comparable<CtNode> {
     void initiateFlood(ContextView context, CtNode initiatorNode);
 
     // TODO: remove sender
-    <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message);
+    <T> void floodMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message);
 
     int getId();
 

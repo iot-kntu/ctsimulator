@@ -16,7 +16,7 @@ public class SilentCtNode extends LoyalCtNode {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message) {
+    public <T> void floodMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message) {
 
     }
 }

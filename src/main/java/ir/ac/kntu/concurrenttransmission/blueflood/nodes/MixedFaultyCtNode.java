@@ -37,10 +37,10 @@ public class MixedFaultyCtNode extends FaultyCtNode {
     }
 
     @Override
-    public <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message) {
+    public <T> void floodMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message) {
 
         if (random.nextDouble() > silencePercent) {
-            super.floodMessage(context, sender, message);
+            super.floodMessage(context, delay, sender, message);
         }
         // else remain silent
     }

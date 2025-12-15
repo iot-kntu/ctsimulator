@@ -9,9 +9,10 @@ import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 
 public interface StatefulNode extends CtNode {
-    <T> void floodMessage(ContextView context, CtNode sender, CtMessage<T> message, boolean finalFlood);
+    <T> void floodMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message, boolean finalFlood);
 
-    void initializeForNewRound(ContextView context, CtMessage<ChaosMessage> initialKnowledge, ChaosStateLogger logger, NodeState startingPoint);
+    void initializeForNewRound(ContextView context, CtMessage<ChaosMessage> initialKnowledge, ChaosStateLogger logger,
+            NodeState startingPoint);
 
     void handlePacket(ContextView context, FloodPacket<?> packet);
 
@@ -33,7 +34,4 @@ public interface StatefulNode extends CtNode {
     boolean shouldFlood(CtMessage<ChaosMessage> currentKnowledge, CtMessage<ChaosMessage> receivedMessage);
 
     int getFinalFloodCounter();
-
-    // TODO: remove sender
-    <T> void sendMessage(ContextView context, long delay, CtNode sender, CtMessage<T> message);
 }
