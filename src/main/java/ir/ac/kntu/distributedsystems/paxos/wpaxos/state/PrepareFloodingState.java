@@ -22,7 +22,7 @@ public class PrepareFloodingState implements NodeState {
     @Override
     public void onEnter(StatefulNode node, ContextView context) {
         // The primary action of this state is to flood the current knowledge.
-        node.floodMessage(context, node, node.getKnowledge());
+        node.floodMessage(context, 0, node, node.getKnowledge());
         long endOfFloodTime = context.getTime()
                 + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
 

@@ -20,7 +20,7 @@ public class PrepareFloodingState implements NodeState {
 
     @Override
     public void onEnter(StatefulNode node, ContextView context) {
-        node.floodMessage(context, node, node.getKnowledge());
+        node.floodMessage(context, 0, node, node.getKnowledge());
         long endOfFloodTime = context.getTime()
                 + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
 

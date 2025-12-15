@@ -21,7 +21,7 @@ public class VoteFloodingState implements NodeState {
     public void onEnter(StatefulNode node, ContextView context) {
         CtMessage<ChaosMessage> message = node.getKnowledge();
 
-        node.floodMessage(context, node, message);
+        node.floodMessage(context, 0, node, message);
         long endOfFloodTime = context.getTime()
                 + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();
 
