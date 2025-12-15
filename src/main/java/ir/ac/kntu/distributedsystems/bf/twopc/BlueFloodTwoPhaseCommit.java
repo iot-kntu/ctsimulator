@@ -32,7 +32,6 @@ public class BlueFloodTwoPhaseCommit implements BlueFloodNodeListener {
     private final Queue<VoteValue> votePlan;
 
     private final Map<Integer, Object> knownProposals = new HashMap<>();
-    private final Map<Integer, VoteValue> myVotes = new HashMap<>();
     private final Map<Integer, Map<Integer, VoteValue>> votesByProposal = new HashMap<>();
     private final Map<Integer, TwoPhaseCommitDecision> decisions = new HashMap<>();
     private final Set<Integer> deliveredMessages = new HashSet<>();
@@ -94,7 +93,7 @@ public class BlueFloodTwoPhaseCommit implements BlueFloodNodeListener {
         ensureVotesForKnownProposals(selfId);
         maybeFinalizeOwnProposal(selfId);
 
-        Map<Integer, VoteValue> outgoingVotes = new HashMap<>(myVotes);
+        Map<Integer, Map<Integer, VoteValue>> outgoingVotes = deepCopyVotes();
         Map<Integer, TwoPhaseCommitDecision> outgoingDecisions = new HashMap<>(decisions);
         Map<Integer, Object> outgoingProposals = new HashMap<>(knownProposals);
 
@@ -123,18 +122,21 @@ public class BlueFloodTwoPhaseCommit implements BlueFloodNodeListener {
     }
 
     private void mergeIncomingVotes(TwoPcPayload payload) {
-        if (payload.votes() == null) {
+        if (payload.votes() == null || payload.votes().isEmpty()) {
             return;
         }
-
-        int voterId = payload.authorId();
-        payload.votes().forEach((proposalOwner, vote) -> {
-            if (vote == null) {
+        payload.votes().forEach((proposalOwner, voteMap) -> {
+            if (voteMap == null) {
                 return;
             }
-            votesByProposal.computeIfAbsent(proposalOwner, key -> new HashMap<>())
-                    .put(voterId, vote);
-            decisions.putIfAbsent(proposalOwner, TwoPhaseCommitDecision.IN_PROGRESS);
+            voteMap.forEach((voterId, vote) -> {
+                if (vote == null) {
+                    return;
+                }
+                votesByProposal.computeIfAbsent(proposalOwner, key -> new HashMap<>())
+                        .put(voterId, vote);
+                decisions.putIfAbsent(proposalOwner, TwoPhaseCommitDecision.IN_PROGRESS);
+            });
         });
     }
 
@@ -165,11 +167,10 @@ public class BlueFloodTwoPhaseCommit implements BlueFloodNodeListener {
 
     private void ensureVotesForKnownProposals(int selfId) {
         knownProposals.keySet().forEach(proposalOwner -> {
-            if (!myVotes.containsKey(proposalOwner)) {
+            Map<Integer, VoteValue> perProposal = votesByProposal.computeIfAbsent(proposalOwner, key -> new HashMap<>());
+            if (!perProposal.containsKey(selfId)) {
                 VoteValue vote = nextVote();
-                myVotes.put(proposalOwner, vote);
-                votesByProposal.computeIfAbsent(proposalOwner, key -> new HashMap<>())
-                        .put(selfId, vote);
+                perProposal.put(selfId, vote);
             }
         });
     }
@@ -207,5 +208,11 @@ public class BlueFloodTwoPhaseCommit implements BlueFloodNodeListener {
         decisions.put(selfId, finalDecision);
         logger.log(Level.INFO,
                 "Node[" + selfId + "] finalized its proposal as " + finalDecision + " with votes=" + votes);
+    }
+
+    private Map<Integer, Map<Integer, VoteValue>> deepCopyVotes() {
+        Map<Integer, Map<Integer, VoteValue>> copy = new HashMap<>();
+        votesByProposal.forEach((proposalOwner, votes) -> copy.put(proposalOwner, new HashMap<>(votes)));
+        return copy;
     }
 }

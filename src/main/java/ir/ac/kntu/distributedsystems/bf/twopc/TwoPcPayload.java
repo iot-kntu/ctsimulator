@@ -10,11 +10,11 @@ import java.util.Map;
  *
  * @param authorId  node id that generated the message (and owns the votes map)
  * @param proposals all proposals known to the author keyed by proposer id
- * @param votes     author's votes for known proposals keyed by proposal owner id
+ * @param votes     known votes per proposal owner id -> (voter id -> vote)
  * @param decisions author's known final decisions keyed by proposal owner id
  */
 public record TwoPcPayload(int authorId,
                            Map<Integer, Object> proposals,
-                           Map<Integer, VoteValue> votes,
+                           Map<Integer, Map<Integer, VoteValue>> votes,
                            Map<Integer, TwoPhaseCommitDecision> decisions) {
 }
