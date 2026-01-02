@@ -40,8 +40,8 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
     public void simulationStarting(ContextView context) {
         this.stateLogger = new StateLogger(new ArrayList<>(context.getNetGraph().getNodes()),
                 strategies.transmissionPolicy());
-        newRound(context);
         updateNetworkTime(strategies.transmissionPolicy().getNetworkTime(context.getTime()));
+        newRound(context);
         recordStateSnapshot(context);
     }
 
@@ -61,11 +61,14 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
 
     @Override
     public void newRound(ContextView context) {
-        if (getNetworkTime() != null && getNetworkTime().round() > 0)
+        CtNetworkTime networkTime = resolveNetworkTime(context);
+        if (networkTime.round() > 0)
             logger.log(Level.INFO, "======== round " + getRound() + " completed ===========");
 
-        if (getRound() < settings.roundLimit()) {
+        if (networkTime.round() < settings.roundLimit()) {
             final int nextInitiator = strategies.initiatorStrategy().getNextInitiatorId();
+            final CtNode initiatorNode = context.getNetGraph().getNodeById(nextInitiator);
+            strategies.transmissionPolicy().newRound(networkTime, initiatorNode);
             SimInitiateFloodEvent initiateFloodEvent = new SimInitiateFloodEvent(context.getTime(), nextInitiator);
             context.getSimulator().scheduleEvent(initiateFloodEvent);
 
@@ -80,8 +83,6 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
         Objects.requireNonNull(context);
 
         final CtNode inode = getInitiatorNode(context);
-
-        strategies.transmissionPolicy().newRound(getNetworkTime(), inode);
         // capture the initial node states for this round before any packets move
         recordStateSnapshot(context);
 
@@ -482,6 +483,15 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
         String normalized = input.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", "_");
         normalized = normalized.replaceAll("^_+", "").replaceAll("_+$", "");
         return normalized.isEmpty() ? "scenario" : normalized;
+    }
+
+    private CtNetworkTime resolveNetworkTime(ContextView context) {
+        CtNetworkTime networkTime = getNetworkTime();
+        if (networkTime == null && context != null) {
+            networkTime = strategies.transmissionPolicy().getNetworkTime(context.getTime());
+            updateNetworkTime(networkTime);
+        }
+        return networkTime;
     }
 
     private static final class YamlBuilder {
