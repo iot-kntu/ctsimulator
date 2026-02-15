@@ -10,6 +10,8 @@ import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.a2.twopc.TwoPhaseCommitPayload;
 import ir.ac.kntu.distributedsystems.a2.twopc.TwoPhaseCommitPhase;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 public class VoteListeningState implements NodeState {
 
@@ -22,6 +24,7 @@ public class VoteListeningState implements NodeState {
         node.setKnowledge(mergedMessage);
 
         TwoPhaseCommitPayload payload = (TwoPhaseCommitPayload) mergedMessage.content().payload();
+        recordPhase(context, node, payload.phase());
         if (payload.phase() == TwoPhaseCommitPhase.FINALIZING) {
             if (node.shouldFlood(currentKnowledge, (CtMessage<ChaosMessage>) capturedPacket.ctMessage())) {
                 node.setState(new CommitFloodingState(), context);
@@ -46,7 +49,25 @@ public class VoteListeningState implements NodeState {
     }
 
     @Override
+    public boolean isListening() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "vR";
+    }
+
+    private void recordPhase(ContextView context, StatefulNode node, TwoPhaseCommitPhase phase) {
+        if (context == null || phase == null) {
+            return;
+        }
+        if (context.getApplication() instanceof MetricsEmitter emitter) {
+            MetricsCollector metrics = emitter.getMetricsCollector();
+            if (metrics != null && context.getApplication().getNetworkTime() != null) {
+                int round = context.getApplication().getNetworkTime().round();
+                metrics.recordPhaseTime(round, node.getId(), phase.name(), context.getTime());
+            }
+        }
     }
 }

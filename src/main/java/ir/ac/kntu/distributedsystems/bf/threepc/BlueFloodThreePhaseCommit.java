@@ -7,6 +7,8 @@ import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.a2.threepc.ThreePhaseCommitDecision;
 import ir.ac.kntu.distributedsystems.a2.vote.VoteValue;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +39,7 @@ public class BlueFloodThreePhaseCommit implements BlueFloodNodeListener {
     private final Set<Integer> deliveredMessages = new HashSet<>();
 
     private int networkSize = 0;
-    private boolean hasProposed = false;
+    private Integer lastProposedRound = null;
 
     public BlueFloodThreePhaseCommit(Queue<Object> proposals, Queue<VoteValue> votePlan) {
         this.proposals = proposals;
@@ -61,8 +63,9 @@ public class BlueFloodThreePhaseCommit implements BlueFloodNodeListener {
         mergeIncomingProposals(payload);
         mergeIncomingVotes(payload);
         mergeIncomingDecisions(payload);
-        ensureVotesForKnownProposals(receiverId);
-        maybeAdvanceOwnProposal(receiverId);
+        ensureVotesForKnownProposals(context, receiverId);
+        maybeAdvanceProposals();
+        recordFinalDecisions(context, receiverId);
 
         return deliveredMessages.add(ctMessage.messageNo());
     }
@@ -80,18 +83,20 @@ public class BlueFloodThreePhaseCommit implements BlueFloodNodeListener {
 
         int selfId = initiator.getId();
         Object proposalToSend = null;
+        int round = resolveRound(context);
 
-        if (!hasProposed) {
+        if (lastProposedRound == null || lastProposedRound != round) {
             proposalToSend = proposals.poll();
             if (proposalToSend == null) {
                 proposalToSend = "proposal-" + selfId;
             }
-            registerProposal(selfId, proposalToSend);
-            hasProposed = true;
+            registerProposal(round, proposalToSend);
+            lastProposedRound = round;
         }
 
-        ensureVotesForKnownProposals(selfId);
-        maybeAdvanceOwnProposal(selfId);
+        ensureVotesForKnownProposals(context, selfId);
+        maybeAdvanceProposals();
+        recordFinalDecisions(context, selfId);
 
         Map<Integer, Map<Integer, VoteValue>> outgoingVotes = deepCopyVotes();
         Map<Integer, ThreePhaseCommitDecision> outgoingDecisions = new HashMap<>(decisions);
@@ -112,13 +117,13 @@ public class BlueFloodThreePhaseCommit implements BlueFloodNodeListener {
         }
     }
 
-    private void registerProposal(int proposerId, Object proposal) {
-        if (proposal == null || knownProposals.containsKey(proposerId)) {
+    private void registerProposal(int proposalId, Object proposal) {
+        if (proposal == null || knownProposals.containsKey(proposalId)) {
             return;
         }
 
-        knownProposals.put(proposerId, proposal);
-        decisions.putIfAbsent(proposerId, ThreePhaseCommitDecision.IN_PROGRESS);
+        knownProposals.put(proposalId, proposal);
+        decisions.putIfAbsent(proposalId, ThreePhaseCommitDecision.IN_PROGRESS);
     }
 
     private void mergeIncomingProposals(ThreePcPayload payload) {
@@ -183,12 +188,13 @@ public class BlueFloodThreePhaseCommit implements BlueFloodNodeListener {
         return ThreePhaseCommitDecision.IN_PROGRESS;
     }
 
-    private void ensureVotesForKnownProposals(int selfId) {
+    private void ensureVotesForKnownProposals(ContextView context, int selfId) {
         knownProposals.keySet().forEach(proposalOwner -> {
             Map<Integer, VoteValue> perProposal = votesByProposal.computeIfAbsent(proposalOwner, key -> new HashMap<>());
             if (!perProposal.containsKey(selfId)) {
                 VoteValue vote = nextVote();
                 perProposal.put(selfId, vote);
+                recordPhaseVote(context, selfId, proposalOwner);
             }
         });
     }
@@ -198,48 +204,86 @@ public class BlueFloodThreePhaseCommit implements BlueFloodNodeListener {
         return vote != null ? vote : VoteValue.YES;
     }
 
-    private void maybeAdvanceOwnProposal(int selfId) {
-        if (!knownProposals.containsKey(selfId)) {
-            return;
-        }
-
-        ThreePhaseCommitDecision currentDecision = decisions.get(selfId);
-        if (currentDecision == ThreePhaseCommitDecision.ABORT
-                || currentDecision == ThreePhaseCommitDecision.COMMIT) {
-            return;
-        }
-
-        Map<Integer, VoteValue> votes = votesByProposal.get(selfId);
-        if (votes == null || votes.size() < networkSize) {
-            return;
-        }
-
-        boolean anyNo = votes.values().stream().anyMatch(vote -> vote == VoteValue.NO);
-        boolean anyUndecided = votes.values().stream().anyMatch(vote -> vote == VoteValue.UNDECIDED);
-
-        if (anyNo) {
-            decisions.put(selfId, ThreePhaseCommitDecision.ABORT);
-            logger.log(Level.INFO,
-                    "Node[" + selfId + "] aborted its proposal after receiving a NO vote");
-            return;
-        }
-
-        if (anyUndecided) {
-            return;
-        }
-
-        if (currentDecision == null || currentDecision == ThreePhaseCommitDecision.IN_PROGRESS) {
-            decisions.put(selfId, ThreePhaseCommitDecision.PRE_COMMIT);
-            preCommitAcks.computeIfAbsent(selfId, key -> new HashSet<>()).add(selfId);
-            logger.log(Level.INFO, "Node[" + selfId + "] reached PRE_COMMIT");
-        } else if (currentDecision == ThreePhaseCommitDecision.PRE_COMMIT) {
-            Set<Integer> acks = preCommitAcks.getOrDefault(selfId, Set.of());
-            if (acks.size() < networkSize) {
+    private void maybeAdvanceProposals() {
+        knownProposals.keySet().forEach(proposalId -> {
+            ThreePhaseCommitDecision currentDecision = decisions.get(proposalId);
+            if (currentDecision == ThreePhaseCommitDecision.ABORT
+                    || currentDecision == ThreePhaseCommitDecision.COMMIT) {
                 return;
             }
-            decisions.put(selfId, ThreePhaseCommitDecision.COMMIT);
-            logger.log(Level.INFO, "Node[" + selfId + "] finalized COMMIT");
+
+            Map<Integer, VoteValue> votes = votesByProposal.get(proposalId);
+            if (votes == null || votes.size() < networkSize) {
+                return;
+            }
+
+            boolean anyNo = votes.values().stream().anyMatch(vote -> vote == VoteValue.NO);
+            boolean anyUndecided = votes.values().stream().anyMatch(vote -> vote == VoteValue.UNDECIDED);
+
+            if (anyNo) {
+                decisions.put(proposalId, ThreePhaseCommitDecision.ABORT);
+                logger.log(Level.INFO,
+                        "Proposal[" + proposalId + "] aborted after receiving a NO vote");
+                return;
+            }
+
+            if (anyUndecided) {
+                return;
+            }
+
+            if (currentDecision == null || currentDecision == ThreePhaseCommitDecision.IN_PROGRESS) {
+                decisions.put(proposalId, ThreePhaseCommitDecision.PRE_COMMIT);
+                preCommitAcks.computeIfAbsent(proposalId, key -> new HashSet<>()).add(proposalId);
+                logger.log(Level.INFO, "Proposal[" + proposalId + "] reached PRE_COMMIT");
+            } else if (currentDecision == ThreePhaseCommitDecision.PRE_COMMIT) {
+                Set<Integer> acks = preCommitAcks.getOrDefault(proposalId, Set.of());
+                if (acks.size() < networkSize) {
+                    return;
+                }
+                decisions.put(proposalId, ThreePhaseCommitDecision.COMMIT);
+                logger.log(Level.INFO, "Proposal[" + proposalId + "] finalized COMMIT");
+            }
+        });
+    }
+
+    private int resolveRound(ContextView context) {
+        if (context == null || context.getApplication().getNetworkTime() == null) {
+            return 0;
         }
+        return context.getApplication().getNetworkTime().round();
+    }
+
+    private void recordPhaseVote(ContextView context, int nodeId, int proposalId) {
+        MetricsCollector metrics = resolveMetrics(context);
+        if (metrics != null) {
+            metrics.recordPhaseTime(proposalId, nodeId, "VOTE", context.getTime());
+        }
+    }
+
+    private void recordFinalDecisions(ContextView context, int nodeId) {
+        MetricsCollector metrics = resolveMetrics(context);
+        if (metrics == null) {
+            return;
+        }
+        decisions.forEach((proposalId, decision) -> {
+            if (decision == ThreePhaseCommitDecision.PRE_COMMIT) {
+                metrics.recordPhaseTime(proposalId, nodeId, "PRE_COMMIT", context.getTime());
+            }
+            if (decision == ThreePhaseCommitDecision.COMMIT || decision == ThreePhaseCommitDecision.ABORT) {
+                metrics.recordDecisionEnd(proposalId, nodeId, context.getTime(),
+                        decision == ThreePhaseCommitDecision.COMMIT);
+                metrics.recordPhaseTime(proposalId, nodeId,
+                        decision == ThreePhaseCommitDecision.COMMIT ? "COMMIT" : "ABORT",
+                        context.getTime());
+            }
+        });
+    }
+
+    private MetricsCollector resolveMetrics(ContextView context) {
+        if (context == null) {
+            return null;
+        }
+        return context.getApplication() instanceof MetricsEmitter emitter ? emitter.getMetricsCollector() : null;
     }
 
     private Map<Integer, Map<Integer, VoteValue>> deepCopyVotes() {

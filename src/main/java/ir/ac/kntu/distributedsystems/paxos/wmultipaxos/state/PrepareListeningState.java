@@ -10,6 +10,8 @@ import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.paxos.wmultipaxos.WirelessMultiPaxosPayload;
 import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxosPhase;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 import java.util.Objects;
 
@@ -27,6 +29,8 @@ public class PrepareListeningState implements NodeState {
 
         WirelessMultiPaxosPayload beforePayload = payloadOrEmpty(before);
         WirelessMultiPaxosPayload afterPayload = payloadOrEmpty(merged);
+
+        recordPhase(context, node, afterPayload.phase());
 
         boolean payloadChanged = !Objects.equals(beforePayload, afterPayload);
         boolean shouldFlood = payloadChanged || node.shouldFlood(before, merged);
@@ -56,6 +60,11 @@ public class PrepareListeningState implements NodeState {
     }
 
     @Override
+    public boolean isListening() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "pR";
     }
@@ -66,5 +75,18 @@ public class PrepareListeningState implements NodeState {
             return mpPayload;
         }
         return WirelessMultiPaxosPayload.empty(0);
+    }
+
+    private void recordPhase(ContextView context, StatefulNode node, WirelessPaxosPhase phase) {
+        if (context == null || phase == null) {
+            return;
+        }
+        if (context.getApplication() instanceof MetricsEmitter emitter) {
+            MetricsCollector metrics = emitter.getMetricsCollector();
+            if (metrics != null && context.getApplication().getNetworkTime() != null) {
+                int round = context.getApplication().getNetworkTime().round();
+                metrics.recordPhaseTime(round, node.getId(), phase.name(), context.getTime());
+            }
+        }
     }
 }

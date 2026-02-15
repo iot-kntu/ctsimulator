@@ -5,6 +5,11 @@ import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
 import ir.ac.kntu.concurrenttransmission.events.SimNewRoundEvent;
+import ir.ac.kntu.metrics.FailureReason;
+import ir.ac.kntu.metrics.FaultModel;
+import ir.ac.kntu.metrics.FaultModelProvider;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 import java.awt.geom.Point2D;
 import java.nio.file.Files;
@@ -16,15 +21,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BlueFloodApplication extends AbstractConcurrentTransmissionApplication<BlueFloodNodeListener>
-        implements CtBlueFloodApplication {
+        implements CtBlueFloodApplication, MetricsEmitter, FaultModelProvider {
 
     public static double DEFAULT_INTERFERENCE_PROB = 0.9;
     protected final BlueFloodStrategies strategies;
     private final Logger logger = Logger.getLogger("BlueFloodApplication");
     private final BlueFloodSettings settings;
-    private final Random random = new Random(new Date().getTime());
+    private Random random = new Random(new Date().getTime());
     private StateLogger stateLogger;
     private final BlueFloodScenarioRecorder scenarioRecorder = new BlueFloodScenarioRecorder();
+    private MetricsCollector metricsCollector;
+    private FaultModel faultModel;
 
     public BlueFloodApplication(BlueFloodSettings settings, BlueFloodStrategies strategies) {
         this.settings = settings;
@@ -83,6 +90,9 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
         Objects.requireNonNull(context);
 
         final CtNode inode = getInitiatorNode(context);
+        if (metricsCollector != null) {
+            metricsCollector.recordDecisionStart(getRound(), inode.getId(), context.getTime());
+        }
         // capture the initial node states for this round before any packets move
         recordStateSnapshot(context);
 
@@ -113,17 +123,34 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
 
         switch (getNodeState(receiver)) {
 
-            case Sleep -> {
+            case Sleep, Flood -> {
+                CtNetworkTime time = getNetworkTime();
+                if (time != null) {
+                    for (FloodPacket<?> packet : packets) {
+                        scenarioRecorder.recordEvent(time,
+                                BlueFloodScenarioRecorder.TransmissionEvent.failure("flood", packet,
+                                        FailureReason.NOT_LISTENING));
+                    }
+                }
+                if (metricsCollector != null) {
+                    int round = getRound();
+                    for (int i = 0; i < packets.size(); i++) {
+                        metricsCollector.recordReceiveFailure(round, receiver.getId(),
+                                FailureReason.NOT_LISTENING);
+                    }
+                }
+                getBlueFloodListener(receiver).ctPacketsLost(context, packets, ctEvent.areMessagesSimilar());
             }
             case Listen -> {
 
                 strategies.transmissionPolicy().newPacketReceived(receiver, getSlot());
 
                 double receiveProbability = ctEvent.areMessagesSimilar()
-                        ? settings.lossProbability()
+                        ? (faultModel != null ? faultModel.packetLossProb() : settings.lossProbability())
                         : settings.conflictProbability();
 
-                if (random.nextDouble() >= receiveProbability) { // no loss
+                Random rng = faultModel != null ? faultModel.runtimeRandom() : random;
+                if (rng.nextDouble() >= receiveProbability) { // no loss
 
                     getLogger().log(Level.INFO, String.format("[t:%d-r:%d-s:%d] node[%d] received Pkt[%d]",
                             context.getTime(),
@@ -133,17 +160,36 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
 
                     boolean shouldFlood = getBlueFloodListener(receiver).ctPacketsReceived(context, packets, thePacket,
                             ctEvent.areMessagesSimilar());
-                    recordTransmissionEvents(ctEvent.areMessagesSimilar(), true, packets, thePacket);
+                    recordTransmissionEvents(ctEvent.areMessagesSimilar(), true, packets, thePacket, null);
+                    if (metricsCollector != null) {
+                        int round = getRound();
+                        if (ctEvent.areMessagesSimilar()) {
+                            for (FloodPacket<?> packet : packets) {
+                                metricsCollector.recordReceiveSuccess(round, receiver.getId());
+                            }
+                        } else {
+                            metricsCollector.recordReceiveSuccess(round, receiver.getId());
+                            for (FloodPacket<?> packet : packets) {
+                                if (packet != thePacket) {
+                                    metricsCollector.recordReceiveFailure(round, receiver.getId(),
+                                            FailureReason.COLLISION);
+                                }
+                            }
+                        }
+                    }
                     if (shouldFlood)
                         receiver.floodMessage(context, 1, receiver, thePacket.ctMessage());
                 } else {
-                    recordTransmissionEvents(ctEvent.areMessagesSimilar(), false, packets, thePacket);
+                    FailureReason reason = ctEvent.areMessagesSimilar() ? FailureReason.DROP : FailureReason.COLLISION;
+                    recordTransmissionEvents(ctEvent.areMessagesSimilar(), false, packets, thePacket, reason);
+                    if (metricsCollector != null) {
+                        int round = getRound();
+                        for (int i = 0; i < packets.size(); i++) {
+                            metricsCollector.recordReceiveFailure(round, receiver.getId(), reason);
+                        }
+                    }
                     getBlueFloodListener(receiver).ctPacketsLost(context, packets, ctEvent.areMessagesSimilar());
                 }
-            }
-            case Flood -> {
-                // getLogger().log(Level.WARNING, "Received packet while in the flooding
-                // state");
             }
         }
 
@@ -204,6 +250,32 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
         return scenarioRecorder;
     }
 
+    @Override
+    public MetricsCollector getMetricsCollector() {
+        return metricsCollector;
+    }
+
+    public void setMetricsCollector(MetricsCollector metricsCollector) {
+        this.metricsCollector = metricsCollector;
+    }
+
+    @Override
+    public FaultModel getFaultModel() {
+        return faultModel;
+    }
+
+    public void setFaultModel(FaultModel faultModel) {
+        this.faultModel = faultModel;
+        TransmissionPolicy policy = strategies.transmissionPolicy();
+        if (policy instanceof FaultAwareTransmissionPolicy aware) {
+            aware.setFaultModel(faultModel);
+        }
+    }
+
+    public void setRandomSeed(long seed) {
+        this.random = new Random(seed);
+    }
+
     public void configureScenarioMetadata(String name, String author, String description) {
         scenarioRecorder.setScenarioMetadata(name, author, description);
     }
@@ -249,7 +321,7 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
     }
 
     private void recordTransmissionEvents(boolean areSimilar, boolean success, List<FloodPacket<?>> packets,
-            FloodPacket<?> selected) {
+            FloodPacket<?> selected, FailureReason failureReason) {
         CtNetworkTime time = getNetworkTime();
         if (time == null || packets == null || packets.isEmpty()) {
             return;
@@ -266,7 +338,8 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
             scenarioRecorder.recordEvent(time,
                     isSuccess
                             ? BlueFloodScenarioRecorder.TransmissionEvent.success("flood", packet)
-                            : BlueFloodScenarioRecorder.TransmissionEvent.failure("flood", packet));
+                            : BlueFloodScenarioRecorder.TransmissionEvent.failure("flood", packet,
+                                    success ? FailureReason.COLLISION : failureReason));
         }
     }
 
@@ -395,6 +468,9 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
                         builder.appendLine("from: " + event.from());
                         builder.appendLine("to: " + event.to());
                         builder.appendLine("success: " + event.success());
+                        if (event.failureReason() != null) {
+                            builder.appendLine("failureReason: " + quote(event.failureReason().name()));
+                        }
                         if (event.packet() != null) {
                             builder.appendLine("packet:");
                             builder.increaseIndent();

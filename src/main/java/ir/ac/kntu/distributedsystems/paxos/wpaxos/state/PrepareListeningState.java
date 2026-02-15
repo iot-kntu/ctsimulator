@@ -10,6 +10,8 @@ import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxosPayload;
 import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxosPhase;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 /**
  * Behavior of a node when it is in the Listening state.
@@ -28,6 +30,7 @@ public class PrepareListeningState implements NodeState {
         node.setKnowledge(mergedMessage);
 
         WirelessPaxosPayload payload = (WirelessPaxosPayload) mergedMessage.content().payload();
+        recordPhase(context, node, payload.phase());
 
         if (payload.phase() == WirelessPaxosPhase.ACCEPT) {
             if (node.shouldFlood(currentKnowledge, (CtMessage<ChaosMessage>) capturedPacket.ctMessage())) {
@@ -54,7 +57,25 @@ public class PrepareListeningState implements NodeState {
     }
 
     @Override
+    public boolean isListening() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "pR";
+    }
+
+    private void recordPhase(ContextView context, StatefulNode node, WirelessPaxosPhase phase) {
+        if (context == null || phase == null) {
+            return;
+        }
+        if (context.getApplication() instanceof MetricsEmitter emitter) {
+            MetricsCollector metrics = emitter.getMetricsCollector();
+            if (metrics != null && context.getApplication().getNetworkTime() != null) {
+                int round = context.getApplication().getNetworkTime().round();
+                metrics.recordPhaseTime(round, node.getId(), phase.name(), context.getTime());
+            }
+        }
     }
 }

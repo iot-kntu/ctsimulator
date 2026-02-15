@@ -8,6 +8,12 @@ import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
 import ir.ac.kntu.concurrenttransmission.events.SimNewRoundEvent;
+import ir.ac.kntu.distributedsystems.paxos.wmultipaxos.WirelessMultiPaxos;
+import ir.ac.kntu.metrics.FailureReason;
+import ir.ac.kntu.metrics.FaultModel;
+import ir.ac.kntu.metrics.FaultModelProvider;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 import java.awt.geom.Point2D;
 import java.io.BufferedWriter;
@@ -25,7 +31,7 @@ import java.util.logging.Logger;
  * slots) is reached.
  */
 public class ChaosApplication extends AbstractConcurrentTransmissionApplication<ChaosNodeListener>
-        implements CtChaosApplication {
+        implements CtChaosApplication, MetricsEmitter, FaultModelProvider {
 
     private static final Logger logger = Logger.getLogger(ChaosApplication.class.getSimpleName());
 
@@ -44,6 +50,8 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
     private final ChaosScenarioRecorder scenarioRecorder;
     private boolean roundActive;
     private int roundsCompleted;
+    private MetricsCollector metricsCollector;
+    private FaultModel faultModel;
 
     public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph,
                             NodeState startingPoint) {
@@ -205,6 +213,13 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         Objects.requireNonNull(context);
 
         final CtNode initiator = getInitiatorNode(context);
+        if (metricsCollector != null) {
+            ChaosNodeListener listener = getChaosNodeListener(initiator);
+            boolean skipDecisionStart = listener instanceof WirelessMultiPaxos;
+            if (!skipDecisionStart) {
+                metricsCollector.recordDecisionStart(getRound(), initiator.getId(), context.getTime());
+            }
+        }
         initiator.initiateFlood(context, initiator);
     }
 
@@ -221,39 +236,95 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         final CtNode receiver = ctEvent.getReceiver();
         if (!(receiver instanceof StatefulNode))
             return; // Only process for stateful nodes
+        StatefulNode statefulReceiver = (StatefulNode) receiver;
         CtNetworkTime currentTime = getNetworkTime();
-        FloodPacket<?> capturedPacket = selectPacketBySignal(packets, (StatefulNode) receiver, context);
+        if (statefulReceiver.getCurrentState() != null && !statefulReceiver.getCurrentState().isListening()) {
+            if (currentTime != null) {
+                packets.forEach(packet -> {
+                    CtNetworkTime failureTime = determineEventTime(packet, currentTime);
+                    scenarioRecorder.recordEvent(failureTime,
+                            ChaosScenarioRecorder.TransmissionEvent.failure("flood", packet,
+                                    FailureReason.NOT_LISTENING));
+                });
+            }
+            if (metricsCollector != null) {
+                int round = getRound();
+                for (int i = 0; i < packets.size(); i++) {
+                    metricsCollector.recordReceiveFailure(round, receiver.getId(), FailureReason.NOT_LISTENING);
+                }
+            }
+            return;
+        }
+
+        FloodPacket<?> capturedPacket = selectPacketBySignal(packets, statefulReceiver, context);
 
         if (capturedPacket != null) {
+            boolean dropped = faultModel != null
+                    ? faultModel.shouldDropPacket()
+                    : Math.random() < settings.lossProbability();
             CtNetworkTime successTime = null;
             if (currentTime != null) {
                 successTime = determineEventTime(capturedPacket, currentTime);
-                scenarioRecorder.recordEvent(successTime,
-                        ChaosScenarioRecorder.TransmissionEvent.success("flood", capturedPacket));
+                if (!dropped) {
+                    scenarioRecorder.recordEvent(successTime,
+                            ChaosScenarioRecorder.TransmissionEvent.success("flood", capturedPacket));
+                } else {
+                    scenarioRecorder.recordEvent(successTime,
+                            ChaosScenarioRecorder.TransmissionEvent.failure("flood", capturedPacket,
+                                    FailureReason.DROP));
+                }
                 packets.stream()
                         .filter(packet -> packet != capturedPacket)
                         .forEach(packet -> {
                             CtNetworkTime failureTime = determineEventTime(packet, currentTime);
                             scenarioRecorder.recordEvent(failureTime,
-                                    ChaosScenarioRecorder.TransmissionEvent.failure("flood", packet));
+                                    ChaosScenarioRecorder.TransmissionEvent.failure("flood", packet,
+                                            FailureReason.COLLISION));
                         });
             }
-            StatefulNode statefulReceiver = (StatefulNode) receiver;
-            statefulReceiver.handlePacket(context, capturedPacket);
-            if (successTime == null) {
-                successTime = getNetworkTime();
+            if (!dropped) {
+                if (metricsCollector != null) {
+                    int round = getRound();
+                    metricsCollector.recordReceiveSuccess(round, receiver.getId());
+                    for (FloodPacket<?> packet : packets) {
+                        if (packet != capturedPacket) {
+                            metricsCollector.recordReceiveFailure(round, receiver.getId(), FailureReason.COLLISION);
+                        }
+                    }
+                }
+                statefulReceiver.handlePacket(context, capturedPacket);
+                if (successTime == null) {
+                    successTime = getNetworkTime();
+                }
+                if (successTime != null) {
+                    recordKnowledge(successTime, statefulReceiver);
+                }
+                checkRoundCompletion(context);
+            } else {
+                if (metricsCollector != null) {
+                    int round = getRound();
+                    metricsCollector.recordReceiveFailure(round, receiver.getId(), FailureReason.DROP);
+                    for (FloodPacket<?> packet : packets) {
+                        if (packet != capturedPacket) {
+                            metricsCollector.recordReceiveFailure(round, receiver.getId(), FailureReason.COLLISION);
+                        }
+                    }
+                }
+                getChaosNodeListener(receiver).ctPacketsLost(context, packets, false);
             }
-            if (successTime != null) {
-                recordKnowledge(successTime, statefulReceiver);
-            }
-            checkRoundCompletion(context);
         } else {
             if (currentTime != null) {
                 packets.forEach(packet -> {
                     CtNetworkTime failureTime = determineEventTime(packet, currentTime);
                     scenarioRecorder.recordEvent(failureTime,
-                            ChaosScenarioRecorder.TransmissionEvent.failure("flood", packet));
+                            ChaosScenarioRecorder.TransmissionEvent.failure("flood", packet, FailureReason.COLLISION));
                 });
+            }
+            if (metricsCollector != null) {
+                int round = getRound();
+                for (int i = 0; i < packets.size(); i++) {
+                    metricsCollector.recordReceiveFailure(round, receiver.getId(), FailureReason.COLLISION);
+                }
             }
             getChaosNodeListener(receiver).ctPacketsLost(context, packets, false);
         }
@@ -265,11 +336,15 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
             return packets.get(0);
         }
 
+        // Stabilize ordering for deterministic fading with seeded RNG.
+        List<FloodPacket<?>> orderedPackets = new ArrayList<>(packets);
+        orderedPackets.sort(Comparator.comparingInt(packet -> packet.sender() == null ? -1 : packet.sender().getId()));
+
         FloodPacket<?> strongestPacket = null;
         double maxSignalStrengthDb = -Double.MAX_VALUE;
         double totalInterferencePowerMw = 0;
 
-        for (FloodPacket<?> packet : packets) {
+        for (FloodPacket<?> packet : orderedPackets) {
             double distance = context.getNetGraph().getDistanceBetween(packet.sender(), receiver);
             double signalStrengthDb = signalModel.calculateSignalStrengthDb(distance);
 
@@ -348,6 +423,31 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
 
     public ChaosScenarioRecorder getScenarioRecorder() {
         return scenarioRecorder;
+    }
+
+    @Override
+    public MetricsCollector getMetricsCollector() {
+        return metricsCollector;
+    }
+
+    public void setMetricsCollector(MetricsCollector metricsCollector) {
+        this.metricsCollector = metricsCollector;
+    }
+
+    @Override
+    public FaultModel getFaultModel() {
+        return faultModel;
+    }
+
+    public void setFaultModel(FaultModel faultModel) {
+        this.faultModel = faultModel;
+        if (faultModel != null) {
+            signalModel.reseed(faultModel.seed() ^ 0xD1B54A32D192ED03L);
+        }
+        ConcurrentTransmissionPolicy policy = strategies.transmissionPolicy();
+        if (policy instanceof FaultAwareTransmissionPolicy aware) {
+            aware.setFaultModel(faultModel);
+        }
     }
 
     public void configureScenarioMetadata(String name, String author, String description) {

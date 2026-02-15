@@ -51,6 +51,11 @@ public class ListeningState implements NodeState {
     }
 
     @Override
+    public boolean isListening() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "R";
     }

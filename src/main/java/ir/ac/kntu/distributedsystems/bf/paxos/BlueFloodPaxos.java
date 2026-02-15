@@ -6,6 +6,8 @@ import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.a2.vote.VoteValue;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +38,7 @@ public class BlueFloodPaxos implements BlueFloodNodeListener {
     private final Set<Integer> deliveredMessages = new HashSet<>();
 
     private int networkSize = 0;
-    private boolean hasProposed = false;
+    private Integer lastProposedRound = null;
 
     public BlueFloodPaxos(Queue<Object> proposals, Queue<VoteValue> votePlan) {
         this.proposals = proposals;
@@ -60,8 +62,9 @@ public class BlueFloodPaxos implements BlueFloodNodeListener {
         mergeIncomingProposals(payload);
         mergeIncomingVotes(payload);
         mergeIncomingDecisions(payload);
-        ensureVotesForKnownProposals(receiverId);
+        ensureVotesForKnownProposals(context, receiverId);
         maybeFinalizeProposals();
+        recordFinalDecisions(context, receiverId);
 
         return deliveredMessages.add(ctMessage.messageNo());
     }
@@ -79,18 +82,20 @@ public class BlueFloodPaxos implements BlueFloodNodeListener {
 
         int selfId = initiator.getId();
         Object proposalToSend = null;
+        int round = resolveRound(context);
 
-        if (!hasProposed) {
+        if (lastProposedRound == null || lastProposedRound != round) {
             proposalToSend = proposals.poll();
             if (proposalToSend == null) {
                 proposalToSend = "proposal-" + selfId;
             }
-            registerProposal(selfId, proposalToSend);
-            hasProposed = true;
+            registerProposal(round, proposalToSend);
+            lastProposedRound = round;
         }
 
-        ensureVotesForKnownProposals(selfId);
+        ensureVotesForKnownProposals(context, selfId);
         maybeFinalizeProposals();
+        recordFinalDecisions(context, selfId);
 
         Map<Integer, Map<Integer, VoteValue>> outgoingVotes = deepCopyVotes();
         Map<Integer, PaxosDecision> outgoingDecisions = new HashMap<>(decisions);
@@ -111,13 +116,13 @@ public class BlueFloodPaxos implements BlueFloodNodeListener {
         }
     }
 
-    private void registerProposal(int proposerId, Object proposal) {
-        if (proposal == null || knownProposals.containsKey(proposerId)) {
+    private void registerProposal(int proposalId, Object proposal) {
+        if (proposal == null || knownProposals.containsKey(proposalId)) {
             return;
         }
 
-        knownProposals.put(proposerId, proposal);
-        decisions.putIfAbsent(proposerId, PaxosDecision.IN_PROGRESS);
+        knownProposals.put(proposalId, proposal);
+        decisions.putIfAbsent(proposalId, PaxosDecision.IN_PROGRESS);
     }
 
     private void mergeIncomingProposals(PaxosPayload payload) {
@@ -170,12 +175,13 @@ public class BlueFloodPaxos implements BlueFloodNodeListener {
         return incoming;
     }
 
-    private void ensureVotesForKnownProposals(int selfId) {
+    private void ensureVotesForKnownProposals(ContextView context, int selfId) {
         knownProposals.keySet().forEach(proposalOwner -> {
             Map<Integer, VoteValue> perProposal = votesByProposal.computeIfAbsent(proposalOwner, key -> new HashMap<>());
             if (!perProposal.containsKey(selfId)) {
                 VoteValue vote = nextVote();
                 perProposal.put(selfId, vote);
+                recordPhaseVote(context, selfId, proposalOwner);
             }
         });
     }
@@ -215,6 +221,40 @@ public class BlueFloodPaxos implements BlueFloodNodeListener {
                         "Proposal[" + proposalOwner + "] committed after majority YES votes");
             }
         });
+    }
+
+    private int resolveRound(ContextView context) {
+        if (context == null || context.getApplication().getNetworkTime() == null) {
+            return 0;
+        }
+        return context.getApplication().getNetworkTime().round();
+    }
+
+    private void recordPhaseVote(ContextView context, int nodeId, int proposalId) {
+        MetricsCollector metrics = resolveMetrics(context);
+        if (metrics != null) {
+            metrics.recordPhaseTime(proposalId, nodeId, "VOTE", context.getTime());
+        }
+    }
+
+    private void recordFinalDecisions(ContextView context, int nodeId) {
+        MetricsCollector metrics = resolveMetrics(context);
+        if (metrics == null) {
+            return;
+        }
+        decisions.forEach((proposalId, decision) -> {
+            if (decision == PaxosDecision.COMMIT || decision == PaxosDecision.ABORT) {
+                metrics.recordDecisionEnd(proposalId, nodeId, context.getTime(), decision == PaxosDecision.COMMIT);
+                metrics.recordPhaseTime(proposalId, nodeId, "DECIDE", context.getTime());
+            }
+        });
+    }
+
+    private MetricsCollector resolveMetrics(ContextView context) {
+        if (context == null) {
+            return null;
+        }
+        return context.getApplication() instanceof MetricsEmitter emitter ? emitter.getMetricsCollector() : null;
     }
 
     private Map<Integer, Map<Integer, VoteValue>> deepCopyVotes() {

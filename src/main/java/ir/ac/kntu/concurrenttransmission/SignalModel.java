@@ -25,7 +25,18 @@ public class SignalModel {
      */
     private static final double FADING_STANDARD_DEVIATION_DB = 2.0;
 
-    private final Random random = new Random();
+    private Random random = new Random();
+
+    public SignalModel() {
+    }
+
+    public SignalModel(long seed) {
+        this.random = new Random(seed);
+    }
+
+    public void reseed(long seed) {
+        this.random = new Random(seed);
+    }
 
     /**
      * Calculates the received signal strength in dBm, including a random fading
@@ -46,7 +57,6 @@ public class SignalModel {
         // 2. Add a random component for fading (log-normal shadowing)
         // This simulates the unpredictable variations in a real environment.
         double fading = random.nextGaussian() * FADING_STANDARD_DEVIATION_DB;
-        fading = 0; // TODO: Delete it later
 
         return deterministicSignalStrength + fading;
     }

@@ -38,6 +38,10 @@ public interface NodeState {
      */
     void onSlotStart(StatefulNode node, ContextView context);
 
+    default boolean isListening() {
+        return false;
+    }
+
     /**
      * Returns the symbolic representation of this state.
      *

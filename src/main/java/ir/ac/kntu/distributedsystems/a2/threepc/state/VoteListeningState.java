@@ -10,6 +10,8 @@ import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.a2.threepc.ThreePhaseCommitPayload;
 import ir.ac.kntu.distributedsystems.a2.threepc.ThreePhaseCommitPhase;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 public class VoteListeningState implements NodeState {
 
@@ -22,6 +24,7 @@ public class VoteListeningState implements NodeState {
         node.setKnowledge(mergedMessage);
 
         ThreePhaseCommitPayload payload = (ThreePhaseCommitPayload) mergedMessage.content().payload();
+        recordPhase(context, node, payload.phase());
         if (payload.phase() == ThreePhaseCommitPhase.PRE_COMMIT) {
             if (node.shouldFlood(currentKnowledge, (CtMessage<ChaosMessage>) capturedPacket.ctMessage())) {
                 node.setState(new PreCommitFloodingState(), context);
@@ -55,7 +58,30 @@ public class VoteListeningState implements NodeState {
     }
 
     @Override
+    public boolean isListening() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "vR";
+    }
+
+    private void recordPhase(ContextView context, StatefulNode node, ThreePhaseCommitPhase phase) {
+        if (context == null || phase == null) {
+            return;
+        }
+        if (context.getApplication() instanceof MetricsEmitter emitter) {
+            MetricsCollector metrics = emitter.getMetricsCollector();
+            if (metrics != null && context.getApplication().getNetworkTime() != null) {
+                int round = context.getApplication().getNetworkTime().round();
+                String phaseName = switch (phase) {
+                    case VOTING -> "VOTE";
+                    case PRE_COMMIT -> "PRE_COMMIT";
+                    case FINALIZING -> "COMMIT";
+                };
+                metrics.recordPhaseTime(round, node.getId(), phaseName, context.getTime());
+            }
+        }
     }
 }

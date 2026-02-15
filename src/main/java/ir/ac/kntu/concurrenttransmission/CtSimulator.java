@@ -33,14 +33,24 @@ public class CtSimulator {
     }
 
     public void start() {
+        start(Long.MAX_VALUE);
+    }
+
+    public boolean start(long maxTime) {
         scheduleEvent(new SimulationStartEvent(0));
 
+        boolean timedOut = false;
         context.time = -1;
         while (!eventQueue.isEmpty()) {
 
             try {
                 final SimEvent event = eventQueue.poll();
                 logger.log(Level.FINE, "Event popped:" + event);
+
+                if (event.getTime() > maxTime) {
+                    timedOut = true;
+                    break;
+                }
 
                 final int timeDiff = (int) (event.getTime() - context.time);
                 if (timeDiff > 0) {
@@ -54,6 +64,7 @@ public class CtSimulator {
             }
         }
         context.getApplication().simulationFinishing(context);
+        return !timedOut;
     }
 
     public void schedulePacket(FloodPacket<?> packet) {

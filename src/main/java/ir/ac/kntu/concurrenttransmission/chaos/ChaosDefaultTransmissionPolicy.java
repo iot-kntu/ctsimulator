@@ -4,8 +4,10 @@ import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.NodeState;
+import ir.ac.kntu.concurrenttransmission.FaultAwareTransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FloodingState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.ListeningState;
+import ir.ac.kntu.metrics.FaultModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +20,14 @@ import java.util.List;
  * Then, receiver nodes receive a valid packet and merge it and flood N
  * consecutive slots.
  */
-public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
+
+public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy, FaultAwareTransmissionPolicy {
 
     private final int floodRepeatCount;
     private final int finalFloodRepeatCount;
     private final NetGraph netGraph;
     private final List<Long> endRounds;
+    private FaultModel faultModel;
 
     public ChaosDefaultTransmissionPolicy(int floodRepeatCount, int finalFloodRepeatCount, NetGraph netGraph) {
         this.floodRepeatCount = floodRepeatCount;
@@ -110,6 +114,16 @@ public class ChaosDefaultTransmissionPolicy implements ChaosTransmissionPolicy {
         // With dynamic completion detection, this is now just a maximum bound
         // The actual round will complete when all nodes reach SleepingState or timeout occurs
         return 256; // Maximum slots before timeout
+    }
+
+    @Override
+    public void setFaultModel(FaultModel faultModel) {
+        this.faultModel = faultModel;
+    }
+
+    @Override
+    public FaultModel getFaultModel() {
+        return faultModel;
     }
 
 }

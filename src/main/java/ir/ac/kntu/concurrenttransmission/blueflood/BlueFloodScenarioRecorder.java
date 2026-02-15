@@ -4,6 +4,7 @@ import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.metrics.FailureReason;
 
 import java.util.*;
 
@@ -71,23 +72,33 @@ public class BlueFloodScenarioRecorder {
     public record RoundInfo(String label, String description) {
     }
 
-    public record TransmissionEvent(String type, int from, int to, boolean success, PacketSnapshot packet) {
+    public record TransmissionEvent(String type, int from, int to, boolean success, FailureReason failureReason,
+                                    PacketSnapshot packet) {
 
         public static TransmissionEvent success(String type, FloodPacket<?> packet) {
-            return fromPacket(type, packet, true);
+            return fromPacket(type, packet, true, null);
         }
 
         public static TransmissionEvent failure(String type, FloodPacket<?> packet) {
-            return fromPacket(type, packet, false);
+            return fromPacket(type, packet, false, null);
         }
 
-        private static TransmissionEvent fromPacket(String type, FloodPacket<?> packet, boolean success) {
+        public static TransmissionEvent failure(String type, FloodPacket<?> packet, FailureReason reason) {
+            return fromPacket(type, packet, false, reason);
+        }
+
+        public static TransmissionEvent failure(String type, int from, int to, FailureReason reason) {
+            return new TransmissionEvent(type, from, to, false, reason, null);
+        }
+
+        private static TransmissionEvent fromPacket(String type, FloodPacket<?> packet, boolean success,
+                                                    FailureReason reason) {
             if (packet == null) {
-                return new TransmissionEvent(type, -1, -1, success, null);
+                return new TransmissionEvent(type, -1, -1, success, reason, null);
             }
             int from = packet.sender() != null ? packet.sender().getId() : -1;
             int to = packet.receiver() != null ? packet.receiver().getId() : -1;
-            return new TransmissionEvent(type, from, to, success, PacketSnapshot.from(packet));
+            return new TransmissionEvent(type, from, to, success, reason, PacketSnapshot.from(packet));
         }
     }
 

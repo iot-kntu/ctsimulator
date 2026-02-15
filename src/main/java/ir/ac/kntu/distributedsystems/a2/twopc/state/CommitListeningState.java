@@ -8,6 +8,8 @@ import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 public class CommitListeningState implements NodeState {
 
@@ -18,6 +20,8 @@ public class CommitListeningState implements NodeState {
 
         CtMessage<ChaosMessage> mergedMessage = (CtMessage<ChaosMessage>) listener.merge(context, capturedPacket);
         node.setKnowledge(mergedMessage);
+
+        recordPhase(context, node);
 
         int totalNodes = context.getNetGraph().getNodeCount();
         if (mergedMessage.content().flags().getParticipationCount() == totalNodes) {
@@ -40,7 +44,25 @@ public class CommitListeningState implements NodeState {
     }
 
     @Override
+    public boolean isListening() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "cR";
+    }
+
+    private void recordPhase(ContextView context, StatefulNode node) {
+        if (context == null) {
+            return;
+        }
+        if (context.getApplication() instanceof MetricsEmitter emitter) {
+            MetricsCollector metrics = emitter.getMetricsCollector();
+            if (metrics != null && context.getApplication().getNetworkTime() != null) {
+                int round = context.getApplication().getNetworkTime().round();
+                metrics.recordPhaseTime(round, node.getId(), "COMMIT", context.getTime());
+            }
+        }
     }
 }

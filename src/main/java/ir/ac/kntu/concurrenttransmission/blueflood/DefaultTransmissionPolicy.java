@@ -2,8 +2,10 @@ package ir.ac.kntu.concurrenttransmission.blueflood;
 
 import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
 import ir.ac.kntu.concurrenttransmission.CtNode;
+import ir.ac.kntu.concurrenttransmission.FaultAwareTransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.NetGraph;
 import ir.ac.kntu.concurrenttransmission.NodeState;
+import ir.ac.kntu.metrics.FaultModel;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -17,12 +19,13 @@ import java.util.stream.IntStream;
  * and then
  * go to deep sleep state until the next round.
  */
-public class DefaultTransmissionPolicy implements TransmissionPolicy {
+public class DefaultTransmissionPolicy implements TransmissionPolicy, FaultAwareTransmissionPolicy {
 
     private final int floodRepeatCount;
     private final NetGraph netGraph;
     private final SortedMap<CtNetworkTime, SortedMap<CtNode, List<NodeState>>> stateHistory;
     private SortedMap<CtNode, List<NodeState>> nodeStateMap;
+    private FaultModel faultModel;
 
     public DefaultTransmissionPolicy(int floodRepeatCount, NetGraph netGraph) {
         this.floodRepeatCount = floodRepeatCount;
@@ -157,6 +160,16 @@ public class DefaultTransmissionPolicy implements TransmissionPolicy {
 
         System.out.println(builder);
 
+    }
+
+    @Override
+    public void setFaultModel(FaultModel faultModel) {
+        this.faultModel = faultModel;
+    }
+
+    @Override
+    public FaultModel getFaultModel() {
+        return faultModel;
     }
 
 }

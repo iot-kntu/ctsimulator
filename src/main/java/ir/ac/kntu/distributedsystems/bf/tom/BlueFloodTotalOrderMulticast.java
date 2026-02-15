@@ -5,6 +5,8 @@ import ir.ac.kntu.concurrenttransmission.CtMessage;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.blueflood.BlueFloodNodeListener;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -179,7 +181,21 @@ public class BlueFloodTotalOrderMulticast implements BlueFloodNodeListener {
                         entry.sequence(),
                         entry.value()));
             }
+            recordDecision(context, receiver, entry.sequence(), !entry.isNoop());
             nextSequenceToDeliver++;
+        }
+    }
+
+    private void recordDecision(ContextView context, CtNode receiver, int sequence, boolean committed) {
+        if (context == null || receiver == null) {
+            return;
+        }
+        if (context.getApplication() instanceof MetricsEmitter emitter) {
+            MetricsCollector metrics = emitter.getMetricsCollector();
+            if (metrics != null) {
+                metrics.recordDecisionEnd(sequence, receiver.getId(), context.getTime(), committed);
+                metrics.recordPhaseTime(sequence, receiver.getId(), "DELIVER", context.getTime());
+            }
         }
     }
 }

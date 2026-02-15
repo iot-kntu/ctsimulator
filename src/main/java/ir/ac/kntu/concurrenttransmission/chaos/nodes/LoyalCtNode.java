@@ -7,6 +7,10 @@ import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.chaos.*;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.metrics.FailureReason;
+import ir.ac.kntu.metrics.FaultModel;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 import java.util.List;
 import java.util.Objects;
@@ -163,10 +167,29 @@ public class LoyalCtNode implements StatefulNode {
                                                     // counter
                 : policy.getFloodRepeatCount();
         final List<CtNode> neighbors = context.getNetGraph().getNodeNeighbors(sender);
+        FaultModel faultModel = resolveFaultModel(context);
+        FailureReason suppression = suppressionReason(faultModel, sender);
+        int round = resolveRound(context);
+        MetricsCollector metrics = resolveMetrics(context);
 
-        for (int repeat = 0 + (int) delay; repeat < repeatCount; repeat++) {
+        if (suppression != null) {
             for (CtNode node : neighbors) {
-                final FloodPacket<T> floodPacket = new FloodPacket<>(context.getTime() + delay, message, sender, node);
+                if (metrics != null) {
+                    metrics.recordSendSuppressed(round, sender.getId(), node.getId(), suppression);
+                }
+                recordScenarioFailure(context, sender.getId(), node.getId(), suppression);
+            }
+            return;
+        }
+
+        for (int repeat = 0; repeat < repeatCount; repeat++) {
+            int jitter = faultModel != null ? faultModel.sampleJitterSlots() : 0;
+            for (CtNode node : neighbors) {
+                if (metrics != null) {
+                    metrics.recordSendAttempt(round, sender.getId(), node.getId());
+                }
+                final FloodPacket<T> floodPacket = new FloodPacket<>(context.getTime() + delay + repeat + jitter,
+                        message, sender, node);
                 context.getSimulator().schedulePacket(floodPacket);
             }
         }
@@ -195,5 +218,43 @@ public class LoyalCtNode implements StatefulNode {
     @Override
     public String toString() {
         return "N[" + getId() + "]";
+    }
+
+    private int resolveRound(ContextView context) {
+        CtNetworkTime time = context.getApplication().getNetworkTime();
+        return time != null ? time.round() : 0;
+    }
+
+    private MetricsCollector resolveMetrics(ContextView context) {
+        return context.getApplication() instanceof MetricsEmitter emitter ? emitter.getMetricsCollector() : null;
+    }
+
+    private FaultModel resolveFaultModel(ContextView context) {
+        return context.getApplication() instanceof ir.ac.kntu.metrics.FaultModelProvider provider
+                ? provider.getFaultModel()
+                : null;
+    }
+
+    private FailureReason suppressionReason(FaultModel faultModel, CtNode sender) {
+        if (faultModel == null || sender == null) {
+            return null;
+        }
+        if (faultModel.isSilent(sender.getId())) {
+            return FailureReason.SILENT;
+        }
+        if (faultModel.isFaulty(sender.getId())) {
+            return FailureReason.FAULTY;
+        }
+        return null;
+    }
+
+    private void recordScenarioFailure(ContextView context, int from, int to, FailureReason reason) {
+        if (context.getApplication() instanceof ChaosApplication chaosApp) {
+            CtNetworkTime time = context.getApplication().getNetworkTime();
+            if (time != null) {
+                chaosApp.getScenarioRecorder().recordEvent(time,
+                        ChaosScenarioRecorder.TransmissionEvent.failure("flood", from, to, reason));
+            }
+        }
     }
 }
