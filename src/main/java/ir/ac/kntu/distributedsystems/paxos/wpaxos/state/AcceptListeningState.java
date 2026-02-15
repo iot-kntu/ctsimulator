@@ -9,6 +9,7 @@ import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FinalFloodingState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxos;
 import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxosPhase;
 import ir.ac.kntu.metrics.MetricsCollector;
 import ir.ac.kntu.metrics.MetricsEmitter;
@@ -31,8 +32,19 @@ public class AcceptListeningState implements NodeState {
 
         recordPhase(context, node, WirelessPaxosPhase.ACCEPT);
 
-        int totalNodes = context.getNetGraph().getNodeCount();
-        if (mergedMessage.content().flags().getParticipationCount() == totalNodes) {
+        if (listener instanceof WirelessPaxos paxos) {
+            if (paxos.shouldEndByIdle(context)) {
+                if (paxos.consumeRecovery(context)) {
+                    node.setState(new RecoveryFloodingState(new AcceptListeningState()), context);
+                } else {
+                    node.setState(new FinalFloodingState(), context);
+                }
+                return;
+            }
+        }
+
+        int quorum = Math.max(1, (context.getNetGraph().getNodeCount() / 2) + 1);
+        if (mergedMessage.content().flags().getParticipationCount() >= quorum) {
             node.setState(new FinalFloodingState(), context);
             return;
         }
@@ -49,7 +61,14 @@ public class AcceptListeningState implements NodeState {
 
     @Override
     public void onSlotStart(StatefulNode node, ContextView context) {
-
+        ChaosNodeListener listener = ((ChaosApplication) context.getApplication()).getChaosNodeListener(node);
+        if (listener instanceof WirelessPaxos paxos && paxos.shouldEndByIdle(context)) {
+            if (paxos.consumeRecovery(context)) {
+                node.setState(new RecoveryFloodingState(new AcceptListeningState()), context);
+            } else {
+                node.setState(new FinalFloodingState(), context);
+            }
+        }
     }
 
     @Override

@@ -12,6 +12,7 @@ import ir.ac.kntu.distributedsystems.a2.aggregation.ParticipationFlag;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.logging.Logger;
 
@@ -22,8 +23,10 @@ import java.util.logging.Logger;
 public class WirelessPaxos implements ChaosNodeListener {
     private static final Logger logger = Logger.getLogger(WirelessPaxos.class.getSimpleName());
     private static final int PROPOSAL_STRIDE = 1024;
+    private static final int IDLE_TIMEOUT_SLOTS = 5;
 
     private final Queue<Object> proposalValues;
+    private final int maxRecoveries;
 
     private int nodeId = -1;
     private int networkSize = 0;
@@ -34,9 +37,17 @@ public class WirelessPaxos implements ChaosNodeListener {
     private Object acceptedValue = null;
 
     private Object activeValue = null;
+    private long lastProgressTime = Long.MIN_VALUE;
+    private int remainingRecoveries;
 
     public WirelessPaxos(Queue<Object> proposalValues) {
+        this(proposalValues, 1);
+    }
+
+    public WirelessPaxos(Queue<Object> proposalValues, int maxRecoveries) {
         this.proposalValues = proposalValues != null ? proposalValues : new LinkedList<>();
+        this.maxRecoveries = Math.max(0, maxRecoveries);
+        this.remainingRecoveries = this.maxRecoveries;
     }
 
     @Override
@@ -56,6 +67,7 @@ public class WirelessPaxos implements ChaosNodeListener {
     @Override
     public CtMessage<ChaosMessage> initiateMessage(ContextView context, CtNode self, CtNode initiator) {
         ensureNetworkInfo(context, self);
+        resetForNewRound(context);
 
         WirelessPaxosPayload payload;
         if (self.equals(initiator)) {
@@ -107,12 +119,34 @@ public class WirelessPaxos implements ChaosNodeListener {
                 : participationFlags;
 
         ChaosMessage mergedContent = new ChaosMessage(finalFlags, advancedPayload);
-        return new CtMessage<>(currentKnowledge.initiator(), mergedContent);
+        CtMessage<ChaosMessage> merged = new CtMessage<>(currentKnowledge.initiator(), mergedContent);
+        if (!Objects.equals(currentKnowledge.content(), merged.content())) {
+            lastProgressTime = context.getTime();
+        }
+        return merged;
     }
 
     @Override
     public CtMessage<?> getMessage(ContextView context, CtNode sender, CtMessage<?> receivedMessage, int whichRepeat) {
         return null;
+    }
+
+    public boolean shouldEndByIdle(ContextView context) {
+        if (context == null || lastProgressTime == Long.MIN_VALUE) {
+            return false;
+        }
+        return context.getTime() - lastProgressTime >= IDLE_TIMEOUT_SLOTS;
+    }
+
+    public boolean consumeRecovery(ContextView context) {
+        if (remainingRecoveries <= 0) {
+            return false;
+        }
+        remainingRecoveries--;
+        if (context != null) {
+            lastProgressTime = context.getTime();
+        }
+        return true;
     }
 
     private FlagField buildParticipationFlags(CtMessage<ChaosMessage> currentKnowledge,
@@ -237,5 +271,10 @@ public class WirelessPaxos implements ChaosNodeListener {
             value = "VAL_" + (self != null ? self.getId() : nodeId) + "_" + System.currentTimeMillis();
         }
         return value;
+    }
+
+    private void resetForNewRound(ContextView context) {
+        lastProgressTime = context != null ? context.getTime() : Long.MIN_VALUE;
+        remainingRecoveries = maxRecoveries;
     }
 }
