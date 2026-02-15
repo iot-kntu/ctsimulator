@@ -8,8 +8,8 @@ import ir.ac.kntu.concurrenttransmission.chaos.ChaosStrategies;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosTransmissionPolicy;
 import ir.ac.kntu.concurrenttransmission.graph.CtNodeFactory;
 import ir.ac.kntu.concurrenttransmission.graph.ReflectionCtNodeFactory;
-import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxos;
-import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxosTransmissionPolicy;
+import ir.ac.kntu.distributedsystems.a2.wmultipaxos.WirelessMultiPaxos;
+import ir.ac.kntu.distributedsystems.a2.wmultipaxos.WirelessMultiPaxosTransmissionPolicy;
 import ir.ac.kntu.simulation.ScenarioRunner;
 import ir.ac.kntu.simulation.SimulationScenario;
 
@@ -17,17 +17,15 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.Queue;
 
-/**
- * Runs the Wireless Paxos scenario on top of the Chaos simulator.
- */
-public class WirelessPaxosScenario implements SimulationScenario<ChaosApplication> {
+public class A2WirelessMultiPaxos implements SimulationScenario<ChaosApplication> {
 
     private static final int EXECUTION_ROUNDS = 4;
     private static final int FLOOD_REPEAT_SLOTS = 1;
     private static final int FINAL_FLOOD_REPEAT_SLOTS = 1;
+    private static final int MAX_RECOVERIES = 2;
 
     public static void main(String[] args) {
-        ScenarioRunner.run(new WirelessPaxosScenario());
+        ScenarioRunner.run(new A2WirelessMultiPaxos());
     }
 
     @Override
@@ -43,23 +41,27 @@ public class WirelessPaxosScenario implements SimulationScenario<ChaosApplicatio
     @Override
     public ChaosApplication createApplication(NetGraph netGraph) {
         ChaosSettings settings = new ChaosSettings(0.0, EXECUTION_ROUNDS);
-        ChaosTransmissionPolicy transmissionPolicy = new WirelessPaxosTransmissionPolicy(
+
+        ChaosTransmissionPolicy transmissionPolicy = new WirelessMultiPaxosTransmissionPolicy(
                 FLOOD_REPEAT_SLOTS,
                 FINAL_FLOOD_REPEAT_SLOTS,
                 netGraph);
+
         ChaosStrategies strategies = new ChaosStrategies(
                 new RoundRobinInitiatorStrategy(netGraph.getNodeCount()),
                 transmissionPolicy);
+
         return new ChaosApplication(settings, strategies, netGraph, transmissionPolicy.getInitialState());
     }
 
     @Override
     public void configure(NetGraph netGraph, ChaosApplication application) {
         netGraph.getNodes().forEach(node -> {
-            Queue<Object> proposedValues = new LinkedList<>();
-            proposedValues.add("UPDATE_FROM_NODE_" + node.getId());
-            proposedValues.add("ROLLBACK_FROM_NODE_" + node.getId());
-            application.setListener(node, new WirelessPaxos(proposedValues));
+            Queue<Object> proposals = new LinkedList<>();
+            proposals.add("CMD_A_" + node.getId());
+            proposals.add("CMD_B_" + node.getId());
+            proposals.add("CMD_C_" + node.getId());
+            application.setListener(node, new WirelessMultiPaxos(proposals, MAX_RECOVERIES));
         });
     }
 

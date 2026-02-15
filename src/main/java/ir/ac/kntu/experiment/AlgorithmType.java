@@ -3,6 +3,7 @@ package ir.ac.kntu.experiment;
 public enum AlgorithmType {
     WIRELESS_PAXOS,
     WIRELESS_MULTIPAXOS,
+    A2_WIRELESS_MULTIPAXOS,
     CHAOS_2PC,
     CHAOS_3PC,
     BLUEFLOOD_PAXOS,
@@ -20,6 +21,7 @@ public enum AlgorithmType {
         return switch (normalized) {
             case "WIRELESS_PAXOS", "WPAXOS" -> WIRELESS_PAXOS;
             case "WIRELESS_MULTIPAXOS", "WIRELESS_MULTI_PAXOS", "WMULTIPAXOS" -> WIRELESS_MULTIPAXOS;
+            case "A2_WIRELESS_MULTIPAXOS", "A2_WMULTIPAXOS", "A2_MULTIPAXOS" -> A2_WIRELESS_MULTIPAXOS;
             case "CHAOS_2PC", "2PC", "TWO_PC", "TWOPC" -> CHAOS_2PC;
             case "CHAOS_3PC", "3PC", "THREE_PC", "THREEPC" -> CHAOS_3PC;
             case "BLUEFLOOD_PAXOS", "BF_PAXOS" -> BLUEFLOOD_PAXOS;

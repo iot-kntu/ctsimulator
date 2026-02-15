@@ -7,7 +7,9 @@ import ir.ac.kntu.concurrenttransmission.chaos.ChaosMessage;
 import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
+import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.FinalFloodingState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.distributedsystems.paxos.wmultipaxos.WirelessMultiPaxos;
 import ir.ac.kntu.distributedsystems.paxos.wmultipaxos.WirelessMultiPaxosPayload;
 import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxosPhase;
 import ir.ac.kntu.metrics.MetricsCollector;
@@ -31,6 +33,11 @@ public class AcceptListeningState implements NodeState {
         WirelessMultiPaxosPayload afterPayload = payloadOrEmpty(merged);
 
         recordPhase(context, node, WirelessPaxosPhase.ACCEPT);
+
+        if (listener instanceof WirelessMultiPaxos multiPaxos && multiPaxos.shouldSleep(afterPayload)) {
+            node.setState(new FinalFloodingState(), context);
+            return;
+        }
 
         boolean payloadChanged = !Objects.equals(beforePayload, afterPayload);
         boolean shouldFlood = payloadChanged || node.shouldFlood(before, merged);

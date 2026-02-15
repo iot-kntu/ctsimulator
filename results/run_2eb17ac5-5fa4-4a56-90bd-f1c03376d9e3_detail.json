@@ -1,0 +1,345 @@
+{
+  "runId" : "2eb17ac5-5fa4-4a56-90bd-f1c03376d9e3",
+  "algorithm" : "BLUEFLOOD_TOM",
+  "framework" : "BLUEFLOOD",
+  "nNodes" : 4,
+  "topology" : "sample",
+  "load" : 12,
+  "seed" : 42,
+  "nodes" : {
+    "0" : {
+      "sent" : 24,
+      "received" : 24,
+      "success" : 12,
+      "failed" : 12,
+      "participatedRounds" : 12,
+      "commitCount" : 12
+    },
+    "1" : {
+      "sent" : 24,
+      "received" : 24,
+      "success" : 12,
+      "failed" : 12,
+      "participatedRounds" : 12,
+      "commitCount" : 12
+    },
+    "2" : {
+      "sent" : 24,
+      "received" : 24,
+      "success" : 12,
+      "failed" : 12,
+      "participatedRounds" : 12,
+      "commitCount" : 12
+    },
+    "3" : {
+      "sent" : 24,
+      "received" : 24,
+      "success" : 12,
+      "failed" : 12,
+      "participatedRounds" : 12,
+      "commitCount" : 12
+    }
+  },
+  "decisions" : {
+    "0" : {
+      "round" : 0,
+      "initiatorId" : 0,
+      "startTime" : 0,
+      "decisionTimes" : {
+        "0" : 0,
+        "1" : 0,
+        "2" : 0,
+        "3" : 1
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 0
+        },
+        "1" : {
+          "DELIVER" : 0
+        },
+        "2" : {
+          "DELIVER" : 0
+        },
+        "3" : {
+          "DELIVER" : 1
+        }
+      }
+    },
+    "1" : {
+      "round" : 1,
+      "initiatorId" : 1,
+      "startTime" : 5,
+      "decisionTimes" : {
+        "0" : 5,
+        "1" : 5,
+        "2" : 6,
+        "3" : 5
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 5
+        },
+        "1" : {
+          "DELIVER" : 5
+        },
+        "2" : {
+          "DELIVER" : 6
+        },
+        "3" : {
+          "DELIVER" : 5
+        }
+      }
+    },
+    "2" : {
+      "round" : 2,
+      "initiatorId" : 2,
+      "startTime" : 10,
+      "decisionTimes" : {
+        "0" : 10,
+        "1" : 11,
+        "2" : 10,
+        "3" : 10
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 10
+        },
+        "1" : {
+          "DELIVER" : 11
+        },
+        "2" : {
+          "DELIVER" : 10
+        },
+        "3" : {
+          "DELIVER" : 10
+        }
+      }
+    },
+    "3" : {
+      "round" : 3,
+      "initiatorId" : 3,
+      "startTime" : 15,
+      "decisionTimes" : {
+        "0" : 16,
+        "1" : 15,
+        "2" : 15,
+        "3" : 15
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 16
+        },
+        "1" : {
+          "DELIVER" : 15
+        },
+        "2" : {
+          "DELIVER" : 15
+        },
+        "3" : {
+          "DELIVER" : 15
+        }
+      }
+    },
+    "4" : {
+      "round" : 4,
+      "initiatorId" : 0,
+      "startTime" : 20,
+      "decisionTimes" : {
+        "0" : 20,
+        "1" : 20,
+        "2" : 20,
+        "3" : 21
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 20
+        },
+        "1" : {
+          "DELIVER" : 20
+        },
+        "2" : {
+          "DELIVER" : 20
+        },
+        "3" : {
+          "DELIVER" : 21
+        }
+      }
+    },
+    "5" : {
+      "round" : 5,
+      "initiatorId" : 1,
+      "startTime" : 25,
+      "decisionTimes" : {
+        "0" : 25,
+        "1" : 25,
+        "2" : 26,
+        "3" : 25
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 25
+        },
+        "1" : {
+          "DELIVER" : 25
+        },
+        "2" : {
+          "DELIVER" : 26
+        },
+        "3" : {
+          "DELIVER" : 25
+        }
+      }
+    },
+    "6" : {
+      "round" : 6,
+      "initiatorId" : 2,
+      "startTime" : 30,
+      "decisionTimes" : {
+        "0" : 30,
+        "1" : 31,
+        "2" : 30,
+        "3" : 30
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 30
+        },
+        "1" : {
+          "DELIVER" : 31
+        },
+        "2" : {
+          "DELIVER" : 30
+        },
+        "3" : {
+          "DELIVER" : 30
+        }
+      }
+    },
+    "7" : {
+      "round" : 7,
+      "initiatorId" : 3,
+      "startTime" : 35,
+      "decisionTimes" : {
+        "0" : 36,
+        "1" : 35,
+        "2" : 35,
+        "3" : 35
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 36
+        },
+        "1" : {
+          "DELIVER" : 35
+        },
+        "2" : {
+          "DELIVER" : 35
+        },
+        "3" : {
+          "DELIVER" : 35
+        }
+      }
+    },
+    "8" : {
+      "round" : 8,
+      "initiatorId" : 0,
+      "startTime" : 40,
+      "decisionTimes" : {
+        "0" : 40,
+        "1" : 40,
+        "2" : 40,
+        "3" : 41
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 40
+        },
+        "1" : {
+          "DELIVER" : 40
+        },
+        "2" : {
+          "DELIVER" : 40
+        },
+        "3" : {
+          "DELIVER" : 41
+        }
+      }
+    },
+    "9" : {
+      "round" : 9,
+      "initiatorId" : 1,
+      "startTime" : 45,
+      "decisionTimes" : {
+        "0" : 45,
+        "1" : 45,
+        "2" : 46,
+        "3" : 45
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 45
+        },
+        "1" : {
+          "DELIVER" : 45
+        },
+        "2" : {
+          "DELIVER" : 46
+        },
+        "3" : {
+          "DELIVER" : 45
+        }
+      }
+    },
+    "10" : {
+      "round" : 10,
+      "initiatorId" : 2,
+      "startTime" : 50,
+      "decisionTimes" : {
+        "0" : 50,
+        "1" : 51,
+        "2" : 50,
+        "3" : 50
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 50
+        },
+        "1" : {
+          "DELIVER" : 51
+        },
+        "2" : {
+          "DELIVER" : 50
+        },
+        "3" : {
+          "DELIVER" : 50
+        }
+      }
+    },
+    "11" : {
+      "round" : 11,
+      "initiatorId" : 3,
+      "startTime" : 55,
+      "decisionTimes" : {
+        "0" : 56,
+        "1" : 55,
+        "2" : 55,
+        "3" : 55
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DELIVER" : 56
+        },
+        "1" : {
+          "DELIVER" : 55
+        },
+        "2" : {
+          "DELIVER" : 55
+        },
+        "3" : {
+          "DELIVER" : 55
+        }
+      }
+    }
+  }
+}

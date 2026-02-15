@@ -1,0 +1,87 @@
+{
+  "runId" : "77e821b4-c181-460e-b6ad-715e8fdeea5e",
+  "algorithm" : "WIRELESS_MULTIPAXOS",
+  "framework" : "CHAOS",
+  "nNodes" : 4,
+  "topology" : "sample",
+  "load" : 12,
+  "seed" : 42,
+  "nodes" : {
+    "0" : {
+      "sent" : 6,
+      "received" : 5,
+      "success" : 3,
+      "failed" : 2,
+      "participatedRounds" : 1,
+      "commitCount" : 0
+    },
+    "1" : {
+      "sent" : 4,
+      "received" : 5,
+      "success" : 3,
+      "failed" : 2,
+      "participatedRounds" : 1,
+      "commitCount" : 0
+    },
+    "2" : {
+      "sent" : 6,
+      "received" : 5,
+      "success" : 3,
+      "failed" : 2,
+      "participatedRounds" : 1,
+      "commitCount" : 0
+    },
+    "3" : {
+      "sent" : 4,
+      "received" : 5,
+      "success" : 3,
+      "failed" : 2,
+      "participatedRounds" : 1,
+      "commitCount" : 0
+    }
+  },
+  "decisions" : {
+    "0" : {
+      "round" : 0,
+      "initiatorId" : 0,
+      "startTime" : 3,
+      "decisionTimes" : { },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 3,
+          "PREPARE" : 1
+        },
+        "1" : {
+          "PREPARE" : 0
+        },
+        "2" : {
+          "PREPARE" : 0
+        },
+        "3" : {
+          "PREPARE" : 1
+        }
+      }
+    },
+    "1" : {
+      "round" : 1,
+      "initiatorId" : 0,
+      "startTime" : 3,
+      "decisionTimes" : { },
+      "phaseTimes" : { }
+    },
+    "2" : {
+      "round" : 2,
+      "initiatorId" : 0,
+      "startTime" : 3,
+      "decisionTimes" : { },
+      "phaseTimes" : { }
+    },
+    "3" : {
+      "round" : 3,
+      "initiatorId" : 0,
+      "startTime" : 3,
+      "decisionTimes" : { },
+      "phaseTimes" : { }
+    }
+  }
+}

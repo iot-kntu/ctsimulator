@@ -1,0 +1,393 @@
+{
+  "runId" : "f5dac26a-385d-4a2c-b687-e1b0b75ec2dd",
+  "algorithm" : "WIRELESS_PAXOS",
+  "framework" : "CHAOS",
+  "nNodes" : 4,
+  "topology" : "sample",
+  "load" : 12,
+  "seed" : 42,
+  "nodes" : {
+    "0" : {
+      "sent" : 164,
+      "received" : 159,
+      "success" : 57,
+      "failed" : 102,
+      "participatedRounds" : 12,
+      "commitCount" : 12
+    },
+    "1" : {
+      "sent" : 162,
+      "received" : 159,
+      "success" : 58,
+      "failed" : 101,
+      "participatedRounds" : 12,
+      "commitCount" : 12
+    },
+    "2" : {
+      "sent" : 156,
+      "received" : 159,
+      "success" : 66,
+      "failed" : 93,
+      "participatedRounds" : 12,
+      "commitCount" : 12
+    },
+    "3" : {
+      "sent" : 154,
+      "received" : 159,
+      "success" : 68,
+      "failed" : 91,
+      "participatedRounds" : 12,
+      "commitCount" : 12
+    }
+  },
+  "decisions" : {
+    "0" : {
+      "round" : 0,
+      "initiatorId" : 0,
+      "startTime" : 0,
+      "decisionTimes" : {
+        "0" : 10,
+        "1" : 9,
+        "2" : 11,
+        "3" : 11
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 3,
+          "PREPARE" : 1
+        },
+        "1" : {
+          "ACCEPT" : 6,
+          "PREPARE" : 0
+        },
+        "2" : {
+          "ACCEPT" : 6,
+          "PREPARE" : 0
+        },
+        "3" : {
+          "ACCEPT" : 7,
+          "PREPARE" : 1
+        }
+      }
+    },
+    "1" : {
+      "round" : 1,
+      "initiatorId" : 1,
+      "startTime" : 15,
+      "decisionTimes" : {
+        "0" : 24,
+        "1" : 25,
+        "2" : 25,
+        "3" : 26
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 19,
+          "PREPARE" : 15
+        },
+        "1" : {
+          "ACCEPT" : 18,
+          "PREPARE" : 16
+        },
+        "2" : {
+          "ACCEPT" : 20,
+          "PREPARE" : 16
+        },
+        "3" : {
+          "ACCEPT" : 19,
+          "PREPARE" : 15
+        }
+      }
+    },
+    "2" : {
+      "round" : 2,
+      "initiatorId" : 2,
+      "startTime" : 30,
+      "decisionTimes" : {
+        "0" : 39,
+        "1" : 38,
+        "2" : 41,
+        "3" : 41
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 34,
+          "PREPARE" : 30
+        },
+        "1" : {
+          "ACCEPT" : 35,
+          "PREPARE" : 31
+        },
+        "2" : {
+          "ACCEPT" : 33,
+          "PREPARE" : 31
+        },
+        "3" : {
+          "ACCEPT" : 34,
+          "PREPARE" : 30
+        }
+      }
+    },
+    "3" : {
+      "round" : 3,
+      "initiatorId" : 3,
+      "startTime" : 45,
+      "decisionTimes" : {
+        "0" : 53,
+        "1" : 55,
+        "2" : 56,
+        "3" : 56
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 50,
+          "PREPARE" : 46
+        },
+        "1" : {
+          "ACCEPT" : 49,
+          "PREPARE" : 45
+        },
+        "2" : {
+          "ACCEPT" : 49,
+          "PREPARE" : 45
+        },
+        "3" : {
+          "ACCEPT" : 48,
+          "PREPARE" : 46
+        }
+      }
+    },
+    "4" : {
+      "round" : 4,
+      "initiatorId" : 0,
+      "startTime" : 60,
+      "decisionTimes" : {
+        "0" : 70,
+        "1" : 67,
+        "2" : 70,
+        "3" : 69
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 63,
+          "PREPARE" : 61
+        },
+        "1" : {
+          "ACCEPT" : 64,
+          "PREPARE" : 60
+        },
+        "2" : {
+          "ACCEPT" : 64,
+          "PREPARE" : 60
+        },
+        "3" : {
+          "ACCEPT" : 65,
+          "PREPARE" : 61
+        }
+      }
+    },
+    "5" : {
+      "round" : 5,
+      "initiatorId" : 1,
+      "startTime" : 74,
+      "decisionTimes" : {
+        "0" : 83,
+        "1" : 84,
+        "2" : 84,
+        "3" : 85
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 78,
+          "PREPARE" : 74
+        },
+        "1" : {
+          "ACCEPT" : 77,
+          "PREPARE" : 75
+        },
+        "2" : {
+          "ACCEPT" : 79,
+          "PREPARE" : 75
+        },
+        "3" : {
+          "ACCEPT" : 78,
+          "PREPARE" : 74
+        }
+      }
+    },
+    "6" : {
+      "round" : 6,
+      "initiatorId" : 2,
+      "startTime" : 89,
+      "decisionTimes" : {
+        "0" : 98,
+        "1" : 97,
+        "2" : 97,
+        "3" : 98
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 95,
+          "PREPARE" : 89
+        },
+        "1" : {
+          "ACCEPT" : 94,
+          "PREPARE" : 90
+        },
+        "2" : {
+          "ACCEPT" : 92,
+          "PREPARE" : 90
+        },
+        "3" : {
+          "ACCEPT" : 93,
+          "PREPARE" : 89
+        }
+      }
+    },
+    "7" : {
+      "round" : 7,
+      "initiatorId" : 3,
+      "startTime" : 102,
+      "decisionTimes" : {
+        "0" : 110,
+        "1" : 112,
+        "2" : 113,
+        "3" : 113
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 107,
+          "PREPARE" : 103
+        },
+        "1" : {
+          "ACCEPT" : 106,
+          "PREPARE" : 102
+        },
+        "2" : {
+          "ACCEPT" : 106,
+          "PREPARE" : 102
+        },
+        "3" : {
+          "ACCEPT" : 105,
+          "PREPARE" : 103
+        }
+      }
+    },
+    "8" : {
+      "round" : 8,
+      "initiatorId" : 0,
+      "startTime" : 117,
+      "decisionTimes" : {
+        "0" : 127,
+        "1" : 124,
+        "2" : 127,
+        "3" : 126
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 120,
+          "PREPARE" : 118
+        },
+        "1" : {
+          "ACCEPT" : 121,
+          "PREPARE" : 117
+        },
+        "2" : {
+          "ACCEPT" : 121,
+          "PREPARE" : 117
+        },
+        "3" : {
+          "ACCEPT" : 122,
+          "PREPARE" : 118
+        }
+      }
+    },
+    "9" : {
+      "round" : 9,
+      "initiatorId" : 1,
+      "startTime" : 131,
+      "decisionTimes" : {
+        "0" : 140,
+        "1" : 141,
+        "2" : 141,
+        "3" : 142
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 135,
+          "PREPARE" : 131
+        },
+        "1" : {
+          "ACCEPT" : 134,
+          "PREPARE" : 132
+        },
+        "2" : {
+          "ACCEPT" : 136,
+          "PREPARE" : 132
+        },
+        "3" : {
+          "ACCEPT" : 135,
+          "PREPARE" : 131
+        }
+      }
+    },
+    "10" : {
+      "round" : 10,
+      "initiatorId" : 2,
+      "startTime" : 146,
+      "decisionTimes" : {
+        "0" : 155,
+        "1" : 154,
+        "2" : 156,
+        "3" : 155
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 152,
+          "PREPARE" : 146
+        },
+        "1" : {
+          "ACCEPT" : 151,
+          "PREPARE" : 147
+        },
+        "2" : {
+          "ACCEPT" : 149,
+          "PREPARE" : 147
+        },
+        "3" : {
+          "ACCEPT" : 150,
+          "PREPARE" : 146
+        }
+      }
+    },
+    "11" : {
+      "round" : 11,
+      "initiatorId" : 3,
+      "startTime" : 160,
+      "decisionTimes" : {
+        "0" : 168,
+        "1" : 170,
+        "2" : 171,
+        "3" : 171
+      },
+      "phaseTimes" : {
+        "0" : {
+          "ACCEPT" : 165,
+          "PREPARE" : 161
+        },
+        "1" : {
+          "ACCEPT" : 164,
+          "PREPARE" : 160
+        },
+        "2" : {
+          "ACCEPT" : 164,
+          "PREPARE" : 160
+        },
+        "3" : {
+          "ACCEPT" : 163,
+          "PREPARE" : 161
+        }
+      }
+    }
+  }
+}

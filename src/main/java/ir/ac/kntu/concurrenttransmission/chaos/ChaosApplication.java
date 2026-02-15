@@ -5,7 +5,9 @@ import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.SleepingState;
 import ir.ac.kntu.concurrenttransmission.events.CtPacketsEvent;
+import ir.ac.kntu.concurrenttransmission.events.Event;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
 import ir.ac.kntu.concurrenttransmission.events.SimNewRoundEvent;
 import ir.ac.kntu.distributedsystems.paxos.wmultipaxos.WirelessMultiPaxos;
@@ -52,6 +54,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
     private int roundsCompleted;
     private MetricsCollector metricsCollector;
     private FaultModel faultModel;
+    private long nextSlotTickTime = Long.MIN_VALUE;
 
     public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph,
                             NodeState startingPoint) {
@@ -139,6 +142,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
             return;
         }
         roundActive = true;
+        nextSlotTickTime = Long.MIN_VALUE;
 
         int sleepingNodes = (int) context.getNetGraph().getNodes().stream()
                 .filter(node -> node instanceof StatefulNode statefulNode
@@ -167,6 +171,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
 
         SimInitiateFloodEvent initiateFloodEvent = new SimInitiateFloodEvent(context.getTime(), nextInitiatorId);
         context.getSimulator().scheduleEvent(initiateFloodEvent);
+        scheduleSlotTick(context, context.getTime() + 1);
     }
 
     public void checkRoundCompletion(ContextView context) {
@@ -200,12 +205,30 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         strategies.transmissionPolicy().endRound(context.getTime() + 1);
         roundActive = false;
         roundsCompleted++;
+        nextSlotTickTime = Long.MIN_VALUE;
 
         if (roundsCompleted < settings.roundLimit()) {
             context.getSimulator().scheduleEvent(new SimNewRoundEvent(context.getTime() + 1));
         } else {
             logger.log(Level.INFO, "All rounds completed. Simulation finished.");
         }
+    }
+
+    private void scheduleSlotTick(ContextView context, long time) {
+        if (!roundActive) {
+            return;
+        }
+        if (time <= nextSlotTickTime) {
+            return;
+        }
+        nextSlotTickTime = time;
+        context.getSimulator().scheduleEvent(
+                Event.create("ChaosSlotTick", time, SimEventPriority.Low, (ctx) -> {
+                    if (!roundActive) {
+                        return;
+                    }
+                    scheduleSlotTick(ctx, ctx.getTime() + 1);
+                }));
     }
 
     @Override
@@ -282,12 +305,12 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
                                             FailureReason.COLLISION));
                         });
             }
-            if (!dropped) {
-                if (metricsCollector != null) {
-                    int round = getRound();
-                    metricsCollector.recordReceiveSuccess(round, receiver.getId());
-                    for (FloodPacket<?> packet : packets) {
-                        if (packet != capturedPacket) {
+        if (!dropped) {
+            if (metricsCollector != null) {
+                int round = getRound();
+                metricsCollector.recordReceiveSuccess(round, receiver.getId());
+                for (FloodPacket<?> packet : packets) {
+                    if (packet != capturedPacket) {
                             metricsCollector.recordReceiveFailure(round, receiver.getId(), FailureReason.COLLISION);
                         }
                     }
@@ -449,6 +472,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
             aware.setFaultModel(faultModel);
         }
     }
+
 
     public void configureScenarioMetadata(String name, String author, String description) {
         scenarioRecorder.setScenarioMetadata(name, author, description);

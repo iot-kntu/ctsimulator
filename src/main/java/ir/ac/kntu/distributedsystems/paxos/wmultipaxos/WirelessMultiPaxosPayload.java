@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Payload for Wireless Multi-Paxos messages.
@@ -20,38 +22,48 @@ public record WirelessMultiPaxosPayload(
         int slotStart,
         int slotCount,
         List<LogEntry> entries,
-        int minProposal) {
+        int minProposal,
+        Set<Integer> noProposalNodes) {
 
     public static WirelessMultiPaxosPayload empty(int slotCapacity) {
         return new WirelessMultiPaxosPayload(WirelessPaxosPhase.PREPARE, -1, 0, Math.max(0, slotCapacity),
-                List.of(), 0);
+                List.of(), 0, Set.of());
     }
 
     public static WirelessMultiPaxosPayload prepare(int proposalNumber, int slotStart, List<LogEntry> entries,
-                                                    int minProposal) {
-        return build(WirelessPaxosPhase.PREPARE, proposalNumber, slotStart, entries, minProposal);
+                                                    int minProposal, Set<Integer> noProposalNodes) {
+        return build(WirelessPaxosPhase.PREPARE, proposalNumber, slotStart, entries, minProposal, noProposalNodes);
     }
 
     public static WirelessMultiPaxosPayload accept(int proposalNumber, int slotStart, List<LogEntry> entries,
-                                                   int minProposal) {
-        return build(WirelessPaxosPhase.ACCEPT, proposalNumber, slotStart, entries, minProposal);
+                                                   int minProposal, Set<Integer> noProposalNodes) {
+        return build(WirelessPaxosPhase.ACCEPT, proposalNumber, slotStart, entries, minProposal, noProposalNodes);
     }
 
     private static WirelessMultiPaxosPayload build(WirelessPaxosPhase phase, int proposalNumber, int slotStart,
-                                                   List<LogEntry> entries, int minProposal) {
+                                                   List<LogEntry> entries, int minProposal,
+                                                   Set<Integer> noProposalNodes) {
         List<LogEntry> normalized = normalize(entries, slotStart, Integer.MAX_VALUE);
         int slotCount = normalized.size();
-        return new WirelessMultiPaxosPayload(phase, proposalNumber, slotStart, slotCount, normalized, minProposal);
+        return new WirelessMultiPaxosPayload(phase, proposalNumber, slotStart, slotCount, normalized, minProposal,
+                normalizeNoProposal(noProposalNodes));
     }
 
     public WirelessMultiPaxosPayload withEntries(List<LogEntry> updatedEntries, int slotCapacity) {
         int start = updatedEntries.isEmpty() ? slotStart : updatedEntries.get(0).slotIndex();
         List<LogEntry> normalized = normalize(updatedEntries, start, slotCapacity);
-        return new WirelessMultiPaxosPayload(phase, proposalNumber, start, normalized.size(), normalized, minProposal);
+        return new WirelessMultiPaxosPayload(phase, proposalNumber, start, normalized.size(), normalized, minProposal,
+                noProposalNodes);
     }
 
     public WirelessMultiPaxosPayload withMinProposal(int nextMinProposal) {
-        return new WirelessMultiPaxosPayload(phase, proposalNumber, slotStart, slotCount, entries, nextMinProposal);
+        return new WirelessMultiPaxosPayload(phase, proposalNumber, slotStart, slotCount, entries, nextMinProposal,
+                noProposalNodes);
+    }
+
+    public WirelessMultiPaxosPayload withNoProposalNodes(Set<Integer> nodes) {
+        return new WirelessMultiPaxosPayload(phase, proposalNumber, slotStart, slotCount, entries, minProposal,
+                normalizeNoProposal(nodes));
     }
 
     public boolean isEmptyAttempt() {
@@ -97,11 +109,13 @@ public record WirelessMultiPaxosPayload(
                 dominant.slotStart(), slotCapacity);
         int slotCount = normalized.size();
         int min = Math.max(left.minProposal(), right.minProposal());
+        Set<Integer> mergedNoProposal = mergeNoProposal(left.noProposalNodes(), right.noProposalNodes());
         return new WirelessMultiPaxosPayload(dominant.phase(), dominant.proposalNumber(),
                 normalized.isEmpty() ? dominant.slotStart() : normalized.get(0).slotIndex(),
                 slotCount,
                 normalized,
-                min);
+                min,
+                mergedNoProposal);
     }
 
     private static WirelessMultiPaxosPayload pickDominant(WirelessMultiPaxosPayload left,
@@ -131,6 +145,27 @@ public record WirelessMultiPaxosPayload(
             copy = copy.subList(0, slotCapacity);
         }
         return List.copyOf(copy);
+    }
+
+    private static Set<Integer> normalizeNoProposal(Set<Integer> nodes) {
+        if (nodes == null || nodes.isEmpty()) {
+            return Set.of();
+        }
+        return Set.copyOf(new TreeSet<>(nodes));
+    }
+
+    private static Set<Integer> mergeNoProposal(Set<Integer> left, Set<Integer> right) {
+        if ((left == null || left.isEmpty()) && (right == null || right.isEmpty())) {
+            return Set.of();
+        }
+        TreeSet<Integer> merged = new TreeSet<>();
+        if (left != null) {
+            merged.addAll(left);
+        }
+        if (right != null) {
+            merged.addAll(right);
+        }
+        return Set.copyOf(merged);
     }
 
     public record LogEntry(int slotIndex, int acceptedProposal, Object acceptedValue, Object proposedValue) {

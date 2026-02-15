@@ -40,14 +40,16 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
     private int lastProposedSlot = -1;
     private boolean preparing = false;
     private boolean prepared = false;
+    private boolean localNoProposal = false;
 
     public WirelessMultiPaxos(Queue<Object> proposalValues) {
         this.proposalValues = proposalValues != null ? proposalValues : new LinkedList<>();
+        this.localNoProposal = this.proposalValues.isEmpty();
     }
 
     @Override
     public boolean ctPacketsReceived(ContextView context, List<FloodPacket<?>> packets, FloodPacket<?> selectedPacket,
-                                     boolean areSimilar) {
+            boolean areSimilar) {
         ensureNetworkInfo(context, selectedPacket != null ? selectedPacket.receiver() : null);
         return true;
     }
@@ -63,6 +65,7 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
     public CtMessage<ChaosMessage> initiateMessage(ContextView context, CtNode self, CtNode initiator) {
         ensureNetworkInfo(context, self);
         WirelessMultiPaxosPayload payload;
+        updateLocalNoProposal();
 
         if (self.equals(initiator)) {
             int proposalNumber = nextProposalNumberAbove(minProposal);
@@ -70,12 +73,13 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
             currentLeaderProposal = proposalNumber;
             preparing = true;
             prepared = false;
-            payload = buildPreparePayload(proposalNumber, 0);
+            payload = buildPreparePayload(proposalNumber, 0, Set.of());
             logger.info(String.format("Node[%d] starting wireless multi-Paxos with n=%d", self.getId(),
                     proposalNumber));
         } else {
             payload = WirelessMultiPaxosPayload.empty(MESSAGE_SLOT_CAPACITY);
         }
+        payload = attachNoProposal(payload, self.getId());
 
         FlagField flags = FlagField.initial(self.getId(), ParticipationFlag.PARTICIPATED);
         return new CtMessage<>(initiator, new ChaosMessage(flags, payload));
@@ -109,13 +113,14 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
 
         WirelessMultiPaxosPayload advancedPayload = maybeAdvanceLeader(context, receiver,
                 currentKnowledge.initiator(), augmentedPayload, participants);
+        WirelessMultiPaxosPayload finalPayload = attachNoProposal(advancedPayload, receiver.getId());
 
         boolean attemptChanged = !sameAttempt(mergedPayload, advancedPayload);
         FlagField finalFlags = attemptChanged
                 ? FlagField.initial(receiver.getId(), ParticipationFlag.PARTICIPATED)
                 : mergedFlags;
 
-        ChaosMessage mergedContent = new ChaosMessage(finalFlags, advancedPayload);
+        ChaosMessage mergedContent = new ChaosMessage(finalFlags, finalPayload);
         return new CtMessage<>(currentKnowledge.initiator(), mergedContent);
     }
 
@@ -125,8 +130,8 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
     }
 
     private FlagField mergeFlags(CtMessage<ChaosMessage> currentKnowledge, CtMessage<ChaosMessage> receivedKnowledge,
-                                 WirelessMultiPaxosPayload currentPayload, WirelessMultiPaxosPayload incomingPayload,
-                                 WirelessMultiPaxosPayload mergedPayload, StatefulNode receiver) {
+            WirelessMultiPaxosPayload currentPayload, WirelessMultiPaxosPayload incomingPayload,
+            WirelessMultiPaxosPayload mergedPayload, StatefulNode receiver) {
         FlagField flags = FlagField.empty();
         if (sameAttempt(mergedPayload, currentPayload) && currentKnowledge.content() != null) {
             flags = flags.merge(currentKnowledge.content().flags());
@@ -138,13 +143,14 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
     }
 
     private WirelessMultiPaxosPayload augmentWithLocalState(ContextView context, StatefulNode receiver,
-                                                            WirelessMultiPaxosPayload payload, int participants) {
+            WirelessMultiPaxosPayload payload, int participants) {
         if (payload.phase() == WirelessPaxosPhase.PREPARE) {
             if (payload.proposalNumber() >= 0) {
                 minProposal = Math.max(minProposal, payload.proposalNumber());
             }
             List<LogEntry> updated = new ArrayList<>(payload.entries());
-            for (int slot = payload.slotStart(); slot < payload.slotStart() + Math.max(1, payload.slotCount()); slot++) {
+            for (int slot = payload.slotStart(); slot < payload.slotStart()
+                    + Math.max(1, payload.slotCount()); slot++) {
                 LogSlot local = log.get(slot);
                 if (local == null || local.acceptedProposal < 0) {
                     continue;
@@ -200,7 +206,7 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
     }
 
     private WirelessMultiPaxosPayload maybeAdvanceLeader(ContextView context, StatefulNode receiver, CtNode initiator,
-                                                         WirelessMultiPaxosPayload payload, int participants) {
+            WirelessMultiPaxosPayload payload, int participants) {
         if (initiator == null || receiver.getId() != initiator.getId()) {
             return payload;
         }
@@ -212,12 +218,13 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
                 currentLeaderProposal = newer;
                 preparing = true;
                 prepared = false;
-                return buildPreparePayload(newer, 0);
+                return buildPreparePayload(newer, 0, payload.noProposalNodes());
             }
             if (payload.proposalNumber() >= 0 && participants >= quorum()) {
                 applyPrepareLearnings(payload);
-                // After learning a chunk, immediately write it back via ACCEPT for the same slots.
-                return buildAcceptPayloadForChunk(context, initiator, payload);
+                // After learning a chunk, immediately write it back via ACCEPT for the same
+                // slots.
+                return buildAcceptPayloadForChunk(context, initiator, payload, payload.noProposalNodes());
             }
             return payload;
         }
@@ -228,21 +235,24 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
             currentLeaderProposal = newer;
             preparing = true;
             prepared = false;
-            return buildPreparePayload(newer, 0);
+            return buildPreparePayload(newer, 0, payload.noProposalNodes());
         }
 
         if (participants >= quorum() && payload.proposalNumber() == currentLeaderProposal) {
             if (preparing) {
-                // Finished accepting the prepare chunk: mark synced and move to steady-state accept.
+                // Finished accepting the prepare chunk: mark synced and move to steady-state
+                // accept.
                 preparing = false;
                 prepared = true;
-                lastProposedSlot = Math.max(lastProposedSlot, payload.slotStart() + Math.max(1, payload.slotCount()) - 1);
+                lastProposedSlot = Math.max(lastProposedSlot,
+                        payload.slotStart() + Math.max(1, payload.slotCount()) - 1);
             }
             int nextSlot = findNextSlotToPropose();
             if (nextSlot < 0) {
                 return payload;
             }
-            return buildAcceptPayload(context, initiator, payload.proposalNumber(), nextSlot);
+            return buildAcceptPayload(context, initiator, payload.proposalNumber(), nextSlot,
+                    payload.noProposalNodes());
         }
         return payload;
     }
@@ -268,7 +278,8 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
         }
     }
 
-    private WirelessMultiPaxosPayload buildPreparePayload(int proposalNumber, int slotStart) {
+    private WirelessMultiPaxosPayload buildPreparePayload(int proposalNumber, int slotStart,
+            Set<Integer> noProposalNodes) {
         List<LogEntry> entries = new ArrayList<>();
         for (int slot = slotStart; slot < Math.min(slotStart + MESSAGE_SLOT_CAPACITY, LOG_CAPACITY); slot++) {
             LogSlot local = log.get(slot);
@@ -278,13 +289,14 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
                 entries.add(new LogEntry(slot, -1, null, null));
             }
         }
-        return WirelessMultiPaxosPayload.prepare(proposalNumber, slotStart, entries, minProposal);
+        return WirelessMultiPaxosPayload.prepare(proposalNumber, slotStart, entries, minProposal, noProposalNodes);
     }
 
     private WirelessMultiPaxosPayload buildAcceptPayload(ContextView context, CtNode initiator,
-                                                         int proposalNumber, int startSlot) {
+            int proposalNumber, int startSlot,
+            Set<Integer> noProposalNodes) {
         if (startSlot < 0 || startSlot >= LOG_CAPACITY) {
-            return WirelessMultiPaxosPayload.accept(proposalNumber, startSlot, List.of(), minProposal);
+            return WirelessMultiPaxosPayload.accept(proposalNumber, startSlot, List.of(), minProposal, noProposalNodes);
         }
 
         List<LogEntry> entries = new ArrayList<>();
@@ -295,6 +307,10 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
                 continue;
             }
             Object value = determineValueForSlot(slot);
+            if (value == null) {
+                slot++;
+                continue;
+            }
             acceptLocally(slot, proposalNumber, value);
             LogSlot local = log.get(slot);
             entries.add(new LogEntry(slot, local.acceptedProposal, local.acceptedValue, value));
@@ -303,31 +319,42 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
         }
 
         if (entries.isEmpty()) {
-            return WirelessMultiPaxosPayload.accept(proposalNumber, startSlot, List.of(), minProposal);
+            return WirelessMultiPaxosPayload.accept(proposalNumber, startSlot, List.of(), minProposal, noProposalNodes);
         }
 
         recordSlotStarts(context, initiator, entries);
 
         int slotStart = entries.get(0).slotIndex();
-        return WirelessMultiPaxosPayload.accept(proposalNumber, slotStart, entries, minProposal);
+        return WirelessMultiPaxosPayload.accept(proposalNumber, slotStart, entries, minProposal, noProposalNodes);
     }
 
     private WirelessMultiPaxosPayload buildAcceptPayloadForChunk(ContextView context, CtNode initiator,
-                                                                 WirelessMultiPaxosPayload preparePayload) {
+            WirelessMultiPaxosPayload preparePayload,
+            Set<Integer> noProposalNodes) {
         List<LogEntry> entries = new ArrayList<>();
         for (LogEntry entry : preparePayload.entries()) {
             Object value = entry.acceptedValue() != null ? entry.acceptedValue() : nextProposalValue(null);
+            if (value == null) {
+                continue;
+            }
             entries.add(new LogEntry(entry.slotIndex(), preparePayload.proposalNumber(), value, value));
         }
-        // If no entries were present (unlikely), fall back to a single slot accept at the cursor.
+        // If no entries were present (unlikely), fall back to a single slot accept at
+        // the cursor.
         if (entries.isEmpty()) {
             int slot = preparePayload.slotStart();
             Object value = nextProposalValue(null);
-            entries.add(new LogEntry(slot, preparePayload.proposalNumber(), value, value));
+            if (value != null) {
+                entries.add(new LogEntry(slot, preparePayload.proposalNumber(), value, value));
+            }
+        }
+        if (entries.isEmpty()) {
+            return WirelessMultiPaxosPayload.accept(preparePayload.proposalNumber(),
+                    preparePayload.slotStart(), List.of(), minProposal, noProposalNodes);
         }
         recordSlotStarts(context, initiator, entries);
         return WirelessMultiPaxosPayload.accept(preparePayload.proposalNumber(),
-                preparePayload.slotStart(), entries, minProposal);
+                preparePayload.slotStart(), entries, minProposal, noProposalNodes);
     }
 
     private Object determineValueForSlot(int slotIndex) {
@@ -377,6 +404,25 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
             return mpPayload;
         }
         return WirelessMultiPaxosPayload.empty(MESSAGE_SLOT_CAPACITY);
+    }
+
+    private void updateLocalNoProposal() {
+        if (!localNoProposal && proposalValues.isEmpty()) {
+            localNoProposal = true;
+        }
+    }
+
+    private WirelessMultiPaxosPayload attachNoProposal(WirelessMultiPaxosPayload payload, int nodeId) {
+        if (payload == null) {
+            return null;
+        }
+        updateLocalNoProposal();
+        if (!localNoProposal) {
+            return payload;
+        }
+        Set<Integer> merged = new TreeSet<>(payload.noProposalNodes());
+        merged.add(nodeId);
+        return payload.withNoProposalNodes(merged);
     }
 
     private void ensureNetworkInfo(ContextView context, CtNode self) {
@@ -434,7 +480,8 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
     private Object nextProposalValue(CtNode self) {
         Object value = proposalValues.poll();
         if (value == null) {
-            value = "VAL_" + (self != null ? self.getId() : nodeId) + "_" + System.currentTimeMillis();
+            localNoProposal = true;
+            return null;
         }
         return value;
     }
@@ -464,6 +511,22 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
             return 1;
         }
         return (networkSize / 2) + 1;
+    }
+
+    private boolean hasUndecidedSlots() {
+        for (LogSlot slot : log.values()) {
+            if (slot != null && slot.acceptedProposal >= 0 && !slot.decided) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean shouldSleep(WirelessMultiPaxosPayload payload) {
+        if (payload == null || networkSize <= 0) {
+            return false;
+        }
+        return (payload.noProposalNodes().size() >= ((networkSize / 2) + 1)) && !hasUndecidedSlots();
     }
 
     private static class LogSlot {

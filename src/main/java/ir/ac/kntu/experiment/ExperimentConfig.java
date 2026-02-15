@@ -13,6 +13,7 @@ public record ExperimentConfig(
         List<TopologyConfig> topologies,
         Integer timeoutSlots,
         Integer slotDurationMs,
+        Integer maxRecoveries,
         String resultsDir,
         Boolean exportYaml,
         FaultModelConfig faultModel

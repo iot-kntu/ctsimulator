@@ -1,0 +1,756 @@
+id: "fc3f7ce6-57cf-4e74-a80a-c08751ff4b08"
+name: "A2WirelessMultiPaxos"
+metadata:
+  author: "amir"
+  description: "Auto-generated report for A2WirelessMultiPaxos"
+nodes:
+  - id: 0
+    label: "A"
+    position: { x: 3.5, y: 8.8 }
+  - id: 1
+    label: "B"
+    position: { x: 0, y: 3.2 }
+  - id: 2
+    label: "C"
+    position: { x: 4, y: 2.5 }
+  - id: 3
+    label: "D"
+    position: { x: 2, y: 0 }
+links:
+  - source: 0
+    target: 1
+  - source: 0
+    target: 2
+  - source: 1
+    target: 3
+  - source: 2
+    target: 3
+rounds:
+  - id: 1
+    label: "Round 1"
+    description: "Auto generated description for round 1"
+    slots:
+      - id: 1
+        nodeStates:
+          0: "pT"
+          1: "pR"
+          2: "pR"
+          3: "pR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[1]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=0, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          1: "StMessage[I=N[0], Msg[5]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          2: "StMessage[I=N[0], Msg[6]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          3: "StMessage[I=N[0], Msg[4]=ChaosMessage[flags={3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=-1, instanceId=0, minProposal=0, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 0
+              initiatorId: 0
+              messageNo: 1
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=0, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 0
+              initiatorId: 0
+              messageNo: 1
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=0, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+      - id: 2
+        nodeStates:
+          0: "pR"
+          1: "pT"
+          2: "pT"
+          3: "pR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[7]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          1: "StMessage[I=N[0], Msg[5]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          2: "StMessage[I=N[0], Msg[6]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          3: "StMessage[I=N[0], Msg[8]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 6
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 5
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 6
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 5
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+      - id: 3
+        nodeStates:
+          0: "pT"
+          1: "pR"
+          2: "pR"
+          3: "pT"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[7]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          1: "StMessage[I=N[0], Msg[10]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          2: "StMessage[I=N[0], Msg[9]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          3: "StMessage[I=N[0], Msg[8]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+        events:
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 8
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 7
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 8
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 7
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+      - id: 4
+        nodeStates:
+          0: "pR"
+          1: "pT"
+          2: "pT"
+          3: "pR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[12]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=CMD_A_0, done=false]]]"
+          1: "StMessage[I=N[0], Msg[10]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          2: "StMessage[I=N[0], Msg[9]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+          3: "StMessage[I=N[0], Msg[11]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+        events:
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 9
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 10
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 9
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 10
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]"
+      - id: 5
+        nodeStates:
+          0: "aT"
+          1: "pR"
+          2: "pR"
+          3: "pR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[12]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=CMD_A_0, done=false]]]"
+          1: "StMessage[I=N[0], Msg[14]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[13]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[11]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=null, done=false]]]"
+        events:
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 4
+              initiatorId: 0
+              messageNo: 12
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 4
+              initiatorId: 0
+              messageNo: 12
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=-1, acceptedValue=null, value=CMD_A_0, done=false]]"
+      - id: 6
+        nodeStates:
+          0: "aR"
+          1: "aT"
+          2: "aT"
+          3: "pR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[15]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=1, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_B_0, done=false]]]"
+          1: "StMessage[I=N[0], Msg[14]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[13]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[16]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 13
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 14
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 13
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 14
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+      - id: 7
+        nodeStates:
+          0: "aT"
+          1: "aR"
+          2: "aR"
+          3: "aT"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[15]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=1, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_B_0, done=false]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[16]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+        events:
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 16
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 15
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=1, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_B_0, done=false]]"
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 16
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 15
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=1, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_B_0, done=false]]"
+      - id: 8
+        nodeStates:
+          0: "aR"
+          1: "aR"
+          2: "aR"
+          3: "aR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[15]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=1, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_B_0, done=false]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[16]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+      - id: 9
+        nodeStates:
+          0: "aR"
+          1: "aR"
+          2: "aR"
+          3: "aR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[15]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=1, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_B_0, done=false]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[16]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+      - id: 10
+        nodeStates:
+          0: "aR"
+          1: "aR"
+          2: "aR"
+          3: "aR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[15]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=1, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_B_0, done=false]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[16]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+      - id: 11
+        nodeStates:
+          0: "aR"
+          1: "F"
+          2: "F"
+          3: "aR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[19]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=2, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_B_0, value=CMD_C_0, done=false]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 17
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 18
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 17
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 18
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+      - id: 12
+        nodeStates:
+          0: "aT"
+          1: "F"
+          2: "F"
+          3: "F"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[19]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=2, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_B_0, value=CMD_C_0, done=false]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+        events:
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 18
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 17
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 18
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 2
+            to: 0
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 17
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 19
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=2, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_B_0, value=CMD_C_0, done=false]]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 20
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 19
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=2, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_B_0, value=CMD_C_0, done=false]]"
+          - type: "flood"
+            from: 3
+            to: 1
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 20
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+      - id: 13
+        nodeStates:
+          0: "aR"
+          1: "F"
+          2: "F"
+          3: "F"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+        events:
+          - type: "flood"
+            from: 3
+            to: 2
+            success: false
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 20
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 17
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 18
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 3
+            to: 1
+            success: false
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 20
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 18
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: false
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 17
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+      - id: 14
+        nodeStates:
+          0: "aT"
+          1: "S"
+          2: "S"
+          3: "F"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+        events:
+          - type: "flood"
+            from: 3
+            to: 1
+            success: false
+            packet:
+              time: 13
+              initiatorId: 0
+              messageNo: 20
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 13
+              initiatorId: 0
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: false
+            packet:
+              time: 13
+              initiatorId: 0
+              messageNo: 20
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 13
+              initiatorId: 0
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]"
+      - id: 15
+        nodeStates:
+          0: "aR"
+          1: "S"
+          2: "S"
+          3: "S"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+      - id: 16
+        nodeStates:
+          0: "aR"
+          1: "S"
+          2: "S"
+          3: "S"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+      - id: 17
+        nodeStates:
+          0: "aR"
+          1: "S"
+          2: "S"
+          3: "S"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+      - id: 18
+        nodeStates:
+          0: "aR"
+          1: "S"
+          2: "S"
+          3: "S"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+      - id: 19
+        nodeStates:
+          0: "F"
+          1: "S"
+          2: "S"
+          3: "S"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 18
+              initiatorId: 0
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 18
+              initiatorId: 0
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]"
+      - id: 20
+        nodeStates:
+          0: "F"
+          1: "S"
+          2: "S"
+          3: "S"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+        events:
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 19
+              initiatorId: 0
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 19
+              initiatorId: 0
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]"
+      - id: 21
+        nodeStates:
+          0: "F"
+          1: "S"
+          2: "S"
+          3: "S"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 20
+              initiatorId: 0
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 20
+              initiatorId: 0
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]"
+      - id: 22
+        nodeStates:
+          0: "S"
+          1: "S"
+          2: "S"
+          3: "S"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=3, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_C_0, value=null, done=true]]]"
+          1: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          2: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, instanceId=0, minProposal=1024, acceptedProposal=1024, acceptedValue=CMD_A_0, value=CMD_A_0, done=false]]]"

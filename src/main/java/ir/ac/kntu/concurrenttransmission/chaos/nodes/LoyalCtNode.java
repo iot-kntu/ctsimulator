@@ -6,7 +6,10 @@ import ir.ac.kntu.concurrenttransmission.CtNetworkTime;
 import ir.ac.kntu.concurrenttransmission.CtNode;
 import ir.ac.kntu.concurrenttransmission.chaos.*;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
+import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.RecoveryFloodingState;
+import ir.ac.kntu.concurrenttransmission.events.Event;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
 import ir.ac.kntu.metrics.FailureReason;
 import ir.ac.kntu.metrics.FaultModel;
 import ir.ac.kntu.metrics.MetricsCollector;
@@ -14,6 +17,7 @@ import ir.ac.kntu.metrics.MetricsEmitter;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.logging.Logger;
 
 /**
@@ -25,6 +29,9 @@ public class LoyalCtNode implements StatefulNode {
 
     private final int id;
     private static final Logger logger = Logger.getLogger(LoyalCtNode.class.getSimpleName());
+    private static final int LISTEN_TIMEOUT_SLOTS = 4;
+    private static final int BACKOFF_MIN_SLOTS = 1;
+    private static final int BACKOFF_MAX_SLOTS = 2;
 
     private NodeState currentState;
     private NodeState pendingState;
@@ -32,9 +39,16 @@ public class LoyalCtNode implements StatefulNode {
     private CtMessage<ChaosMessage> knowledge;
     private ChaosStateLogger stateLogger;
     private ChaosTransmissionPolicy policy;
+    private long lastProgressTime = Long.MIN_VALUE;
+    private long listeningSinceTime = Long.MIN_VALUE;
+    private long pendingRecoveryTime = Long.MIN_VALUE;
+    private int recoveryBackoffSlots = BACKOFF_MIN_SLOTS;
+    private long recoveryEpoch = 0;
+    private final Random recoveryRandom;
 
     public LoyalCtNode(Integer id) {
         this.id = id;
+        this.recoveryRandom = new Random(0x9E3779B97F4A7C15L ^ (long) id);
     }
 
     /**
@@ -46,6 +60,10 @@ public class LoyalCtNode implements StatefulNode {
         this.knowledge = initialKnowledge;
         this.stateLogger = logger;
         this.policy = (ChaosTransmissionPolicy) context.getApplication().getTransmissionPolicy();
+        this.lastProgressTime = context.getTime();
+        this.listeningSinceTime = Long.MIN_VALUE;
+        invalidateRecovery();
+        this.recoveryBackoffSlots = sampleRecoveryBackoff(context);
         if (startingPoint != null) {
             setState(startingPoint, context, true);
         }
@@ -57,6 +75,8 @@ public class LoyalCtNode implements StatefulNode {
      */
     @Override
     public void handlePacket(ContextView context, FloodPacket<?> packet) {
+        this.lastProgressTime = context.getTime();
+        invalidateRecovery();
         this.currentState.onPacketReceived(this, context, packet);
     }
 
@@ -72,6 +92,7 @@ public class LoyalCtNode implements StatefulNode {
             pendingActivationTime = Long.MIN_VALUE;
             applyState(next, context);
         }
+        maybeScheduleRecovery(context);
     }
 
     @Override
@@ -104,6 +125,14 @@ public class LoyalCtNode implements StatefulNode {
         if (context.getApplication() instanceof ChaosApplication chaosApp) {
             chaosApp.onNodeStateChanged(this, oldState, newState);
             chaosApp.checkRoundCompletion(context);
+        }
+
+        invalidateRecovery();
+
+        if (newState.isListening()) {
+            listeningSinceTime = context.getTime();
+        } else {
+            listeningSinceTime = Long.MIN_VALUE;
         }
 
         newState.onEnter(this, context);
@@ -256,5 +285,69 @@ public class LoyalCtNode implements StatefulNode {
                         ChaosScenarioRecorder.TransmissionEvent.failure("flood", from, to, reason));
             }
         }
+    }
+
+    private void maybeScheduleRecovery(ContextView context) {
+        if (context == null || currentState == null || !currentState.isListening()) {
+            return;
+        }
+        long now = context.getTime();
+        if (pendingRecoveryTime != Long.MIN_VALUE && now < pendingRecoveryTime) {
+            return;
+        }
+        long idleSince = listeningSinceTime != Long.MIN_VALUE
+                ? Math.max(listeningSinceTime, lastProgressTime)
+                : lastProgressTime;
+        if (idleSince == Long.MIN_VALUE || now - idleSince < recoveryBackoffSlots) {
+            return;
+        }
+        long scheduledAt = now;
+        long scheduledTime = now + 1;
+        long scheduledEpoch = recoveryEpoch;
+        pendingRecoveryTime = scheduledTime;
+
+        context.getSimulator().scheduleEvent(
+                Event.create("ListenTimeoutFlood", scheduledTime, SimEventPriority.High, (ctx) -> {
+                    if (currentState == null || !currentState.isListening()) {
+                        invalidateRecovery();
+                        return;
+                    }
+                    // System.out.println(1);
+                    // if (pendingRecoveryTime != scheduledTime) {
+                    // return;
+                    // }
+                    // System.out.println(2);
+                    // if (recoveryEpoch != scheduledEpoch) {
+                    // return;
+                    // }
+                    // System.out.println(3);
+                    if (lastProgressTime > scheduledAt) {
+                        invalidateRecovery();
+                        return;
+                    }
+                    recoveryBackoffSlots = sampleRecoveryBackoff(context);
+                    pendingRecoveryTime = Long.MIN_VALUE;
+                    NodeState previousState = currentState;
+                    setState(new RecoveryFloodingState(previousState), ctx, true);
+                }));
+    }
+
+    private int sampleRecoveryBackoff(ContextView context) {
+        FaultModel faultModel = resolveFaultModel(context);
+        Random rng = faultModel != null ? faultModel.runtimeRandom() : recoveryRandom;
+        int range = BACKOFF_MAX_SLOTS - BACKOFF_MIN_SLOTS + 1;
+        if (range <= 0) {
+            return BACKOFF_MIN_SLOTS + LISTEN_TIMEOUT_SLOTS;
+        }
+
+        int b = rng.nextInt(range);
+        int result = b + LISTEN_TIMEOUT_SLOTS;
+
+        return result;
+    }
+
+    private void invalidateRecovery() {
+        pendingRecoveryTime = Long.MIN_VALUE;
+        recoveryEpoch++;
     }
 }

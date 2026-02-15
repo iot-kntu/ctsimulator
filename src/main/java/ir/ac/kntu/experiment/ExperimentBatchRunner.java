@@ -117,10 +117,11 @@ public final class ExperimentBatchRunner {
                                     String runId = UUID.randomUUID().toString();
                                     Path graphPath = resolveGraphPath(topologyMap, topology, nodeCount);
                                     try {
+                                        int maxRecoveries = config.maxRecoveries() == null ? 1 : config.maxRecoveries();
                                         RunMetrics metrics = runSingle(algorithm, graphPath, topology, nodeCount,
                                                 lossRate, failureRate, load, seed, silentRatio, failureRate,
                                                 delayJitter, timeoutSlots, slotDurationMs, resultsDir, runId,
-                                                exportYaml);
+                                                exportYaml, maxRecoveries);
                                         MetricsCsvWriter.append(metricsCsv, metrics);
                                     } catch (Exception e) {
                                         writeFailedRun(failedCsv, runId, algorithm, topology, nodeCount, lossRate,
@@ -150,7 +151,8 @@ public final class ExperimentBatchRunner {
             Integer slotDurationMs,
             Path resultsDir,
             String runId,
-            boolean exportYaml) throws Exception {
+            boolean exportYaml,
+            int maxRecoveries) throws Exception {
         boolean chaos = isChaos(algorithm);
         CtNodeFactory nodeFactory = chaos
                 ? new ReflectionCtNodeFactory("ir.ac.kntu.concurrenttransmission.chaos.nodes")
@@ -184,10 +186,11 @@ public final class ExperimentBatchRunner {
             application.setMetricsCollector(metricsCollector);
             application.setFaultModel(faultModel);
             application.configureScenarioMetadata(scenarioName, author, scenarioDescription);
-            configureChaosListeners(algorithm, netGraph, application, load);
+            configureChaosListeners(algorithm, netGraph, application, load, maxRecoveries);
 
             CtSimulator simulator = CtSimulator.createInstance(netGraph, application);
             boolean completed = simulator.start(timeoutSlots);
+            System.out.println(completed);
             if (!completed) {
                 throw new RuntimeException("timeout");
             }
@@ -229,6 +232,8 @@ public final class ExperimentBatchRunner {
                     CHAOS_FLOOD_REPEAT, CHAOS_FINAL_FLOOD_REPEAT, netGraph);
             case WIRELESS_MULTIPAXOS -> new WirelessMultiPaxosTransmissionPolicy(
                     CHAOS_FLOOD_REPEAT, CHAOS_FINAL_FLOOD_REPEAT, netGraph);
+            case A2_WIRELESS_MULTIPAXOS -> new ir.ac.kntu.distributedsystems.a2.wmultipaxos.WirelessMultiPaxosTransmissionPolicy(
+                    CHAOS_FLOOD_REPEAT, CHAOS_FINAL_FLOOD_REPEAT, netGraph);
             case CHAOS_2PC -> new TwoPcTransmissionPolicy(
                     CHAOS_FLOOD_REPEAT, CHAOS_FINAL_FLOOD_REPEAT, netGraph);
             case CHAOS_3PC -> new ThreePcTransmissionPolicy(
@@ -265,14 +270,15 @@ public final class ExperimentBatchRunner {
     }
 
     private static void configureChaosListeners(AlgorithmType algorithm, NetGraph netGraph,
-            ChaosApplication application, int load) {
+            ChaosApplication application, int load, int maxRecoveries) {
         switch (algorithm) {
             case WIRELESS_PAXOS -> netGraph.getNodes().forEach(node -> {
                 Queue<Object> proposals = new LinkedList<>();
                 for (int i = 0; i < Math.max(1, load); i++) {
                     proposals.add("VAL_" + node.getId() + "_" + i);
                 }
-                application.setListener(node, new WirelessPaxos(proposals));
+                int safeRecoveries = Math.max(0, maxRecoveries);
+                application.setListener(node, new WirelessPaxos(proposals, safeRecoveries));
             });
             case WIRELESS_MULTIPAXOS -> netGraph.getNodes().forEach(node -> {
                 Queue<Object> proposals = new LinkedList<>();
@@ -280,6 +286,16 @@ public final class ExperimentBatchRunner {
                     proposals.add("CMD_" + node.getId() + "_" + i);
                 }
                 application.setListener(node, new WirelessMultiPaxos(proposals));
+            });
+            case A2_WIRELESS_MULTIPAXOS -> netGraph.getNodes().forEach(node -> {
+                Queue<Object> proposals = new LinkedList<>();
+                for (int i = 0; i < Math.max(1, load); i++) {
+                    proposals.add("CMD_" + node.getId() + "_" + i);
+                }
+                int safeRecoveries = Math.max(0, maxRecoveries);
+                application.setListener(node,
+                        new ir.ac.kntu.distributedsystems.a2.wmultipaxos.WirelessMultiPaxos(
+                                proposals, safeRecoveries));
             });
             case CHAOS_2PC -> netGraph.getNodes().forEach(node -> {
                 Queue<Object> proposals = new LinkedList<>();
@@ -396,6 +412,7 @@ public final class ExperimentBatchRunner {
     private static boolean isChaos(AlgorithmType algorithm) {
         return algorithm == AlgorithmType.WIRELESS_PAXOS
                 || algorithm == AlgorithmType.WIRELESS_MULTIPAXOS
+                || algorithm == AlgorithmType.A2_WIRELESS_MULTIPAXOS
                 || algorithm == AlgorithmType.CHAOS_2PC
                 || algorithm == AlgorithmType.CHAOS_3PC;
     }

@@ -1,0 +1,380 @@
+{
+  "runId" : "a27f0e75-9cb7-4e5e-8d6d-ea933307df50",
+  "algorithm" : "BLUEFLOOD_PAXOS",
+  "framework" : "BLUEFLOOD",
+  "nNodes" : 4,
+  "topology" : "sample",
+  "load" : 12,
+  "seed" : 42,
+  "nodes" : {
+    "0" : {
+      "sent" : 24,
+      "received" : 24,
+      "success" : 12,
+      "failed" : 12,
+      "participatedRounds" : 12,
+      "commitCount" : 11
+    },
+    "1" : {
+      "sent" : 24,
+      "received" : 24,
+      "success" : 12,
+      "failed" : 12,
+      "participatedRounds" : 12,
+      "commitCount" : 11
+    },
+    "2" : {
+      "sent" : 24,
+      "received" : 24,
+      "success" : 12,
+      "failed" : 12,
+      "participatedRounds" : 12,
+      "commitCount" : 10
+    },
+    "3" : {
+      "sent" : 24,
+      "received" : 24,
+      "success" : 12,
+      "failed" : 12,
+      "participatedRounds" : 12,
+      "commitCount" : 10
+    }
+  },
+  "decisions" : {
+    "0" : {
+      "round" : 0,
+      "initiatorId" : 0,
+      "startTime" : 0,
+      "decisionTimes" : {
+        "0" : 10,
+        "1" : 11,
+        "2" : 6,
+        "3" : 5
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 10,
+          "VOTE" : 0
+        },
+        "1" : {
+          "DECIDE" : 11,
+          "VOTE" : 0
+        },
+        "2" : {
+          "DECIDE" : 6,
+          "VOTE" : 0
+        },
+        "3" : {
+          "DECIDE" : 5,
+          "VOTE" : 1
+        }
+      }
+    },
+    "1" : {
+      "round" : 1,
+      "initiatorId" : 1,
+      "startTime" : 5,
+      "decisionTimes" : {
+        "0" : 10,
+        "1" : 15,
+        "2" : 15,
+        "3" : 10
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 10,
+          "VOTE" : 5
+        },
+        "1" : {
+          "DECIDE" : 15,
+          "VOTE" : 5
+        },
+        "2" : {
+          "DECIDE" : 15,
+          "VOTE" : 6
+        },
+        "3" : {
+          "DECIDE" : 10,
+          "VOTE" : 5
+        }
+      }
+    },
+    "2" : {
+      "round" : 2,
+      "initiatorId" : 2,
+      "startTime" : 10,
+      "decisionTimes" : {
+        "0" : 16,
+        "1" : 15,
+        "2" : 20,
+        "3" : 21
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 16,
+          "VOTE" : 10
+        },
+        "1" : {
+          "DECIDE" : 15,
+          "VOTE" : 11
+        },
+        "2" : {
+          "DECIDE" : 20,
+          "VOTE" : 10
+        },
+        "3" : {
+          "DECIDE" : 21,
+          "VOTE" : 10
+        }
+      }
+    },
+    "3" : {
+      "round" : 3,
+      "initiatorId" : 3,
+      "startTime" : 15,
+      "decisionTimes" : {
+        "0" : 25,
+        "1" : 20,
+        "2" : 20,
+        "3" : 25
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 25,
+          "VOTE" : 16
+        },
+        "1" : {
+          "DECIDE" : 20,
+          "VOTE" : 15
+        },
+        "2" : {
+          "DECIDE" : 20,
+          "VOTE" : 15
+        },
+        "3" : {
+          "DECIDE" : 25,
+          "VOTE" : 15
+        }
+      }
+    },
+    "4" : {
+      "round" : 4,
+      "initiatorId" : 0,
+      "startTime" : 20,
+      "decisionTimes" : {
+        "0" : 30,
+        "1" : 31,
+        "2" : 26,
+        "3" : 25
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 30,
+          "VOTE" : 20
+        },
+        "1" : {
+          "DECIDE" : 31,
+          "VOTE" : 20
+        },
+        "2" : {
+          "DECIDE" : 26,
+          "VOTE" : 20
+        },
+        "3" : {
+          "DECIDE" : 25,
+          "VOTE" : 21
+        }
+      }
+    },
+    "5" : {
+      "round" : 5,
+      "initiatorId" : 1,
+      "startTime" : 25,
+      "decisionTimes" : {
+        "0" : 30,
+        "1" : 35,
+        "2" : 35,
+        "3" : 30
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 30,
+          "VOTE" : 25
+        },
+        "1" : {
+          "DECIDE" : 35,
+          "VOTE" : 25
+        },
+        "2" : {
+          "DECIDE" : 35,
+          "VOTE" : 26
+        },
+        "3" : {
+          "DECIDE" : 30,
+          "VOTE" : 25
+        }
+      }
+    },
+    "6" : {
+      "round" : 6,
+      "initiatorId" : 2,
+      "startTime" : 30,
+      "decisionTimes" : {
+        "0" : 36,
+        "1" : 35,
+        "2" : 40,
+        "3" : 41
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 36,
+          "VOTE" : 30
+        },
+        "1" : {
+          "DECIDE" : 35,
+          "VOTE" : 31
+        },
+        "2" : {
+          "DECIDE" : 40,
+          "VOTE" : 30
+        },
+        "3" : {
+          "DECIDE" : 41,
+          "VOTE" : 30
+        }
+      }
+    },
+    "7" : {
+      "round" : 7,
+      "initiatorId" : 3,
+      "startTime" : 35,
+      "decisionTimes" : {
+        "0" : 45,
+        "1" : 40,
+        "2" : 40,
+        "3" : 45
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 45,
+          "VOTE" : 36
+        },
+        "1" : {
+          "DECIDE" : 40,
+          "VOTE" : 35
+        },
+        "2" : {
+          "DECIDE" : 40,
+          "VOTE" : 35
+        },
+        "3" : {
+          "DECIDE" : 45,
+          "VOTE" : 35
+        }
+      }
+    },
+    "8" : {
+      "round" : 8,
+      "initiatorId" : 0,
+      "startTime" : 40,
+      "decisionTimes" : {
+        "0" : 50,
+        "1" : 51,
+        "2" : 46,
+        "3" : 45
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 50,
+          "VOTE" : 40
+        },
+        "1" : {
+          "DECIDE" : 51,
+          "VOTE" : 40
+        },
+        "2" : {
+          "DECIDE" : 46,
+          "VOTE" : 40
+        },
+        "3" : {
+          "DECIDE" : 45,
+          "VOTE" : 41
+        }
+      }
+    },
+    "9" : {
+      "round" : 9,
+      "initiatorId" : 1,
+      "startTime" : 45,
+      "decisionTimes" : {
+        "0" : 50,
+        "1" : 55,
+        "2" : 55,
+        "3" : 50
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 50,
+          "VOTE" : 45
+        },
+        "1" : {
+          "DECIDE" : 55,
+          "VOTE" : 45
+        },
+        "2" : {
+          "DECIDE" : 55,
+          "VOTE" : 46
+        },
+        "3" : {
+          "DECIDE" : 50,
+          "VOTE" : 45
+        }
+      }
+    },
+    "10" : {
+      "round" : 10,
+      "initiatorId" : 2,
+      "startTime" : 50,
+      "decisionTimes" : {
+        "0" : 56,
+        "1" : 55
+      },
+      "phaseTimes" : {
+        "0" : {
+          "DECIDE" : 56,
+          "VOTE" : 50
+        },
+        "1" : {
+          "DECIDE" : 55,
+          "VOTE" : 51
+        },
+        "2" : {
+          "VOTE" : 50
+        },
+        "3" : {
+          "VOTE" : 50
+        }
+      }
+    },
+    "11" : {
+      "round" : 11,
+      "initiatorId" : 3,
+      "startTime" : 55,
+      "decisionTimes" : { },
+      "phaseTimes" : {
+        "0" : {
+          "VOTE" : 56
+        },
+        "1" : {
+          "VOTE" : 55
+        },
+        "2" : {
+          "VOTE" : 55
+        },
+        "3" : {
+          "VOTE" : 55
+        }
+      }
+    }
+  }
+}

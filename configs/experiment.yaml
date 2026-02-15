@@ -1,12 +1,12 @@
 algorithms:
-  - WIRELESS_PAXOS
+  # - WIRELESS_PAXOS
   - WIRELESS_MULTIPAXOS
-  - CHAOS_2PC
-  - CHAOS_3PC
-  - BLUEFLOOD_PAXOS
-  - BLUEFLOOD_2PC
-  - BLUEFLOOD_3PC
-  - BLUEFLOOD_TOM
+  # - CHAOS_2PC
+  # - CHAOS_3PC
+  # - BLUEFLOOD_PAXOS
+  # - BLUEFLOOD_2PC
+  # - BLUEFLOOD_3PC
+  # - BLUEFLOOD_TOM
 nodeCounts:
   - 4
 lossRates:
@@ -25,6 +25,7 @@ topologies:
     graphPath: sample.graph
 timeoutSlots: 500
 slotDurationMs: 1
+maxRecoveries: 1
 resultsDir: results
 exportYaml: true
 faultModel:

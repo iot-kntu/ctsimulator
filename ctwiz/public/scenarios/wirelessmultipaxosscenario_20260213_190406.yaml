@@ -1,0 +1,595 @@
+id: "8c10a742-51bd-4cde-ab79-23a86ee99825"
+name: "WirelessMultiPaxosScenario"
+metadata:
+  author: "amir"
+  description: "Auto-generated report for WirelessMultiPaxosScenario"
+nodes:
+  - id: 0
+    label: "A"
+    position: { x: 3.5, y: 8.8 }
+  - id: 1
+    label: "B"
+    position: { x: 0, y: 3.2 }
+  - id: 2
+    label: "C"
+    position: { x: 4, y: 2.5 }
+  - id: 3
+    label: "D"
+    position: { x: 2, y: 0 }
+links:
+  - source: 0
+    target: 1
+  - source: 0
+    target: 2
+  - source: 1
+    target: 3
+  - source: 2
+    target: 3
+rounds:
+  - id: 1
+    label: "Round 1"
+    description: "Auto generated description for round 1"
+    slots:
+      - id: 1
+        nodeStates:
+          0: "pT"
+          1: "pR"
+          2: "pR"
+          3: "pR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[1]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[5]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[6]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[4]=ChaosMessage[flags={3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=-1, slotStart=0, slotCount=4, entries=[], minProposal=0]]]"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 0
+              initiatorId: 0
+              messageNo: 1
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 0
+              initiatorId: 0
+              messageNo: 1
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+      - id: 2
+        nodeStates:
+          0: "pR"
+          1: "pT"
+          2: "pT"
+          3: "pR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[7]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[5]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[6]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[8]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 6
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 5
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 6
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 1
+              initiatorId: 0
+              messageNo: 5
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+      - id: 3
+        nodeStates:
+          0: "pT"
+          1: "pR"
+          2: "pR"
+          3: "pT"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[7]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[9]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[10]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[8]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 8
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 7
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 8
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 2
+              initiatorId: 0
+              messageNo: 7
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+      - id: 4
+        nodeStates:
+          0: "pR"
+          1: "pT"
+          2: "pT"
+          3: "pR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[11]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[9]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[10]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[12]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 10
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 9
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 10
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 3
+              initiatorId: 0
+              messageNo: 9
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]"
+      - id: 5
+        nodeStates:
+          0: "aT"
+          1: "pR"
+          2: "pR"
+          3: "pR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[11]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[13]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[14]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[12]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=PREPARE, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=1, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=2, acceptedProposal=-1, acceptedValue=null, proposedValue=null], LogEntry[slotIndex=3, acceptedProposal=-1, acceptedValue=null, proposedValue=null]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 4
+              initiatorId: 0
+              messageNo: 11
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 4
+              initiatorId: 0
+              messageNo: 11
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+      - id: 6
+        nodeStates:
+          0: "aR"
+          1: "aT"
+          2: "aT"
+          3: "pR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[15]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[13]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[14]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[16]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 14
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 13
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 14
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 5
+              initiatorId: 0
+              messageNo: 13
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+      - id: 7
+        nodeStates:
+          0: "aT"
+          1: "aR"
+          2: "aR"
+          3: "aT"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[15]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[16]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 16
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 15
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 16
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 6
+              initiatorId: 0
+              messageNo: 15
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+      - id: 8
+        nodeStates:
+          0: "aR"
+          1: "aT"
+          2: "aT"
+          3: "aR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[19]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[17]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[18]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 18
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 17
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 18
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 7
+              initiatorId: 0
+              messageNo: 17
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]"
+      - id: 9
+        nodeStates:
+          0: "aT"
+          1: "aR"
+          2: "aR"
+          3: "aR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[19]=ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[22]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[20]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=0, slotCount=4, entries=[LogEntry[slotIndex=0, acceptedProposal=1024, acceptedValue=CMD_A_0, proposedValue=CMD_A_0], LogEntry[slotIndex=1, acceptedProposal=1024, acceptedValue=CMD_B_0, proposedValue=CMD_B_0], LogEntry[slotIndex=2, acceptedProposal=1024, acceptedValue=CMD_C_0, proposedValue=CMD_C_0], LogEntry[slotIndex=3, acceptedProposal=1024, acceptedValue=VAL_0_1770996846944, proposedValue=VAL_0_1770996846944]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 8
+              initiatorId: 0
+              messageNo: 19
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 8
+              initiatorId: 0
+              messageNo: 19
+              content: "ChaosMessage[flags={0:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+      - id: 10
+        nodeStates:
+          0: "aR"
+          1: "aT"
+          2: "aT"
+          3: "aR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[23]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[21]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[22]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[24]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 9
+              initiatorId: 0
+              messageNo: 22
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 9
+              initiatorId: 0
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 9
+              initiatorId: 0
+              messageNo: 22
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 9
+              initiatorId: 0
+              messageNo: 21
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+      - id: 11
+        nodeStates:
+          0: "aT"
+          1: "aR"
+          2: "aR"
+          3: "aT"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[23]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[25]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[26]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[24]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 3
+            to: 1
+            success: true
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 24
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 0
+            to: 1
+            success: false
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 23
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 3
+            to: 2
+            success: true
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 24
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: false
+            packet:
+              time: 10
+              initiatorId: 0
+              messageNo: 23
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+      - id: 12
+        nodeStates:
+          0: "aR"
+          1: "aT"
+          2: "aT"
+          3: "aR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[27]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[25]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[26]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[28]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 2
+            to: 0
+            success: true
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 26
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 0
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 25
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 2
+            to: 3
+            success: true
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 26
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 1
+            to: 3
+            success: false
+            packet:
+              time: 11
+              initiatorId: 0
+              messageNo: 25
+              content: "ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+      - id: 13
+        nodeStates:
+          0: "aT"
+          1: "aR"
+          2: "aR"
+          3: "aR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[27]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[29]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[30]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[28]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+        events:
+          - type: "flood"
+            from: 0
+            to: 1
+            success: true
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 27
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+          - type: "flood"
+            from: 0
+            to: 2
+            success: true
+            packet:
+              time: 12
+              initiatorId: 0
+              messageNo: 27
+              content: "ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]"
+      - id: 14
+        nodeStates:
+          0: "aR"
+          1: "aR"
+          2: "aR"
+          3: "aR"
+        knowledge:
+          0: "StMessage[I=N[0], Msg[27]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          1: "StMessage[I=N[0], Msg[29]=ChaosMessage[flags={0:PARTICIPATED, 1:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          2: "StMessage[I=N[0], Msg[30]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
+          3: "StMessage[I=N[0], Msg[28]=ChaosMessage[flags={0:PARTICIPATED, 2:PARTICIPATED, 3:PARTICIPATED}, payload=WirelessMultiPaxosPayload[phase=ACCEPT, proposalNumber=1024, slotStart=4, slotCount=4, entries=[LogEntry[slotIndex=4, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=5, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=6, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959], LogEntry[slotIndex=7, acceptedProposal=1024, acceptedValue=VAL_0_1770996846959, proposedValue=VAL_0_1770996846959]], minProposal=1024]]]"
