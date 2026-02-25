@@ -1,0 +1,39 @@
+algorithms:
+  - WIRELESS_PAXOS
+  - A2_WIRELESS_MULTIPAXOS
+  - CHAOS_2PC
+  - CHAOS_3PC
+  - BLUEFLOOD_PAXOS
+  - BLUEFLOOD_2PC
+  - BLUEFLOOD_3PC
+  - BLUEFLOOD_TOM
+nodeCounts:
+  - 6
+lossRates:
+  - 0.0
+  - 0.05
+  - 0.1
+  - 0.2
+  - 0.3
+  - 0.4
+loads:
+  - 12
+  - 24
+  - 48
+  - 96
+seeds:
+  - 1
+  - 2
+  - 3
+topologyTypes:
+  - grid
+topologies:
+  - name: grid
+    nodeCount: 6
+    graphPath: graphs/grid.graph
+timeoutSlots: 10000
+slotDurationMs: 1
+maxRecoveries: 5
+fadingStdDevDb: 2.0
+resultsDir: results/grid-6.graph
+exportYaml: true

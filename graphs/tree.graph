@@ -1,0 +1,6 @@
+0;1,2;LoyalCtNode;6;9
+1;0,3,4;LoyalCtNode;3;6
+2;0,5;LoyalCtNode;9;6
+3;1;LoyalCtNode;2;2
+4;1;LoyalCtNode;4;2
+5;2;LoyalCtNode;9;2
