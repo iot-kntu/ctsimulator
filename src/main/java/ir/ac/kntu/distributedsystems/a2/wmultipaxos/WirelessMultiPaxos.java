@@ -9,6 +9,8 @@ import ir.ac.kntu.concurrenttransmission.chaos.FlagField;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.a2.aggregation.ParticipationFlag;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 import java.util.List;
 import java.util.Objects;
@@ -71,6 +73,9 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
                     -1, currentInstance, minProposal, acceptedProposal, acceptedValue);
         }
 
+        recordDecisionStart(context, initiator != null ? initiator.getId() : null, payload);
+        recordPhase(context, self != null ? self.getId() : -1, payload);
+
         FlagField initialFlags = FlagField.initial(self.getId(), ParticipationFlag.PARTICIPATED);
         return new CtMessage<>(initiator, new ChaosMessage(initialFlags, payload));
     }
@@ -105,6 +110,11 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
             merged = handlePreparePhase(context, receiver, currentKnowledge, receivedKnowledge,
                     currentPayload, receivedPayload);
         }
+
+        WirelessMultiPaxosPayload mergedPayload = payloadOrDefault(merged);
+        recordDecisionStart(context, initiatorIdOf(merged), mergedPayload);
+        recordPhase(context, receiver != null ? receiver.getId() : -1, mergedPayload);
+        recordDecisionCompletions(context, receiver, currentPayload.instanceId(), mergedPayload.instanceId());
 
         if (!Objects.equals(currentKnowledge.content(), merged.content())) {
             onProgress(context);
@@ -397,5 +407,79 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
             candidate = (int) (proposalEpoch * PROPOSAL_STRIDE + nodeId);
         } while (candidate <= minExclusive);
         return candidate;
+    }
+
+    private Integer initiatorIdOf(CtMessage<ChaosMessage> message) {
+        if (message == null || message.initiator() == null) {
+            return null;
+        }
+        return message.initiator().getId();
+    }
+
+    private void recordDecisionStart(ContextView context, Integer initiatorId, WirelessMultiPaxosPayload payload) {
+        if (!isDecisionPayload(payload)) {
+            return;
+        }
+        MetricsCollector metrics = resolveMetrics(context);
+        if (metrics == null) {
+            return;
+        }
+        metrics.recordDecisionStart(payload.instanceId(), initiatorId, context.getTime());
+    }
+
+    private void recordDecisionCompletions(ContextView context,
+                                           StatefulNode receiver,
+                                           int previousInstanceId,
+                                           int currentInstanceId) {
+        if (receiver == null) {
+            return;
+        }
+        if (currentInstanceId <= previousInstanceId) {
+            return;
+        }
+        MetricsCollector metrics = resolveMetrics(context);
+        if (metrics == null) {
+            return;
+        }
+        int from = Math.max(0, previousInstanceId);
+        int to = Math.max(0, currentInstanceId);
+        for (int instanceId = from; instanceId < to; instanceId++) {
+            metrics.recordDecisionEnd(instanceId, receiver.getId(), context.getTime(), true);
+            metrics.recordPhaseTime(instanceId, receiver.getId(), "DECIDE", context.getTime());
+        }
+    }
+
+    private void recordPhase(ContextView context, int nodeId, WirelessMultiPaxosPayload payload) {
+        if (nodeId < 0 || !isDecisionPayload(payload)) {
+            return;
+        }
+        MetricsCollector metrics = resolveMetrics(context);
+        if (metrics == null) {
+            return;
+        }
+        metrics.recordPhaseTime(payload.instanceId(), nodeId, payload.phase().name(), context.getTime());
+    }
+
+    private boolean isDecisionPayload(WirelessMultiPaxosPayload payload) {
+        if (payload == null) {
+            return false;
+        }
+        if (payload.instanceId() < 0 || payload.proposalNumber() < 0 || payload.done()) {
+            return false;
+        }
+        if (payload.phase() == WirelessMultiPaxosPhase.PREPARE) {
+            return true;
+        }
+        return payload.phase() == WirelessMultiPaxosPhase.ACCEPT && payload.value() != null;
+    }
+
+    private MetricsCollector resolveMetrics(ContextView context) {
+        if (context == null || context.getApplication() == null) {
+            return null;
+        }
+        if (context.getApplication() instanceof MetricsEmitter emitter) {
+            return emitter.getMetricsCollector();
+        }
+        return null;
     }
 }

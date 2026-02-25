@@ -25,8 +25,7 @@ import ir.ac.kntu.distributedsystems.bf.paxos.BlueFloodPaxos;
 import ir.ac.kntu.distributedsystems.bf.threepc.BlueFloodThreePhaseCommit;
 import ir.ac.kntu.distributedsystems.bf.tom.BlueFloodTotalOrderMulticast;
 import ir.ac.kntu.distributedsystems.bf.twopc.BlueFloodTwoPhaseCommit;
-import ir.ac.kntu.distributedsystems.paxos.wmultipaxos.WirelessMultiPaxos;
-import ir.ac.kntu.distributedsystems.paxos.wmultipaxos.WirelessMultiPaxosTransmissionPolicy;
+
 import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxos;
 import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxosTransmissionPolicy;
 import ir.ac.kntu.metrics.MetricsCollector;
@@ -214,8 +213,6 @@ public final class ExperimentBatchRunner {
         ChaosTransmissionPolicy policy = switch (algorithm) {
             case WIRELESS_PAXOS -> new WirelessPaxosTransmissionPolicy(
                     CHAOS_FLOOD_REPEAT, CHAOS_FINAL_FLOOD_REPEAT, netGraph);
-            case WIRELESS_MULTIPAXOS -> new WirelessMultiPaxosTransmissionPolicy(
-                    CHAOS_FLOOD_REPEAT, CHAOS_FINAL_FLOOD_REPEAT, netGraph);
             case A2_WIRELESS_MULTIPAXOS -> new ir.ac.kntu.distributedsystems.a2.wmultipaxos.WirelessMultiPaxosTransmissionPolicy(
                     CHAOS_FLOOD_REPEAT, CHAOS_FINAL_FLOOD_REPEAT, netGraph);
             case CHAOS_2PC -> new TwoPcTransmissionPolicy(
@@ -264,16 +261,9 @@ public final class ExperimentBatchRunner {
                 int safeRecoveries = Math.max(0, maxRecoveries);
                 application.setListener(node, new WirelessPaxos(proposals, safeRecoveries));
             });
-            case WIRELESS_MULTIPAXOS -> netGraph.getNodes().forEach(node -> {
-                Queue<Object> proposals = new LinkedList<>();
-                for (int i = 0; i < Math.max(1, load); i++) {
-                    proposals.add("CMD_" + node.getId() + "_" + i);
-                }
-                application.setListener(node, new WirelessMultiPaxos(proposals));
-            });
             case A2_WIRELESS_MULTIPAXOS -> netGraph.getNodes().forEach(node -> {
                 Queue<Object> proposals = new LinkedList<>();
-                for (int i = 0; i < Math.max(1, load); i++) {
+                for (int i = 0; i < 4; i++) {
                     proposals.add("CMD_" + node.getId() + "_" + i);
                 }
                 int safeRecoveries = Math.max(0, maxRecoveries);

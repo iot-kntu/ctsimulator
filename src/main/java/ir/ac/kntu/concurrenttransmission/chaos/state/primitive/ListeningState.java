@@ -8,6 +8,8 @@ import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.metrics.MetricsCollector;
+import ir.ac.kntu.metrics.MetricsEmitter;
 
 /**
  * Behavior of a node when it is in the Listening state.
@@ -29,6 +31,7 @@ public class ListeningState implements NodeState {
         // Check for completion first.
         int totalNodes = context.getNetGraph().getNodeCount();
         if (mergedMessage.content().flags().getParticipationCount() == totalNodes) {
+            recordDecisionEnd(context, node);
             node.setState(new FinalFloodingState(), context);
             return;
         }
@@ -58,5 +61,18 @@ public class ListeningState implements NodeState {
     @Override
     public String toString() {
         return "R";
+    }
+
+    private void recordDecisionEnd(ContextView context, StatefulNode node) {
+        if (context == null || node == null) {
+            return;
+        }
+        if (context.getApplication() instanceof MetricsEmitter emitter) {
+            MetricsCollector metrics = emitter.getMetricsCollector();
+            if (metrics != null && context.getApplication().getNetworkTime() != null) {
+                int round = context.getApplication().getNetworkTime().round();
+                metrics.recordDecisionEnd(round, node.getId(), context.getTime(), true);
+            }
+        }
     }
 }

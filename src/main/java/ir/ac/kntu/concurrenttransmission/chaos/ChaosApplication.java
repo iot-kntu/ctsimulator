@@ -243,7 +243,8 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         final CtNode initiator = getInitiatorNode(context);
         if (metricsCollector != null) {
             ChaosNodeListener listener = getChaosNodeListener(initiator);
-            boolean skipDecisionStart = listener instanceof WirelessMultiPaxos;
+            boolean skipDecisionStart = listener instanceof WirelessMultiPaxos
+                    || listener instanceof ir.ac.kntu.distributedsystems.a2.wmultipaxos.WirelessMultiPaxos;
             if (!skipDecisionStart) {
                 metricsCollector.recordDecisionStart(getRound(), initiator.getId(), context.getTime());
             }

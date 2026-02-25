@@ -8,6 +8,7 @@ import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.distributedsystems.a2.twopc.TwoPhaseCommitDecision;
 import ir.ac.kntu.distributedsystems.a2.twopc.TwoPhaseCommitPayload;
 import ir.ac.kntu.distributedsystems.a2.twopc.TwoPhaseCommitPhase;
 import ir.ac.kntu.metrics.MetricsCollector;
@@ -26,6 +27,7 @@ public class VoteListeningState implements NodeState {
         TwoPhaseCommitPayload payload = (TwoPhaseCommitPayload) mergedMessage.content().payload();
         recordPhase(context, node, payload.phase());
         if (payload.phase() == TwoPhaseCommitPhase.FINALIZING) {
+            recordDecisionEnd(context, node, payload.decision());
             if (node.shouldFlood(currentKnowledge, (CtMessage<ChaosMessage>) capturedPacket.ctMessage())) {
                 node.setState(new CommitFloodingState(), context);
             } else {
@@ -67,6 +69,21 @@ public class VoteListeningState implements NodeState {
             if (metrics != null && context.getApplication().getNetworkTime() != null) {
                 int round = context.getApplication().getNetworkTime().round();
                 metrics.recordPhaseTime(round, node.getId(), phase.name(), context.getTime());
+            }
+        }
+    }
+
+    private void recordDecisionEnd(ContextView context, StatefulNode node, TwoPhaseCommitDecision decision) {
+        if (context == null || node == null || decision == null || decision == TwoPhaseCommitDecision.IN_PROGRESS) {
+            return;
+        }
+        if (context.getApplication() instanceof MetricsEmitter emitter) {
+            MetricsCollector metrics = emitter.getMetricsCollector();
+            if (metrics != null && context.getApplication().getNetworkTime() != null) {
+                int round = context.getApplication().getNetworkTime().round();
+                boolean committed = decision == TwoPhaseCommitDecision.COMMIT;
+                metrics.recordDecisionEnd(round, node.getId(), context.getTime(), committed);
+                metrics.recordPhaseTime(round, node.getId(), "DECIDE", context.getTime());
             }
         }
     }

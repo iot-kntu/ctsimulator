@@ -17,7 +17,6 @@ public class RecoveryFloodingState implements NodeState {
     private final NodeState previousState;
 
     public RecoveryFloodingState(NodeState previousState) {
-        System.out.println("RecoveryFloodingState :)");
         this.previousState = previousState;
     }
 
@@ -28,7 +27,6 @@ public class RecoveryFloodingState implements NodeState {
 
     @Override
     public void onEnter(StatefulNode node, ContextView context) {
-        System.out.println("RecoveryFloodingState  flood :)");
         node.floodMessage(context, 0, node, node.getKnowledge());
         long endOfFloodTime = context.getTime()
                 + context.getApplication().getTransmissionPolicy().getFloodRepeatCount();

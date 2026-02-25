@@ -8,6 +8,7 @@ import ir.ac.kntu.concurrenttransmission.chaos.ChaosNodeListener;
 import ir.ac.kntu.concurrenttransmission.chaos.nodes.StatefulNode;
 import ir.ac.kntu.concurrenttransmission.chaos.state.NodeState;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
+import ir.ac.kntu.distributedsystems.a2.threepc.ThreePhaseCommitDecision;
 import ir.ac.kntu.distributedsystems.a2.threepc.ThreePhaseCommitPayload;
 import ir.ac.kntu.distributedsystems.a2.threepc.ThreePhaseCommitPhase;
 import ir.ac.kntu.metrics.MetricsCollector;
@@ -26,6 +27,7 @@ public class PreCommitListeningState implements NodeState {
         ThreePhaseCommitPayload payload = (ThreePhaseCommitPayload) mergedMessage.content().payload();
         recordPhase(context, node, payload.phase());
         if (payload.phase() == ThreePhaseCommitPhase.FINALIZING) {
+            recordDecisionEnd(context, node, payload.decision());
             if (node.shouldFlood(currentKnowledge, (CtMessage<ChaosMessage>) capturedPacket.ctMessage())) {
                 node.setState(new CommitFloodingState(), context);
             } else {
@@ -68,6 +70,23 @@ public class PreCommitListeningState implements NodeState {
                 int round = context.getApplication().getNetworkTime().round();
                 String phaseName = phase == ThreePhaseCommitPhase.PRE_COMMIT ? "PRE_COMMIT" : "COMMIT";
                 metrics.recordPhaseTime(round, node.getId(), phaseName, context.getTime());
+            }
+        }
+    }
+
+    private void recordDecisionEnd(ContextView context, StatefulNode node, ThreePhaseCommitDecision decision) {
+        if (context == null || node == null || decision == null
+                || decision == ThreePhaseCommitDecision.IN_PROGRESS
+                || decision == ThreePhaseCommitDecision.PRE_COMMIT) {
+            return;
+        }
+        if (context.getApplication() instanceof MetricsEmitter emitter) {
+            MetricsCollector metrics = emitter.getMetricsCollector();
+            if (metrics != null && context.getApplication().getNetworkTime() != null) {
+                int round = context.getApplication().getNetworkTime().round();
+                boolean committed = decision == ThreePhaseCommitDecision.COMMIT;
+                metrics.recordDecisionEnd(round, node.getId(), context.getTime(), committed);
+                metrics.recordPhaseTime(round, node.getId(), "DECIDE", context.getTime());
             }
         }
     }

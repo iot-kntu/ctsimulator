@@ -9,8 +9,6 @@ import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.SleepingState;
 import ir.ac.kntu.concurrenttransmission.events.Event;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
-import ir.ac.kntu.metrics.MetricsCollector;
-import ir.ac.kntu.metrics.MetricsEmitter;
 
 public class FinalFloodingState implements NodeState {
 
@@ -20,7 +18,6 @@ public class FinalFloodingState implements NodeState {
 
     @Override
     public void onEnter(StatefulNode node, ContextView context) {
-        recordDecisionEnd(context, node);
         node.floodMessage(context, 0, node, node.getKnowledge(), true);
 
         long endOfFloodTime = context.getTime() + node.getFinalFloodCounter();
@@ -43,18 +40,5 @@ public class FinalFloodingState implements NodeState {
     @Override
     public String toString() {
         return "F";
-    }
-
-    private void recordDecisionEnd(ContextView context, StatefulNode node) {
-        if (context == null || node == null) {
-            return;
-        }
-        if (context.getApplication() instanceof MetricsEmitter emitter) {
-            MetricsCollector metrics = emitter.getMetricsCollector();
-            if (metrics != null && context.getApplication().getNetworkTime() != null) {
-                int round = context.getApplication().getNetworkTime().round();
-                metrics.recordDecisionEnd(round, node.getId(), context.getTime(), true);
-            }
-        }
     }
 }

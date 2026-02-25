@@ -11,9 +11,6 @@ import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.distributedsystems.a2.wmultipaxos.WirelessMultiPaxos;
 import ir.ac.kntu.distributedsystems.a2.wmultipaxos.WirelessMultiPaxosPayload;
 import ir.ac.kntu.distributedsystems.a2.wmultipaxos.WirelessMultiPaxosPhase;
-import ir.ac.kntu.metrics.MetricsCollector;
-import ir.ac.kntu.metrics.MetricsEmitter;
-import ir.ac.kntu.distributedsystems.a2.wmultipaxos.state.RecoveryFloodingState;
 
 import java.util.Objects;
 
@@ -28,8 +25,6 @@ public class PrepareListeningState implements NodeState {
 
         WirelessMultiPaxosPayload before = payloadOrEmpty(currentKnowledge);
         WirelessMultiPaxosPayload after = payloadOrEmpty(mergedMessage);
-
-        recordPhase(context, node, after.phase());
 
         if (listener instanceof WirelessMultiPaxos multiPaxos) {
             if (multiPaxos.shouldEndByIdle(context)) {
@@ -96,18 +91,5 @@ public class PrepareListeningState implements NodeState {
             return mpPayload;
         }
         return WirelessMultiPaxosPayload.prepare(-1, 0, 0, -1, null);
-    }
-
-    private void recordPhase(ContextView context, StatefulNode node, WirelessMultiPaxosPhase phase) {
-        if (context == null || phase == null) {
-            return;
-        }
-        if (context.getApplication() instanceof MetricsEmitter emitter) {
-            MetricsCollector metrics = emitter.getMetricsCollector();
-            if (metrics != null && context.getApplication().getNetworkTime() != null) {
-                int round = context.getApplication().getNetworkTime().round();
-                metrics.recordPhaseTime(round, node.getId(), phase.name(), context.getTime());
-            }
-        }
     }
 }
