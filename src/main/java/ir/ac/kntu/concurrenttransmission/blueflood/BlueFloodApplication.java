@@ -139,9 +139,6 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
                 getBlueFloodListener(receiver).ctPacketsLost(context, packets, ctEvent.areMessagesSimilar());
             }
             case Listen -> {
-
-                strategies.transmissionPolicy().newPacketReceived(receiver, getSlot());
-
                 double receiveProbability = ctEvent.areMessagesSimilar()
                         ? settings.lossProbability()
                         : settings.conflictProbability();
@@ -173,8 +170,10 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
                             }
                         }
                     }
-                    if (shouldFlood)
+                    if (shouldFlood) {
+                        strategies.transmissionPolicy().newPacketReceived(receiver, getSlot());
                         receiver.floodMessage(context, 1, receiver, thePacket.ctMessage());
+                    }
                 } else {
                     FailureReason reason = ctEvent.areMessagesSimilar() ? FailureReason.DROP : FailureReason.COLLISION;
                     recordTransmissionEvents(ctEvent.areMessagesSimilar(), false, packets, thePacket, reason);
