@@ -1,2 +1,0 @@
-runId,algorithm,topology,nodeCount,lossRate,failureRate,load,seed,error
-d679c517-5e77-426b-8eb4-d4d12259cb6c,WIRELESS_MULTIPAXOS,sample,4,0.0,0.0,12,42,timeout

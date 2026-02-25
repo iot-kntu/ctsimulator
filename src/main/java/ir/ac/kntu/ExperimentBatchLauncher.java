@@ -19,7 +19,7 @@ public final class ExperimentBatchLauncher {
     //         "configs/full-mesh/exp6.yaml",
     //         "configs/line/exp6.yaml",
     //         "configs/grid/exp6.yaml");
-    private static final List<String> CONFIGS = List.of("configs/line/exp6.yaml");
+    private static final List<String> CONFIGS = List.of("configs/tree/exp6.yaml");
 
     private ExperimentBatchLauncher() {
     }
