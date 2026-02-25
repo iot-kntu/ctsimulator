@@ -107,6 +107,8 @@ public final class ExperimentBatchRunner {
                 ? config.faultModel().delayJitterSlots()
                 : 0;
 
+        Double fadingStdDevDb = config.fadingStdDevDb();
+
         for (AlgorithmType algorithm : algorithms) {
             for (int nodeCount : nodeCounts) {
                 for (double lossRate : lossRates) {
@@ -121,7 +123,7 @@ public final class ExperimentBatchRunner {
                                         RunMetrics metrics = runSingle(algorithm, graphPath, topology, nodeCount,
                                                 lossRate, failureRate, load, seed, silentRatio, failureRate,
                                                 delayJitter, timeoutSlots, slotDurationMs, resultsDir, runId,
-                                                exportYaml, maxRecoveries);
+                                                exportYaml, maxRecoveries, fadingStdDevDb);
                                         MetricsCsvWriter.append(metricsCsv, metrics);
                                     } catch (Exception e) {
                                         writeFailedRun(failedCsv, runId, algorithm, topology, nodeCount, lossRate,
@@ -152,7 +154,8 @@ public final class ExperimentBatchRunner {
             Path resultsDir,
             String runId,
             boolean exportYaml,
-            int maxRecoveries) throws Exception {
+            int maxRecoveries,
+            Double fadingStdDevDb) throws Exception {
         boolean chaos = isChaos(algorithm);
         CtNodeFactory nodeFactory = chaos
                 ? new ReflectionCtNodeFactory("ir.ac.kntu.concurrenttransmission.chaos.nodes")
@@ -185,6 +188,7 @@ public final class ExperimentBatchRunner {
             ChaosApplication application = buildChaosApplication(algorithm, netGraph, lossRate, load);
             application.setMetricsCollector(metricsCollector);
             application.setFaultModel(faultModel);
+            application.setFadingStandardDeviationDb(fadingStdDevDb);
             application.configureScenarioMetadata(scenarioName, author, scenarioDescription);
             configureChaosListeners(algorithm, netGraph, application, load, maxRecoveries);
 

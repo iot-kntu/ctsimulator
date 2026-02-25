@@ -107,7 +107,7 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
         }
 
         if (!Objects.equals(currentKnowledge.content(), merged.content())) {
-            lastProgressTime = context.getTime();
+            onProgress(context);
         }
         return merged;
     }
@@ -340,7 +340,12 @@ public class WirelessMultiPaxos implements ChaosNodeListener {
     }
 
     private void resetForNewRound(ContextView context) {
+        onProgress(context);
+    }
+
+    private void onProgress(ContextView context) {
         lastProgressTime = context != null ? context.getTime() : Long.MIN_VALUE;
+        // Recovery budget is per consecutive timeout streak.
         remainingRecoveries = maxRecoveries;
     }
 

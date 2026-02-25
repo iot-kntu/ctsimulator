@@ -14,6 +14,7 @@ public record ExperimentConfig(
         Integer timeoutSlots,
         Integer slotDurationMs,
         Integer maxRecoveries,
+        Double fadingStdDevDb,
         String resultsDir,
         Boolean exportYaml,
         FaultModelConfig faultModel

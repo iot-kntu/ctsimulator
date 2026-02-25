@@ -23,7 +23,7 @@ public class SignalModel {
      * This adds randomness to the signal strength. A value of 2.0 is a reasonable
      * start.
      */
-    private static final double FADING_STANDARD_DEVIATION_DB = 2.0;
+    private double fadingStandardDeviationDb = 2.0;
 
     private Random random = new Random();
 
@@ -36,6 +36,13 @@ public class SignalModel {
 
     public void reseed(long seed) {
         this.random = new Random(seed);
+    }
+
+    public void setFadingStandardDeviationDb(double fadingStandardDeviationDb) {
+        if (Double.isNaN(fadingStandardDeviationDb) || Double.isInfinite(fadingStandardDeviationDb)) {
+            return;
+        }
+        this.fadingStandardDeviationDb = Math.max(0.0, fadingStandardDeviationDb);
     }
 
     /**
@@ -56,7 +63,7 @@ public class SignalModel {
 
         // 2. Add a random component for fading (log-normal shadowing)
         // This simulates the unpredictable variations in a real environment.
-        double fading = random.nextGaussian() * FADING_STANDARD_DEVIATION_DB;
+        double fading = random.nextGaussian() * fadingStandardDeviationDb;
         // double fading = 0;
 
         return deterministicSignalStrength + fading;

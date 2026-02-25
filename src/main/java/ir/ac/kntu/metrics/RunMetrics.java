@@ -23,6 +23,8 @@ public record RunMetrics(
         long failedNotListening,
         Double p95Latency,
         Double p99Latency,
-        Double throughput
+        Double throughput,
+        int totalDecisions,
+        int successfulDecisions
 ) {
 }

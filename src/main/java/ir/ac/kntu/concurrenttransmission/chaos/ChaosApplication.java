@@ -42,7 +42,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
      * to be successfully captured over the interference from other signals.
      * A common value from literature is 3 dB.
      */
-    private static final double CAPTURE_THRESHOLD_DB = 0;
+    // private static final double CAPTURE_THRESHOLD_DB = 0;
     protected final ChaosStrategies strategies;
     private final ChaosSettings settings;
     private final ChaosStateLogger stateLogger;
@@ -84,6 +84,13 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
 
     public ChaosStateLogger getStateLogger() {
         return this.stateLogger;
+    }
+
+    public void setFadingStandardDeviationDb(Double fadingStandardDeviationDb) {
+        if (fadingStandardDeviationDb == null) {
+            return;
+        }
+        signalModel.setFadingStandardDeviationDb(fadingStandardDeviationDb);
     }
 
     @Override
@@ -365,36 +372,40 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
 
         FloodPacket<?> strongestPacket = null;
         double maxSignalStrengthDb = -Double.MAX_VALUE;
-        double totalInterferencePowerMw = 0;
+        // double totalInterferencePowerMw = 0;
 
         for (FloodPacket<?> packet : orderedPackets) {
             double distance = context.getNetGraph().getDistanceBetween(packet.sender(), receiver);
             double signalStrengthDb = signalModel.calculateSignalStrengthDb(distance);
 
             if (signalStrengthDb > maxSignalStrengthDb) {
-                if (strongestPacket != null) {
-                    totalInterferencePowerMw += signalModel.dbmToMilliwatts(maxSignalStrengthDb);
-                }
+                // if (strongestPacket != null) {
+                //     totalInterferencePowerMw += signalModel.dbmToMilliwatts(maxSignalStrengthDb);
+                // }
                 maxSignalStrengthDb = signalStrengthDb;
                 strongestPacket = packet;
-            } else {
-                totalInterferencePowerMw += signalModel.dbmToMilliwatts(signalStrengthDb);
-            }
+            } 
+            // else {
+            // totalInterferencePowerMw += signalModel.dbmToMilliwatts(signalStrengthDb);
+            // }
         }
 
-        if (totalInterferencePowerMw <= 0) {
-            return strongestPacket;
-        }
+        return strongestPacket;
 
-        double signalToInterferenceRatioDb = 10
-                * Math.log10(signalModel.dbmToMilliwatts(maxSignalStrengthDb) / totalInterferencePowerMw);
 
-        if (signalToInterferenceRatioDb >= CAPTURE_THRESHOLD_DB) {
-            return strongestPacket;
-        } else {
-            logger.warning(String.format("[t:%d] Capture FAILED at Node[%d].", context.getTime(), receiver.getId()));
-            return null;
-        }
+        // if (totalInterferencePowerMw <= 0) {
+        //     return strongestPacket;
+        // }
+
+        // double signalToInterferenceRatioDb = 10
+        //         * Math.log10(signalModel.dbmToMilliwatts(maxSignalStrengthDb) / totalInterferencePowerMw);
+
+        // if (signalToInterferenceRatioDb >= CAPTURE_THRESHOLD_DB) {
+        //     return strongestPacket;
+        // } else {
+        //     logger.warning(String.format("[t:%d] Capture FAILED at Node[%d].", context.getTime(), receiver.getId()));
+        //     return null;
+        // }
     }
 
     @Override

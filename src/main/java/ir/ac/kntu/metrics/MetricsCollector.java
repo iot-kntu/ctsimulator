@@ -205,7 +205,9 @@ public final class MetricsCollector {
                 failedNotListening,
                 p95,
                 p99,
-                throughput
+                throughput,
+                totalDecisions,
+                successfulDecisions
         );
     }
 
