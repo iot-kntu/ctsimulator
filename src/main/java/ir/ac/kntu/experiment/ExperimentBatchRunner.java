@@ -29,7 +29,6 @@ import ir.ac.kntu.distributedsystems.paxos.wmultipaxos.WirelessMultiPaxos;
 import ir.ac.kntu.distributedsystems.paxos.wmultipaxos.WirelessMultiPaxosTransmissionPolicy;
 import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxos;
 import ir.ac.kntu.distributedsystems.paxos.wpaxos.WirelessPaxosTransmissionPolicy;
-import ir.ac.kntu.metrics.FaultModel;
 import ir.ac.kntu.metrics.MetricsCollector;
 import ir.ac.kntu.metrics.MetricsCsvWriter;
 import ir.ac.kntu.metrics.MetricsDetailWriter;
@@ -51,8 +50,8 @@ import java.util.UUID;
 public final class ExperimentBatchRunner {
 
     private static final int CHAOS_FLOOD_REPEAT = 1;
-    private static final int CHAOS_FINAL_FLOOD_REPEAT = 3;
-    private static final int BLUEFLOOD_REPEAT = 1;
+    private static final int CHAOS_FINAL_FLOOD_REPEAT = 1;
+    private static final int BLUEFLOOD_REPEAT = 3;
 
     private ExperimentBatchRunner() {
     }
@@ -84,7 +83,6 @@ public final class ExperimentBatchRunner {
         List<AlgorithmType> algorithms = parseAlgorithms(config.algorithms());
         List<Integer> nodeCounts = requireNonEmpty(config.nodeCounts(), "nodeCounts");
         List<Double> lossRates = requireNonEmpty(config.lossRates(), "lossRates");
-        List<Double> failureRates = requireNonEmpty(config.failureRates(), "failureRates");
         List<Integer> loads = requireNonEmpty(config.loads(), "loads");
         List<Long> seeds = requireNonEmpty(config.seeds(), "seeds");
         List<String> topologyTypes = requireNonEmpty(config.topologyTypes(), "topologyTypes");
@@ -100,35 +98,25 @@ public final class ExperimentBatchRunner {
         Integer slotDurationMs = config.slotDurationMs();
         boolean exportYaml = config.exportYaml() == null || config.exportYaml();
 
-        double silentRatio = config.faultModel() != null && config.faultModel().silentNodeRatio() != null
-                ? config.faultModel().silentNodeRatio()
-                : 0.0;
-        int delayJitter = config.faultModel() != null && config.faultModel().delayJitterSlots() != null
-                ? config.faultModel().delayJitterSlots()
-                : 0;
-
         Double fadingStdDevDb = config.fadingStdDevDb();
 
         for (AlgorithmType algorithm : algorithms) {
             for (int nodeCount : nodeCounts) {
                 for (double lossRate : lossRates) {
-                    for (double failureRate : failureRates) {
-                        for (int load : loads) {
-                            for (long seed : seeds) {
-                                for (String topology : topologyTypes) {
-                                    String runId = UUID.randomUUID().toString();
-                                    Path graphPath = resolveGraphPath(topologyMap, topology, nodeCount);
-                                    try {
-                                        int maxRecoveries = config.maxRecoveries() == null ? 1 : config.maxRecoveries();
-                                        RunMetrics metrics = runSingle(algorithm, graphPath, topology, nodeCount,
-                                                lossRate, failureRate, load, seed, silentRatio, failureRate,
-                                                delayJitter, timeoutSlots, slotDurationMs, resultsDir, runId,
-                                                exportYaml, maxRecoveries, fadingStdDevDb);
-                                        MetricsCsvWriter.append(metricsCsv, metrics);
-                                    } catch (Exception e) {
-                                        writeFailedRun(failedCsv, runId, algorithm, topology, nodeCount, lossRate,
-                                                failureRate, load, seed, e.getMessage());
-                                    }
+                    for (int load : loads) {
+                        for (long seed : seeds) {
+                            for (String topology : topologyTypes) {
+                                String runId = UUID.randomUUID().toString();
+                                Path graphPath = resolveGraphPath(topologyMap, topology, nodeCount);
+                                try {
+                                    int maxRecoveries = config.maxRecoveries() == null ? 1 : config.maxRecoveries();
+                                    RunMetrics metrics = runSingle(algorithm, graphPath, topology, nodeCount,
+                                            lossRate, load, seed, timeoutSlots, slotDurationMs, resultsDir, runId,
+                                            exportYaml, maxRecoveries, fadingStdDevDb);
+                                    MetricsCsvWriter.append(metricsCsv, metrics);
+                                } catch (Exception e) {
+                                    writeFailedRun(failedCsv, runId, algorithm, topology, nodeCount, lossRate,
+                                            load, seed, e.getMessage());
                                 }
                             }
                         }
@@ -143,12 +131,8 @@ public final class ExperimentBatchRunner {
             String topology,
             int nodeCount,
             double lossRate,
-            double failureRate,
             int load,
             long seed,
-            double silentRatio,
-            double faultyRatio,
-            int delayJitter,
             int timeoutSlots,
             Integer slotDurationMs,
             Path resultsDir,
@@ -162,8 +146,6 @@ public final class ExperimentBatchRunner {
                 : new ReflectionCtNodeFactory("ir.ac.kntu.concurrenttransmission.blueflood.nodes");
 
         NetGraph netGraph = NetGraph.loadFrom(graphPath.toString(), nodeFactory);
-        FaultModel faultModel = new FaultModel(lossRate, silentRatio, faultyRatio, delayJitter, seed)
-                .withNodes(netGraph.getNodes());
 
         MetricsCollector metricsCollector = new MetricsCollector(
                 runId,
@@ -172,7 +154,6 @@ public final class ExperimentBatchRunner {
                 netGraph.getNodeCount(),
                 topology,
                 lossRate,
-                failureRate,
                 load,
                 seed,
                 slotDurationMs);
@@ -181,13 +162,13 @@ public final class ExperimentBatchRunner {
         String author = System.getProperty("user.name", "Unknown Author");
         String scenarioName = algorithm.name() + "-" + runId;
         String scenarioDescription = "batch run " + runId + " topology=" + topology + " nodes="
-                + netGraph.getNodeCount() + " loss=" + lossRate + " failure=" + failureRate + " load=" + load
+                + netGraph.getNodeCount() + " loss=" + lossRate + " load=" + load
                 + " seed=" + seed;
 
         if (chaos) {
             ChaosApplication application = buildChaosApplication(algorithm, netGraph, lossRate, load);
             application.setMetricsCollector(metricsCollector);
-            application.setFaultModel(faultModel);
+            application.setRandomSeed(seed);
             application.setFadingStandardDeviationDb(fadingStdDevDb);
             application.configureScenarioMetadata(scenarioName, author, scenarioDescription);
             configureChaosListeners(algorithm, netGraph, application, load, maxRecoveries);
@@ -205,7 +186,6 @@ public final class ExperimentBatchRunner {
             int blueFloodRounds = computeBlueFloodRounds(algorithm, load, netGraph.getNodeCount());
             BlueFloodApplication application = buildBlueFloodApplication(netGraph, lossRate, blueFloodRounds);
             application.setMetricsCollector(metricsCollector);
-            application.setFaultModel(faultModel);
             application.setRandomSeed(seed);
             application.configureScenarioMetadata(scenarioName, author, scenarioDescription);
             configureBlueFloodListeners(algorithm, netGraph, application, load);
@@ -427,7 +407,6 @@ public final class ExperimentBatchRunner {
             String topology,
             int nodeCount,
             double lossRate,
-            double failureRate,
             int load,
             long seed,
             String error) throws IOException {
@@ -439,7 +418,7 @@ public final class ExperimentBatchRunner {
                 StandardOpenOption.APPEND)) {
             if (writeHeader) {
                 writer.write(String.join(",",
-                        List.of("runId", "algorithm", "topology", "nodeCount", "lossRate", "failureRate", "load",
+                        List.of("runId", "algorithm", "topology", "nodeCount", "lossRate", "load",
                                 "seed", "error")));
                 writer.newLine();
             }
@@ -449,7 +428,6 @@ public final class ExperimentBatchRunner {
                     topology,
                     String.valueOf(nodeCount),
                     String.valueOf(lossRate),
-                    String.valueOf(failureRate),
                     String.valueOf(load),
                     String.valueOf(seed),
                     escape(error)));

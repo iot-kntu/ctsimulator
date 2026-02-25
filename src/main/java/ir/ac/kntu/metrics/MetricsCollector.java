@@ -19,7 +19,6 @@ public final class MetricsCollector {
     private final int nNodes;
     private final String topology;
     private final double lossRate;
-    private final double failureRate;
     private final int load;
     private final long seed;
     private final Integer slotDurationMs;
@@ -45,7 +44,6 @@ public final class MetricsCollector {
                             int nNodes,
                             String topology,
                             double lossRate,
-                            double failureRate,
                             int load,
                             long seed,
                             Integer slotDurationMs) {
@@ -55,7 +53,6 @@ public final class MetricsCollector {
         this.nNodes = nNodes;
         this.topology = topology != null ? topology : "unknown";
         this.lossRate = lossRate;
-        this.failureRate = failureRate;
         this.load = load;
         this.seed = seed;
         this.slotDurationMs = slotDurationMs;
@@ -189,7 +186,6 @@ public final class MetricsCollector {
                 nNodes,
                 topology,
                 lossRate,
-                failureRate,
                 load,
                 seed,
                 decisionSuccess,

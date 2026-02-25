@@ -12,8 +12,6 @@ import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
 import ir.ac.kntu.concurrenttransmission.events.SimNewRoundEvent;
 import ir.ac.kntu.distributedsystems.paxos.wmultipaxos.WirelessMultiPaxos;
 import ir.ac.kntu.metrics.FailureReason;
-import ir.ac.kntu.metrics.FaultModel;
-import ir.ac.kntu.metrics.FaultModelProvider;
 import ir.ac.kntu.metrics.MetricsCollector;
 import ir.ac.kntu.metrics.MetricsEmitter;
 
@@ -33,7 +31,7 @@ import java.util.logging.Logger;
  * slots) is reached.
  */
 public class ChaosApplication extends AbstractConcurrentTransmissionApplication<ChaosNodeListener>
-        implements CtChaosApplication, MetricsEmitter, FaultModelProvider {
+        implements CtChaosApplication, MetricsEmitter {
 
     private static final Logger logger = Logger.getLogger(ChaosApplication.class.getSimpleName());
 
@@ -53,7 +51,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
     private boolean roundActive;
     private int roundsCompleted;
     private MetricsCollector metricsCollector;
-    private FaultModel faultModel;
+    private Random random = new Random();
     private long nextSlotTickTime = Long.MIN_VALUE;
 
     public ChaosApplication(ChaosSettings settings, ChaosStrategies strategies, NetGraph netGraph,
@@ -289,9 +287,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         FloodPacket<?> capturedPacket = selectPacketBySignal(packets, statefulReceiver, context);
 
         if (capturedPacket != null) {
-            boolean dropped = faultModel != null
-                    ? faultModel.shouldDropPacket()
-                    : Math.random() < settings.lossProbability();
+            boolean dropped = random.nextDouble() < settings.lossProbability();
             CtNetworkTime successTime = null;
             if (currentTime != null) {
                 successTime = determineEventTime(capturedPacket, currentTime);
@@ -468,20 +464,9 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         this.metricsCollector = metricsCollector;
     }
 
-    @Override
-    public FaultModel getFaultModel() {
-        return faultModel;
-    }
-
-    public void setFaultModel(FaultModel faultModel) {
-        this.faultModel = faultModel;
-        if (faultModel != null) {
-            signalModel.reseed(faultModel.seed() ^ 0xD1B54A32D192ED03L);
-        }
-        ConcurrentTransmissionPolicy policy = strategies.transmissionPolicy();
-        if (policy instanceof FaultAwareTransmissionPolicy aware) {
-            aware.setFaultModel(faultModel);
-        }
+    public void setRandomSeed(long seed) {
+        this.random = new Random(seed);
+        signalModel.reseed(seed ^ 0xD1B54A32D192ED03L);
     }
 
 
@@ -510,7 +495,7 @@ public class ChaosApplication extends AbstractConcurrentTransmissionApplication<
         ChaosScenarioRecorder.ScenarioMetadata metadata = scenarioRecorder.getMetadata();
         String slug = slugify(metadata.name());
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        Path directory = Path.of("logs");
+        Path directory = Path.of("results/_runs");
         Files.createDirectories(directory);
         return directory.resolve(slug + "_" + timestamp + ".yaml");
     }

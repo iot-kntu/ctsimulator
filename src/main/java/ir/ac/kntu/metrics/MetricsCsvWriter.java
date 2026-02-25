@@ -41,7 +41,7 @@ public final class MetricsCsvWriter {
             "throughput"
     );
 
-    private static final List<String> HEADERS = List.of(
+    private static final List<String> HEADERS_V2 = List.of(
             "runId",
             "algorithm",
             "framework",
@@ -49,6 +49,33 @@ public final class MetricsCsvWriter {
             "topology",
             "lossRate",
             "failureRate",
+            "load",
+            "seed",
+            "decisionSuccess",
+            "decisionLatencySlots",
+            "decisionLatencyMs",
+            "totalMessages",
+            "successfulMessages",
+            "failedMessages",
+            "failedCollision",
+            "failedDrop",
+            "failedSilent",
+            "failedFaulty",
+            "failedNotListening",
+            "p95Latency",
+            "p99Latency",
+            "throughput",
+            "totalDecisions",
+            "successfulDecisions"
+    );
+
+    private static final List<String> HEADERS = List.of(
+            "runId",
+            "algorithm",
+            "framework",
+            "nNodes",
+            "topology",
+            "lossRate",
             "load",
             "seed",
             "decisionSuccess",
@@ -104,7 +131,6 @@ public final class MetricsCsvWriter {
                 String.valueOf(metrics.nNodes()),
                 escape(metrics.topology()),
                 String.valueOf(metrics.lossRate()),
-                String.valueOf(metrics.failureRate()),
                 String.valueOf(metrics.load()),
                 String.valueOf(metrics.seed()),
                 String.valueOf(metrics.decisionSuccess()),
@@ -158,7 +184,10 @@ public final class MetricsCsvWriter {
         }
 
         String v1Header = String.join(",", HEADERS_V1);
-        if (!currentHeader.equals(v1Header)) {
+        String v2Header = String.join(",", HEADERS_V2);
+        boolean oldV1 = currentHeader.equals(v1Header);
+        boolean oldV2 = currentHeader.equals(v2Header);
+        if (!oldV1 && !oldV2) {
             // Unknown header; avoid rewriting user data.
             return;
         }
@@ -175,17 +204,23 @@ public final class MetricsCsvWriter {
                 continue;
             }
 
+            String lineWithoutFailureRate = removeColumnFromCsvLine(line, 6);
+            if (!oldV1) {
+                upgraded.add(lineWithoutFailureRate);
+                continue;
+            }
+
             String runId = extractRunId(line);
             if (runId.isBlank()) {
-                upgraded.add(line + ",,");
+                upgraded.add(lineWithoutFailureRate + ",,");
                 continue;
             }
 
             DecisionCounts counts = loadDecisionCounts(path.getParent(), runId);
             if (counts == null) {
-                upgraded.add(line + ",,");
+                upgraded.add(lineWithoutFailureRate + ",,");
             } else {
-                upgraded.add(line + "," + counts.totalDecisions + "," + counts.successfulDecisions);
+                upgraded.add(lineWithoutFailureRate + "," + counts.totalDecisions + "," + counts.successfulDecisions);
             }
         }
 
@@ -200,6 +235,51 @@ public final class MetricsCsvWriter {
             return "";
         }
         return csvLine.substring(0, comma).trim();
+    }
+
+    private static String removeColumnFromCsvLine(String csvLine, int columnIndex) {
+        List<String> columns = parseCsvLine(csvLine);
+        if (columnIndex >= 0 && columnIndex < columns.size()) {
+            columns.remove(columnIndex);
+        }
+        StringBuilder rebuilt = new StringBuilder();
+        for (int i = 0; i < columns.size(); i++) {
+            if (i > 0) {
+                rebuilt.append(',');
+            }
+            rebuilt.append(escape(columns.get(i)));
+        }
+        return rebuilt.toString();
+    }
+
+    private static List<String> parseCsvLine(String line) {
+        List<String> fields = new ArrayList<>();
+        if (line == null || line.isEmpty()) {
+            fields.add("");
+            return fields;
+        }
+        StringBuilder field = new StringBuilder();
+        boolean inQuotes = false;
+        for (int i = 0; i < line.length(); i++) {
+            char ch = line.charAt(i);
+            if (ch == '"') {
+                if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                    field.append('"');
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+                continue;
+            }
+            if (ch == ',' && !inQuotes) {
+                fields.add(field.toString());
+                field.setLength(0);
+                continue;
+            }
+            field.append(ch);
+        }
+        fields.add(field.toString());
+        return fields;
     }
 
     private static DecisionCounts loadDecisionCounts(Path resultsDir, String runId) {

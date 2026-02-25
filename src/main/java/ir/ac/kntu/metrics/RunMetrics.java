@@ -7,7 +7,6 @@ public record RunMetrics(
         int nNodes,
         String topology,
         double lossRate,
-        double failureRate,
         int load,
         long seed,
         double decisionSuccess,

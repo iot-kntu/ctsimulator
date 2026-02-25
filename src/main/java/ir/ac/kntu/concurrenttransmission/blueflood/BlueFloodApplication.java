@@ -6,8 +6,6 @@ import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimInitiateFloodEvent;
 import ir.ac.kntu.concurrenttransmission.events.SimNewRoundEvent;
 import ir.ac.kntu.metrics.FailureReason;
-import ir.ac.kntu.metrics.FaultModel;
-import ir.ac.kntu.metrics.FaultModelProvider;
 import ir.ac.kntu.metrics.MetricsCollector;
 import ir.ac.kntu.metrics.MetricsEmitter;
 
@@ -21,7 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BlueFloodApplication extends AbstractConcurrentTransmissionApplication<BlueFloodNodeListener>
-        implements CtBlueFloodApplication, MetricsEmitter, FaultModelProvider {
+        implements CtBlueFloodApplication, MetricsEmitter {
 
     public static double DEFAULT_INTERFERENCE_PROB = 0.9;
     protected final BlueFloodStrategies strategies;
@@ -31,7 +29,6 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
     private StateLogger stateLogger;
     private final BlueFloodScenarioRecorder scenarioRecorder = new BlueFloodScenarioRecorder();
     private MetricsCollector metricsCollector;
-    private FaultModel faultModel;
 
     public BlueFloodApplication(BlueFloodSettings settings, BlueFloodStrategies strategies) {
         this.settings = settings;
@@ -146,11 +143,10 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
                 strategies.transmissionPolicy().newPacketReceived(receiver, getSlot());
 
                 double receiveProbability = ctEvent.areMessagesSimilar()
-                        ? (faultModel != null ? faultModel.packetLossProb() : settings.lossProbability())
+                        ? settings.lossProbability()
                         : settings.conflictProbability();
 
-                Random rng = faultModel != null ? faultModel.runtimeRandom() : random;
-                if (rng.nextDouble() >= receiveProbability) { // no loss
+                if (random.nextDouble() >= receiveProbability) { // no loss
 
                     getLogger().log(Level.INFO, String.format("[t:%d-r:%d-s:%d] node[%d] received Pkt[%d]",
                             context.getTime(),
@@ -259,19 +255,6 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
         this.metricsCollector = metricsCollector;
     }
 
-    @Override
-    public FaultModel getFaultModel() {
-        return faultModel;
-    }
-
-    public void setFaultModel(FaultModel faultModel) {
-        this.faultModel = faultModel;
-        TransmissionPolicy policy = strategies.transmissionPolicy();
-        if (policy instanceof FaultAwareTransmissionPolicy aware) {
-            aware.setFaultModel(faultModel);
-        }
-    }
-
     public void setRandomSeed(long seed) {
         this.random = new Random(seed);
     }
@@ -347,7 +330,7 @@ public class BlueFloodApplication extends AbstractConcurrentTransmissionApplicat
         BlueFloodScenarioRecorder.ScenarioMetadata metadata = scenarioRecorder.getMetadata();
         String slug = slugify(metadata.name());
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        Path directory = Path.of("logs");
+        Path directory = Path.of("results/_runs");
         Files.createDirectories(directory);
         return directory.resolve(slug + "_" + timestamp + ".yaml");
     }

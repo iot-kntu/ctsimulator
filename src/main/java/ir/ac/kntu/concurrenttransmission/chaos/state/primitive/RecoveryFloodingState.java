@@ -35,18 +35,12 @@ public class RecoveryFloodingState implements NodeState {
 
         context.getSimulator().scheduleEvent(
                 Event.create("FinishedRecoveryFlood", endOfFloodTime, SimEventPriority.High, (ctx) -> {
-                    System.out.println("FinishedRecoveryFlood  flood :)");
-
                     if (ctx.getApplication() instanceof ChaosApplication chaosApp && !chaosApp.isRoundOpen()) {
-                        System.out.println("FinishedRecoveryFlood  flood :(((((((((((");
                         System.out.println(chaosApp.isRoundOpen());
                         return;
                     }
                     if (node.getCurrentState() instanceof RecoveryFloodingState) {
-
                         NodeState next = previousState != null ? previousState : new ListeningState();
-                        System.out.println("its ok!!!");
-                        System.out.println(next);
                         node.setState(next, ctx, true);
                     }
                 }));

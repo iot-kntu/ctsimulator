@@ -8,8 +8,18 @@ import ir.ac.kntu.experiment.ExperimentBatchRunner;
 
 public final class ExperimentBatchLauncher {
 
-    // private static final List<String> CONFIGS = List.of("configs/exp.yaml", "configs/exp2.yaml", "configs/star.yaml");
-    private static final List<String> CONFIGS = List.of("configs/star.yaml");
+    // private static final List<String> CONFIGS = List.of(
+    //         "configs/random/exp4.yaml",
+    //         "configs/random/exp6.yaml",
+    //         "configs/star/exp6.yaml",
+    //         "configs/star/exp8.yaml",
+    //         "configs/tree/exp6.yaml",
+    //         "configs/ring/exp6.yaml",
+    //         "configs/partial-mesh/exp6.yaml",
+    //         "configs/full-mesh/exp6.yaml",
+    //         "configs/line/exp6.yaml",
+    //         "configs/grid/exp6.yaml");
+    private static final List<String> CONFIGS = List.of("configs/grid/exp6.yaml");
 
     private ExperimentBatchLauncher() {
     }

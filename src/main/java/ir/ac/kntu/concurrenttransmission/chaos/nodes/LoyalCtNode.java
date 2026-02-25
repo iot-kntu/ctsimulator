@@ -10,8 +10,6 @@ import ir.ac.kntu.concurrenttransmission.chaos.state.primitive.RecoveryFloodingS
 import ir.ac.kntu.concurrenttransmission.events.Event;
 import ir.ac.kntu.concurrenttransmission.events.FloodPacket;
 import ir.ac.kntu.concurrenttransmission.events.SimEventPriority;
-import ir.ac.kntu.metrics.FailureReason;
-import ir.ac.kntu.metrics.FaultModel;
 import ir.ac.kntu.metrics.MetricsCollector;
 import ir.ac.kntu.metrics.MetricsEmitter;
 
@@ -29,9 +27,9 @@ public class LoyalCtNode implements StatefulNode {
 
     private final int id;
     private static final Logger logger = Logger.getLogger(LoyalCtNode.class.getSimpleName());
-    private static final int LISTEN_TIMEOUT_SLOTS = 4;
+    private static final int MIN_LISTEN_TIMEOUT_SLOTS = 5;
     private static final int BACKOFF_MIN_SLOTS = 1;
-    private static final int BACKOFF_MAX_SLOTS = 2;
+    private static final int BACKOFF_MAX_SLOTS = 5;
 
     private NodeState currentState;
     private NodeState pendingState;
@@ -43,7 +41,7 @@ public class LoyalCtNode implements StatefulNode {
     private long listeningSinceTime = Long.MIN_VALUE;
     private long pendingRecoveryTime = Long.MIN_VALUE;
     private int recoveryBackoffSlots = BACKOFF_MIN_SLOTS;
-    private long recoveryEpoch = 0;
+    // private long recoveryEpoch = 0;
     private final Random recoveryRandom;
 
     public LoyalCtNode(Integer id) {
@@ -196,28 +194,15 @@ public class LoyalCtNode implements StatefulNode {
                                                     // counter
                 : policy.getFloodRepeatCount();
         final List<CtNode> neighbors = context.getNetGraph().getNodeNeighbors(sender);
-        FaultModel faultModel = resolveFaultModel(context);
-        FailureReason suppression = suppressionReason(faultModel, sender);
         int round = resolveRound(context);
         MetricsCollector metrics = resolveMetrics(context);
 
-        if (suppression != null) {
-            for (CtNode node : neighbors) {
-                if (metrics != null) {
-                    metrics.recordSendSuppressed(round, sender.getId(), node.getId(), suppression);
-                }
-                recordScenarioFailure(context, sender.getId(), node.getId(), suppression);
-            }
-            return;
-        }
-
         for (int repeat = 0; repeat < repeatCount; repeat++) {
-            int jitter = faultModel != null ? faultModel.sampleJitterSlots() : 0;
             for (CtNode node : neighbors) {
                 if (metrics != null) {
                     metrics.recordSendAttempt(round, sender.getId(), node.getId());
                 }
-                final FloodPacket<T> floodPacket = new FloodPacket<>(context.getTime() + delay + repeat + jitter,
+                final FloodPacket<T> floodPacket = new FloodPacket<>(context.getTime() + delay + repeat,
                         message, sender, node);
                 context.getSimulator().schedulePacket(floodPacket);
             }
@@ -258,35 +243,6 @@ public class LoyalCtNode implements StatefulNode {
         return context.getApplication() instanceof MetricsEmitter emitter ? emitter.getMetricsCollector() : null;
     }
 
-    private FaultModel resolveFaultModel(ContextView context) {
-        return context.getApplication() instanceof ir.ac.kntu.metrics.FaultModelProvider provider
-                ? provider.getFaultModel()
-                : null;
-    }
-
-    private FailureReason suppressionReason(FaultModel faultModel, CtNode sender) {
-        if (faultModel == null || sender == null) {
-            return null;
-        }
-        if (faultModel.isSilent(sender.getId())) {
-            return FailureReason.SILENT;
-        }
-        if (faultModel.isFaulty(sender.getId())) {
-            return FailureReason.FAULTY;
-        }
-        return null;
-    }
-
-    private void recordScenarioFailure(ContextView context, int from, int to, FailureReason reason) {
-        if (context.getApplication() instanceof ChaosApplication chaosApp) {
-            CtNetworkTime time = context.getApplication().getNetworkTime();
-            if (time != null) {
-                chaosApp.getScenarioRecorder().recordEvent(time,
-                        ChaosScenarioRecorder.TransmissionEvent.failure("flood", from, to, reason));
-            }
-        }
-    }
-
     private void maybeScheduleRecovery(ContextView context) {
         if (context == null || currentState == null || !currentState.isListening()) {
             return;
@@ -303,7 +259,7 @@ public class LoyalCtNode implements StatefulNode {
         }
         long scheduledAt = now;
         long scheduledTime = now + 1;
-        long scheduledEpoch = recoveryEpoch;
+        // long scheduledEpoch = recoveryEpoch;
         pendingRecoveryTime = scheduledTime;
 
         context.getSimulator().scheduleEvent(
@@ -311,16 +267,7 @@ public class LoyalCtNode implements StatefulNode {
                     if (currentState == null || !currentState.isListening()) {
                         invalidateRecovery();
                         return;
-                    }
-                    // System.out.println(1);
-                    // if (pendingRecoveryTime != scheduledTime) {
-                    // return;
-                    // }
-                    // System.out.println(2);
-                    // if (recoveryEpoch != scheduledEpoch) {
-                    // return;
-                    // }
-                    // System.out.println(3);
+                    }                
                     if (lastProgressTime > scheduledAt) {
                         invalidateRecovery();
                         return;
@@ -333,21 +280,29 @@ public class LoyalCtNode implements StatefulNode {
     }
 
     private int sampleRecoveryBackoff(ContextView context) {
-        FaultModel faultModel = resolveFaultModel(context);
-        Random rng = faultModel != null ? faultModel.runtimeRandom() : recoveryRandom;
+        Random rng = recoveryRandom;
         int range = BACKOFF_MAX_SLOTS - BACKOFF_MIN_SLOTS + 1;
+        int listenTimeoutSlots = resolveListenTimeoutSlots(context);
         if (range <= 0) {
-            return BACKOFF_MIN_SLOTS + LISTEN_TIMEOUT_SLOTS;
+            return BACKOFF_MIN_SLOTS + listenTimeoutSlots;
         }
 
         int b = rng.nextInt(range);
-        int result = b + LISTEN_TIMEOUT_SLOTS;
+        int result = b + listenTimeoutSlots;
 
         return result;
     }
 
+    private int resolveListenTimeoutSlots(ContextView context) {
+        if (context == null || context.getNetGraph() == null) {
+            return MIN_LISTEN_TIMEOUT_SLOTS;
+        }
+        int diameterBased = (context.getNetGraph().getDiameter() * 2) + 1;
+        return Math.max(MIN_LISTEN_TIMEOUT_SLOTS, diameterBased);
+    }
+
     private void invalidateRecovery() {
         pendingRecoveryTime = Long.MIN_VALUE;
-        recoveryEpoch++;
+        // recoveryEpoch++;
     }
 }

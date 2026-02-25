@@ -6,7 +6,6 @@ public record ExperimentConfig(
         List<String> algorithms,
         List<Integer> nodeCounts,
         List<Double> lossRates,
-        List<Double> failureRates,
         List<Integer> loads,
         List<Long> seeds,
         List<String> topologyTypes,
@@ -16,21 +15,13 @@ public record ExperimentConfig(
         Integer maxRecoveries,
         Double fadingStdDevDb,
         String resultsDir,
-        Boolean exportYaml,
-        FaultModelConfig faultModel
+        Boolean exportYaml
 ) {
 
     public record TopologyConfig(
             String name,
             int nodeCount,
             String graphPath
-    ) {
-    }
-
-    public record FaultModelConfig(
-            Double silentNodeRatio,
-            Double faultyNodeRatio,
-            Integer delayJitterSlots
     ) {
     }
 }
