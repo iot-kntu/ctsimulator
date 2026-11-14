@@ -1,0 +1,11 @@
+# Rust build artifacts
+/target
+
+# Simulator output
+/results
+/sweep_results
+
+# OS / editor files
+.DS_Store
+.idea/
+.vscode/
