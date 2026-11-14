@@ -1,0 +1,17 @@
+# Paxos over the CI pipeline (Constructive-Interference, deterministic flood rounds).
+# Reference operating point used throughout the paper: N=27, random graph, 5% loss.
+seed = 42
+phy_mode = "ci"
+protocol = "paxos_pipeline"
+num_proposals = 100
+snapshot_interval = 1
+max_slots = 100000
+
+[network]
+num_nodes = 27
+topology = "random"      # full_mesh | partial_mesh | random | scale_free | line | grid | ring | star | tree
+loss_rate = 0.05         # i.i.d. per-link packet-loss probability, [0.0, 1.0)
+
+[ci]
+flood_repeats = 1        # re-transmissions per node per flood round (R)
+# round_slots = 12       # optional; default = (diameter + 2) * flood_repeats
