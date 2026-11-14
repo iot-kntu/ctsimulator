@@ -1,0 +1,42 @@
+# Citation metadata for CTSim (Citation File Format 1.2.0).
+#
+# Author names, the release date and the paper reference are filled in when the
+# first tagged release is made. GitHub shows its "Cite this repository" button
+# only once the author names below are filled in.
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "CTSim: a slot-based simulator for consensus over concurrent transmissions"
+abstract: >-
+  CTSim simulates multi-hop, time-slotted low-power wireless networks and runs
+  Paxos, two-phase commit, and total-order multicast over two concurrent-
+  transmission physical layers: constructive interference (deterministic,
+  pipelined flood rounds) and the capture effect (goal-based rounds with
+  in-network merge).
+type: software
+repository-code: "https://github.com/iot-kntu/ctsimulator"
+# ---------------------------------------------------------------------------
+# Authors — to be filled in before the first release.
+#   family-names : surname, exactly as in your papers
+#   given-names  : first name(s), exactly as in your papers
+#   orcid        : optional, full URL, e.g. https://orcid.org/0000-0002-1825-0097
+# Order here = author order in the citation.
+# Do not add e-mail addresses (this repository is public).
+# ---------------------------------------------------------------------------
+authors:
+  - family-names: ""
+    given-names: ""
+    affiliation: "K. N. Toosi University of Technology"
+    # orcid: ""
+  - family-names: ""
+    given-names: ""
+    affiliation: "K. N. Toosi University of Technology"
+    # orcid: ""
+license: GPL-3.0-only
+version: "0.1.0"
+keywords:
+  - distributed consensus
+  - concurrent transmissions
+  - constructive interference
+  - capture effect
+  - low-power wireless
+  - network simulation
