@@ -1,0 +1,16 @@
+# Paxos over the CE baseline (Capture-Effect, Chaos-style in-network merge).
+seed = 42
+phy_mode = "ce"
+protocol = "paxos_ce"
+num_proposals = 100
+snapshot_interval = 1
+max_slots = 100000
+
+[network]
+num_nodes = 27
+topology = "random"
+loss_rate = 0.05
+
+[ce]
+listen_timeout = 5       # slots of no-progress before a random re-flood
+max_round_slots = 300    # hard cap before a CE round is declared failed

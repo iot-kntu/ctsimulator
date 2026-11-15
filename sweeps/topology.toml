@@ -1,0 +1,19 @@
+# Topology sensitivity sweep (P2)
+# Fixed N and loss; vary graph structure.
+output_dir = "results/topology"
+
+seeds = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]  # Multiple seeds for error bands
+num_nodes = [27]
+topologies = ["line", "partial_mesh", "random", "scale_free", "full_mesh"]
+loss_rates = [0.05]
+flood_repeats = [1]
+
+ci_protocols = ["paxos_pipeline", "2pc_pipeline", "tom_pipeline"]
+ce_protocols = ["paxos_ce", "2pc_ce", "tom_ce"]
+
+num_proposals = 100
+snapshot_interval = 50
+max_slots = 100000
+abort_probability = 0.0
+listen_timeout = 5
+max_round_slots = 512

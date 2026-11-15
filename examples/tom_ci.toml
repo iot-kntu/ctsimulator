@@ -1,0 +1,15 @@
+# Total-Order Multicast over the CI pipeline (distributed sequencing).
+seed = 42
+phy_mode = "ci"
+protocol = "tom_pipeline"
+num_proposals = 100
+snapshot_interval = 1
+max_slots = 100000
+
+[network]
+num_nodes = 27
+topology = "random"
+loss_rate = 0.05
+
+[ci]
+flood_repeats = 1

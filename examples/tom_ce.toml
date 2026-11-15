@@ -1,0 +1,16 @@
+# Total-Order Multicast over the CE baseline (central-sequencer style).
+seed = 42
+phy_mode = "ce"
+protocol = "tom_ce"
+num_proposals = 100
+snapshot_interval = 1
+max_slots = 100000
+
+[network]
+num_nodes = 27
+topology = "random"
+loss_rate = 0.05
+
+[ce]
+listen_timeout = 5
+max_round_slots = 300

@@ -1,0 +1,25 @@
+[package]
+name = "ctsim"
+version = "0.1.0"
+edition = "2021"
+default-run = "ctsim"
+rust-version = "1.74"
+description = "Slot-based simulator for consensus over concurrent transmissions (CI/CE) in low-power wireless networks"
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/iot-kntu/ctsimulator"
+keywords = ["simulation", "consensus", "wireless", "networking", "research"]
+categories = ["simulation", "science"]
+
+[dependencies]
+indicatif = "0.18.6"
+rand = "0.8"
+rand_chacha = "0.3"
+rayon = "1.12.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1.0.150"
+toml = "0.8"
+
+[profile.release]
+# Sweeps run thousands of cells; keep full optimisation.
+opt-level = 3
