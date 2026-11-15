@@ -138,9 +138,8 @@ when slot counts are converted to wall-clock time.
 
 ## Citation
 
-If you use CTSim in your research, please cite it — see
-[`CITATION.cff`](CITATION.cff). Author and paper details are added on
-publication.
+If you use CTSim in your research, please cite the accompanying paper. The
+reference will be added here once the paper is published.
 
 ## License
 
