@@ -1,8 +1,7 @@
 # Citation metadata for CTSim (Citation File Format 1.2.0).
 #
-# Author names, the release date and the paper reference are filled in when the
-# first tagged release is made. GitHub shows its "Cite this repository" button
-# only once the author names below are filled in.
+# The release date and the paper reference are added with the first tagged
+# release.
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "CTSim: a slot-based simulator for consensus over concurrent transmissions"
@@ -14,23 +13,15 @@ abstract: >-
   in-network merge).
 type: software
 repository-code: "https://github.com/iot-kntu/ctsimulator"
-# ---------------------------------------------------------------------------
-# Authors — to be filled in before the first release.
-#   family-names : surname, exactly as in your papers
-#   given-names  : first name(s), exactly as in your papers
-#   orcid        : optional, full URL, e.g. https://orcid.org/0000-0002-1825-0097
-# Order here = author order in the citation.
-# Do not add e-mail addresses (this repository is public).
-# ---------------------------------------------------------------------------
+# Author order here is the author order in the citation.
 authors:
-  - family-names: ""
-    given-names: ""
+  - family-names: "Khanmirza"
+    given-names: "Hamed"
     affiliation: "K. N. Toosi University of Technology"
-    # orcid: ""
-  - family-names: ""
-    given-names: ""
+    orcid: "https://orcid.org/0000-0001-6005-2732"
+  - family-names: "Sadeghi"
+    given-names: "Amir Hossein"
     affiliation: "K. N. Toosi University of Technology"
-    # orcid: ""
 license: GPL-3.0-only
 version: "0.1.0"
 keywords:
